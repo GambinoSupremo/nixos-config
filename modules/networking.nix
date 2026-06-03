@@ -22,7 +22,7 @@
   # DNSSEC must be false — it breaks Mullvad's DNS.
   services.resolved = {
     enable  = true;
-    dnssec  = "false";
+    settings.Resolve.DNSSEC = "false";
     # Don't set domains = [ "~." ] here — let Mullvad manage the split-tunnel DNS
   };
 }

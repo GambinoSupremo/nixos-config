@@ -123,10 +123,10 @@
 
   # ── Git ───────────────────────────────────────────────────────────────────────
   programs.git = {
-    enable      = true;
-    userName    = "Gavin";
-    userEmail   = "";
-    extraConfig = {
+    enable   = true;
+    settings = {
+      user.name        = "Gavin";
+      user.email       = "";
       init.defaultBranch   = "main";
       push.autoSetupRemote = true;
     };
