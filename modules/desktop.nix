@@ -24,11 +24,11 @@
     wayland.enable = true;
     # MangoWM registers itself as a session via addLoginEntry (default: true).
     # On physical machine, set MangoWM as the default:
-    defaultSession = "mango";   # override to "niri" in hosts/vm/default.nix if desired
+    # defaultSession = "mango";   # override to "niri" in hosts/vm/default.nix if desired
     # sddm-silent-theme-git is AUR-only; package it yourself or leave unset for now.
     # theme = "sddm-silent";
   };
-
+  services.displayManager.defaultSession = "mango";
   # ── XDG Portals ───────────────────────────────────────────────────────────────
   # Two compositors, two portal needs:
   #   MangoWM (wlroots) → xdg-desktop-portal-wlr for screencasting
@@ -78,15 +78,11 @@
       cantarell-fonts
       noto-fonts
       noto-fonts-cjk-sans       # was noto-fonts-cjk
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       dejavu_fonts              # was ttf-dejavu
       liberation_ttf            # was ttf-liberation
-      open-sans                 # was ttf-opensans
-      bitstream-vera            # was ttf-bitstream-vera
-      awesome-terminal-fonts
       # nixpkgs 24.11+ split style — if this errors try:
       # (nerdfonts.override { fonts = [ "Meslo" ]; })
-      nerd-fonts.meslo-lg
     ];
     fontconfig.defaultFonts = {
       serif     = [ "Noto Serif" ];
