@@ -3,7 +3,7 @@
 {
   # ── Boot ─────────────────────────────────────────────────────────────────────
   boot.loader.systemd-boot.enable      = true;
-  boot.loader.efi.canTouchEfiVars      = true;
+  boot.loader.efi.canTouchEfiVariables      = true;
 
   # nixos-unstable ships recent kernels.
   # linux-cachyos (BORE scheduler, NTSYNC, etc.) is NOT in nixpkgs.

@@ -71,7 +71,7 @@
   # ── Profile Sync Daemon ───────────────────────────────────────────────────────
   # Moves browser profiles to tmpfs for speed and SSD longevity.
   # Verify this option path against your nixpkgs revision if it errors.
-  services.psd.enable = true;
+  # services.psd.enable = true;  # verify module exists
 
   # ── Power profiles daemon ─────────────────────────────────────────────────────
   services.power-profiles-daemon.enable = true;
