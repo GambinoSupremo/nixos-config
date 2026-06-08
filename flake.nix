@@ -1,3 +1,4 @@
+
 {
   description = "gav's nixos configuration";
 
@@ -23,8 +24,8 @@
     };
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    chaotic-nyx.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-    hyprland.url = "github:hyprwm/Hyprland";
+    chaotic-nyx.url    = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    hyprland.url       = "github:hyprwm/Hyprland";
 
     mangowm = {
       url = "github:mangowm/mango";
@@ -38,65 +39,58 @@
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Raw dotfiles — not a flake, just a source tree
+    dotfiles = {
+      url   = "github:GambinoSupremo/dotfiles";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, chaotic-nyx, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, chaotic-nyx, ... }@inputs:
+  let
+    hmConfig = users: {
+      home-manager = {
+        useGlobalPkgs    = true;
+        useUserPackages  = true;
+        extraSpecialArgs = { inherit inputs; };
+        inherit users;
+      };
+    };
+  in {
     nixosConfigurations = {
-      
-      # Proxmox VM
+
       vm = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        system      = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
           ./hosts/vm/default.nix
           home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              users.gav = import ./home/default.nix;
-            };
-          }
+          (hmConfig { gav = import ./home/default.nix; })
         ];
       };
 
-      # Physical Desktop
       gavin-pc = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        system      = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
           ./hosts/desktop/default.nix
           chaotic-nyx.nixosModules.default
           home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              users.gav = import ./home/default.nix;
-            };
-          }
+          (hmConfig { gav = import ./home/default.nix; })
         ];
       };
 
-      # Future Laptop
       gavin-laptop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        system      = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
           ./hosts/laptop/default.nix
           home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              users.gav = import ./home/default.nix;
-            };
-          }
+          (hmConfig { gav = import ./home/default.nix; })
         ];
       };
     };
   };
 }
+
