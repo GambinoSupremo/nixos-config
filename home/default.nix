@@ -165,7 +165,7 @@
 
   # ── Packages ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "Meslo" ]; })
+    nerd-fonts.meslo-lg
     noto-fonts noto-fonts-cjk-sans noto-fonts-emoji
     liberation_ttf dejavu_fonts open-sans font-awesome
 
