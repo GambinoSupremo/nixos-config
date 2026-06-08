@@ -19,9 +19,6 @@
   };
 
   # ── Display Manager — greetd + tuigreet ───────────────────────────────────────
-  # tuigreet reads /share/wayland-sessions to list available compositors.
-  # MangoWM and Niri both register session files via their NixOS modules.
-  # The VM host overrides the default_session command to drop straight into Niri.
   services.greetd = {
     enable = true;
     settings = {
@@ -37,10 +34,10 @@
     };
   };
 
-  # Suppress the greetd "Welcome to..." getty on tty1 competing with the greeter
   systemd.services.greetd.serviceConfig.TTYPath = "/dev/tty2";
 
   # ── XDG Portals ───────────────────────────────────────────────────────────────
+  # MangoWM's NixOS module owns the `mango` portal config — we don't set it here.
   xdg.portal = {
     enable       = true;
     extraPortals = with pkgs; [
@@ -49,16 +46,14 @@
       xdg-desktop-portal-gtk
     ];
     config = {
-      mango = {
-        default = [ "wlr" "gtk" ];
-        "org.freedesktop.impl.portal.ScreenCast"  = [ "wlr" ];
-        "org.freedesktop.impl.portal.Screenshot"  = [ "wlr" ];
-        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
-      };
       niri = {
         default = [ "gnome" "gtk" ];
         "org.freedesktop.impl.portal.ScreenCast"  = [ "gnome" ];
         "org.freedesktop.impl.portal.Screenshot"  = [ "gnome" ];
+        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+      };
+      hyprland = {
+        default = [ "hyprland" "gtk" ];
         "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
       };
       common = {
