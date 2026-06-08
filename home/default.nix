@@ -166,7 +166,7 @@
   # ── Packages ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [
     nerd-fonts.meslo-lg
-    noto-fonts noto-fonts-cjk-sans noto-fonts-emoji
+    noto-fonts noto-fonts-cjk-sans noto-fonts-color-emoji
     liberation_ttf dejavu_fonts open-sans font-awesome
 
     sway labwc
