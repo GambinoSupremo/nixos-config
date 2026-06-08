@@ -124,7 +124,7 @@
     font-hinting      = "slight";
   };
 
-  qt = { enable = true; platformTheme.name = "qtct"; style.name = "kvantum"; };
+  qt = { enable = true; platformTheme.name = "qtct"; style.name = "kdePackages.qtstyleplugin-kvantum"; };
 
   # ── WM configs from dotfiles repo ─────────────────────────────────────────────
   xdg.configFile = {
@@ -179,7 +179,7 @@
     fuzzel cliphist grim slurp wl-clipboard wtype wev
     nautilus zathura gnome-disk-utility
     duf glances fastfetch tree pv lsd
-    matugen kvantum nwg-look papirus-icon-theme nordzy-icon-theme
+    matugen kdePackages.qtstyleplugin-kvantum nwg-look papirus-icon-theme nordzy-icon-theme
     pavucontrol stow pokemon-colorscripts
   ];
 }
