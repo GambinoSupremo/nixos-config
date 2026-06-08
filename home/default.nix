@@ -5,9 +5,9 @@
     inputs.noctalia.homeModules.default
   ];
 
-  home.username = "gav";
+  home.username      = "gav";
   home.homeDirectory = "/home/gav";
-  home.stateVersion = "24.05";
+  home.stateVersion  = "24.05";
   programs.home-manager.enable = true;
 
   # ── Noctalia Shell ────────────────────────────────────────────────────────────
@@ -15,66 +15,59 @@
     enable = true;
     settings = {
       wallpaper = {
-        enabled = true;
-        directory = "/home/gav/Pictures/backgrounds";
-        automationEnabled = true;
+        enabled             = true;
+        directory           = "/home/gav/Pictures/backgrounds";
+        automationEnabled   = true;
         wallpaperChangeMode = "random";
-        randomIntervalSec = 2700;
+        randomIntervalSec   = 2700;
       };
       appLauncher = {
-        iconMode = "tabler";
-        terminalCommand = "ghostty --";
+        iconMode               = "tabler";
+        terminalCommand        = "ghostty --";
         enableClipboardHistory = true;
-        sortByMostUsed = true;
+        sortByMostUsed         = true;
       };
-      colorSchemes = {
-        darkMode = true;
-      };
+      colorSchemes.darkMode = true;
     };
   };
 
-  # ── Shell & Terminal ────────────────────────────────────────────────────────
+  # ── Shell ─────────────────────────────────────────────────────────────────────
   programs.fish = {
     enable = true;
-    interactiveShellInit = ''
-      set fish_greeting ""
-    '';
+    interactiveShellInit = ''set fish_greeting ""'';
     shellAliases = {
-      ls = "eza --icons --group-directories-first";
-      cat = "bat --style=plain";
+      ls   = "eza --icons --group-directories-first";
+      cat  = "bat --style=plain";
       grep = "rg";
     };
   };
 
   programs.starship = {
-    enable = true;
+    enable                = true;
     enableFishIntegration = true;
     settings = {
       palette = "noctalia";
-      palettes.noctalia = {
-        purple = "#bd93f9";
-        cyan = "#8be9fd";
-      };
-      character = {
-        success_symbol = "[❯](cyan)";
-        error_symbol = "[❯](red)";
-      };
-      os = { disabled = false; };
+      palettes.noctalia = { purple = "#bd93f9"; cyan = "#8be9fd"; };
+      character   = { success_symbol = "[❯](cyan)"; error_symbol = "[❯](red)"; };
+      os          = { disabled = false; };
       git_metrics = { disabled = false; };
-      line_break = { disabled = false; };
+      line_break  = { disabled = false; };
     };
   };
 
+  # ── Terminals ─────────────────────────────────────────────────────────────────
   programs.ghostty = {
     enable = true;
     settings = {
-      font-family = "MesloLGS Nerd Font";
-      font-size = 12;
+      font-family        = "MesloLGS Nerd Font";
+      font-size          = 12;
       background-opacity = 0.7;
-      window-decoration = false;
-      cursor-style = "block";
-      window-padding-x = 12;
-      window-padding-y = 12;
+      window-decoration  = false;
+      cursor-style       = "block";
+      cursor-style-blink = true;
+      window-padding-x   = 12;
+      window-padding-y   = 12;
+      scrollback-limit   = 3023;
       keybind = [ "ctrl+c=copy_to_clipboard" "ctrl+v=paste_from_clipboard" ];
       command = "fish -C 'pokemon-colorscripts --no-title -r 2>/dev/null || true'";
     };
@@ -82,57 +75,95 @@
 
   programs.kitty = {
     enable = true;
-    font = { name = "MesloLGS Nerd Font"; size = 12; };
+    font   = { name = "MesloLGS Nerd Font"; size = 12; };
     settings = {
-      background_opacity = "0.7";
-      window_padding_width = 12;
+      background_opacity      = "0.7";
+      window_padding_width    = 12;
       hide_window_decorations = "yes";
     };
   };
 
+  # ── Editors ───────────────────────────────────────────────────────────────────
   programs.neovim = {
-    enable = true;
+    enable        = true;
     defaultEditor = true;
-    extraPackages = with pkgs; [ gcc ripgrep fd nodejs_22 python311 ];
+    extraPackages = with pkgs; [ gcc ripgrep fd nodejs_22 python3 ];
   };
 
-  programs.tmux = { enable = true; mouse = true; keyMode = "vi"; };
-  programs.zoxide = { enable = true; enableFishIntegration = true; options = [ "--cmd cd" ]; };
-  programs.fzf = { enable = true; enableFishIntegration = false; };
-  programs.bat = { enable = true; config.theme = "base16"; };
-  programs.eza = { enable = true; };
-  programs.btop = { enable = true; };
-  programs.yazi = { enable = true; enableFishIntegration = true; };
-
+  # ── Dev tools ─────────────────────────────────────────────────────────────────
   programs.git = {
-    enable = true;
-    userName = "Gavin Turner";
+    enable    = true;
+    userName  = "Gavin Turner";
     userEmail = "service.haiku882@passinbox.com";
-    extraConfig = { credential.helper = "github"; };
+    extraConfig.credential.helper = "github";
   };
   programs.gh.enable = true;
 
-  # ── GTK & Qt Theming ────────────────────────────────────────────────────────
+  # ── CLI utilities ─────────────────────────────────────────────────────────────
+  programs.tmux   = { enable = true; mouse = true; keyMode = "vi"; };
+  programs.zoxide = { enable = true; enableFishIntegration = true; options = [ "--cmd cd" ]; };
+  programs.fzf    = { enable = true; enableFishIntegration = false; };
+  programs.bat    = { enable = true; config.theme = "base16"; };
+  programs.eza    = { enable = true; };
+  programs.btop   = { enable = true; };
+  programs.yazi   = { enable = true; enableFishIntegration = true; };
+
+  # ── GTK & Qt ──────────────────────────────────────────────────────────────────
   gtk = {
-    enable = true;
-    theme = { name = "adw-gtk3-dark"; package = pkgs.adw-gtk3; };
-    iconTheme = { name = "Tela-pink-dark"; package = pkgs.tela-icon-theme; };
-    cursorTheme = { name = "Bibata-Modern-Ice"; package = pkgs.bibata-cursors; size = 24; };
-    font = { name = "Adwaita Sans"; size = 11; };
+    enable      = true;
+    theme       = { name = "adw-gtk3-dark";      package = pkgs.adw-gtk3; };
+    iconTheme   = { name = "Tela-pink-dark";     package = pkgs.tela-icon-theme; };
+    cursorTheme = { name = "Bibata-Modern-Ice";  package = pkgs.bibata-cursors; size = 24; };
+    font        = { name = "Adwaita Sans"; size = 11; };
   };
 
-  dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-      accent-color = "teal";
-      font-antialiasing = "grayscale";
-      font-hinting = "slight";
-    };
+  dconf.settings."org/gnome/desktop/interface" = {
+    color-scheme      = "prefer-dark";
+    accent-color      = "teal";
+    font-antialiasing = "grayscale";
+    font-hinting      = "slight";
   };
 
   qt = { enable = true; platformTheme.name = "qtct"; style.name = "kvantum"; };
 
-  # ── Fonts & Packages ────────────────────────────────────────────────────────
+  # ── WM configs from dotfiles repo ─────────────────────────────────────────────
+  xdg.configFile = {
+    # Niri: patch config.kdl so noctalia.kdl includes are optional.
+    # Noctalia writes ~/.config/niri/noctalia.kdl at runtime — we must not
+    # deploy it as a read-only nix store symlink or Noctalia can't update it.
+    "niri/config.kdl".source = pkgs.runCommand "niri-config.kdl" {} ''
+      sed 's|^include "./noctalia.kdl"|include optional=true "./noctalia.kdl"|g' \
+        ${inputs.dotfiles}/niri/config.kdl > $out
+    '';
+    "niri/binds.kdl".source       = "${inputs.dotfiles}/niri/binds.kdl";
+    "niri/windowrules.kdl".source = "${inputs.dotfiles}/niri/windowrules.kdl";
+    "niri/alttab.kdl".source      = "${inputs.dotfiles}/niri/alttab.kdl";
+    "niri/outputs.kdl".source     = "${inputs.dotfiles}/niri/outputs.kdl";
+    # cursor.kdl is empty and included optional=true — skip it
+    # noctalia.kdl is NOT deployed — Noctalia manages it at runtime
+
+    # Mango: autostart.conf patches out the Arch-specific portal exec-once
+    # (NixOS activates portals via D-Bus, not exec-once).
+    # bind.conf patches out the hardcoded /usr/bin/ghostty path.
+    # noctalia.conf is NOT deployed — Noctalia manages it at runtime.
+    "mango/config.conf".source  = "${inputs.dotfiles}/mango/config.conf";
+    "mango/monitor.conf".source = "${inputs.dotfiles}/mango/monitor.conf";
+    "mango/tag.conf".source     = "${inputs.dotfiles}/mango/tag.conf";
+    "mango/rule.conf".source    = "${inputs.dotfiles}/mango/rule.conf";
+    "mango/env.conf".source     = "${inputs.dotfiles}/mango/env.conf";
+
+    "mango/autostart.conf".source = pkgs.runCommand "mango-autostart.conf" {} ''
+      grep -v '/usr/lib/xdg-desktop-portal' \
+        ${inputs.dotfiles}/mango/autostart.conf > $out
+    '';
+
+    "mango/bind.conf".source = pkgs.runCommand "mango-bind.conf" {} ''
+      sed 's|/usr/bin/ghostty|ghostty|g' \
+        ${inputs.dotfiles}/mango/bind.conf > $out
+    '';
+  };
+
+  # ── Packages ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [
     (nerdfonts.override { fonts = [ "Meslo" ]; })
     noto-fonts noto-fonts-cjk-sans noto-fonts-emoji
@@ -141,14 +172,14 @@
     sway labwc
     inputs.zen-browser.packages."${pkgs.system}".default
     vivaldi vesktop signal-desktop element-desktop telegram-desktop
-    tidal-hifi cider spotify spicetify-cli mpv vlc obs-studio cava playerctl
-    obsidian lunatask meld qbittorrent
+    spotify mpv vlc obs-studio cava playerctl
+    obsidian meld qbittorrent
     zed-editor ollama mullvad-vpn
-    polychromatic input-remapper keyd
-    fuzzel walker cliphist grim slurp wl-clipboard wtype wev
+    polychromatic input-remapper
+    fuzzel cliphist grim slurp wl-clipboard wtype wev
     nautilus zathura gnome-disk-utility
     duf glances fastfetch tree pv lsd
     matugen kvantum nwg-look papirus-icon-theme nordzy-icon-theme
-    pavucontrol stow
+    pavucontrol stow pokemon-colorscripts
   ];
 }
