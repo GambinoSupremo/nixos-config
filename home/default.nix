@@ -161,6 +161,21 @@
       sed 's|/usr/bin/ghostty|ghostty|g' \
         ${inputs.dotfiles}/mango/bind.conf > $out
     '';
+
+    # Hyprland — deploy all lua config files from dotfiles.
+    # noctalia.lua and noctalia/noctalia-colors.conf are NOT deployed —
+    # Noctalia writes them at runtime. hyprland.conf already has
+    # `source = optional:...` so Hyprland starts cleanly before Noctalia runs.
+    "hypr/hyprland.conf".source  = "${inputs.dotfiles}/hypr/hyprland.conf";
+    "hypr/hyprland.lua".source   = "${inputs.dotfiles}/hypr/hyprland.lua";
+    "hypr/autostart.lua".source  = "${inputs.dotfiles}/hypr/autostart.lua";
+    "hypr/bind.lua".source       = "${inputs.dotfiles}/hypr/bind.lua";
+    "hypr/config.lua".source     = "${inputs.dotfiles}/hypr/config.lua";
+    "hypr/env.lua".source        = "${inputs.dotfiles}/hypr/env.lua";
+    "hypr/monitor.lua".source    = "${inputs.dotfiles}/hypr/monitor.lua";
+    "hypr/rule.lua".source       = "${inputs.dotfiles}/hypr/rule.lua";
+    "hypr/theme.lua".source      = "${inputs.dotfiles}/hypr/theme.lua";
+    "hypr/workspaces.lua".source = "${inputs.dotfiles}/hypr/workspaces.lua";
   };
 
   # ── Packages ──────────────────────────────────────────────────────────────────
