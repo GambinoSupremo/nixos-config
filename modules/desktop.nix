@@ -12,6 +12,12 @@
 
   programs.niri.enable = true;
 
+  # Hyprland — tertiary compositor
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+  };
+
   # ── Display Manager — greetd + tuigreet ───────────────────────────────────────
   # tuigreet reads /share/wayland-sessions to list available compositors.
   # MangoWM and Niri both register session files via their NixOS modules.
