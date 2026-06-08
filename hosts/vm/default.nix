@@ -14,8 +14,18 @@
 
   networking.hostName = "nix-vm";
 
-  # Override the greetd session from desktop.nix to drop straight into Niri for the VM
-  services.greetd.settings.default_session.command = lib.mkForce "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd niri-session";
+  # Autologin directly into Niri — no session picker needed on a dev VM.
+  # initial_session runs once on boot; after logout it falls back to tuigreet.
+  services.greetd.settings = lib.mkForce {
+    default_session = {
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd niri-session";
+      user    = "greeter";
+    };
+    initial_session = {
+      command = "niri-session";
+      user    = "gav";
+    };
+  };
 
   # QEMU guest agent — graceful shutdown, snapshot integration with Proxmox
   services.qemuGuest.enable = true;
@@ -23,14 +33,13 @@
   # SPICE agent — clipboard passthrough + dynamic resolution in Proxmox console
   services.spice-vdagentd.enable = true;
 
-  # VM has no GPU — disable anything that needs hardware acceleration
   hardware.graphics.enable = true;
 
-  # Disable services that don't make sense in a VM
-  services.sunshine.enable      = lib.mkForce false;  # needs KMS capture
-  hardware.openrazer.enable     = lib.mkForce false;  # no Razer hardware in VM
-  hardware.bluetooth.enable     = lib.mkForce false;  # no BT in VM
+  # Disable services that do not make sense in a VM
+  services.sunshine.enable      = lib.mkForce false;
+  hardware.openrazer.enable     = lib.mkForce false;
+  hardware.bluetooth.enable     = lib.mkForce false;
   services.blueman.enable       = lib.mkForce false;
-  programs.gamemode.enable      = lib.mkForce false;  # pointless without a GPU
-  programs.mango.enable         = lib.mkForce false;  # MangoWM needs GPU
+  programs.gamemode.enable      = lib.mkForce false;
+  programs.mango.enable         = lib.mkForce false;
 }
