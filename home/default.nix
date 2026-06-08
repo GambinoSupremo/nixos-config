@@ -2,164 +2,153 @@
 
 {
   imports = [
-    # Noctalia home-manager module — provides programs.noctalia-shell.*
     inputs.noctalia.homeModules.default
   ];
 
-  home.username      = "gav";
+  home.username = "gav";
   home.homeDirectory = "/home/gav";
-  home.stateVersion  = "25.05";
+  home.stateVersion = "24.05";
   programs.home-manager.enable = true;
 
-  # ── Noctalia shell ────────────────────────────────────────────────────────────
-  # NOTE: systemd startup is deprecated in Noctalia v5.
-  # Do NOT use `qs -c noctalia-shell` or `killall qs` anymore.
-  # Noctalia is started via compositor spawn-at-startup (see niri/mango configs).
-  # IPC calls are now `noctalia-shell ipc call <component> <action>` (not qs).
+  # ── Noctalia Shell ────────────────────────────────────────────────────────────
   programs.noctalia-shell = {
     enable = true;
-
     settings = {
-      # ── Wallpaper ────────────────────────────────────────────────────────────
       wallpaper = {
-        enabled          = true;
-        directory        = "/home/gav/Pictures/backgrounds";
-        automationEnabled    = true;
-        wallpaperChangeMode  = "random";
-        randomIntervalSec    = 2700;   # your configured cycle interval
-        # Noctalia uses connector names here, not identity strings.
-        # If Nvidia renames ports after a driver update, update these values.
-        # enableMultiMonitorDirectories = true;  # if you want per-monitor dirs
+        enabled = true;
+        directory = "/home/gav/Pictures/backgrounds";
+        automationEnabled = true;
+        wallpaperChangeMode = "random";
+        randomIntervalSec = 2700;
       };
-
-      # ── App launcher ─────────────────────────────────────────────────────────
       appLauncher = {
-        iconMode       = "tabler";  # avoids broken icons for reverse-DNS app IDs
+        iconMode = "tabler";
         terminalCommand = "ghostty --";
         enableClipboardHistory = true;
         sortByMostUsed = true;
       };
-
-      # ── General ───────────────────────────────────────────────────────────────
-      general = {
-        telemetryEnabled = false;
-      };
-
-      # ── Color scheme ─────────────────────────────────────────────────────────
       colorSchemes = {
-        darkMode     = true;
-        # useWallpaperColors = true;  # enable if you want matugen-style auto colors
-        # predefinedScheme = "Noctalia (default)";
-      };
-    };
-
-    # ── Wallpaper per-monitor declarative config ──────────────────────────────
-    # Uses connector names as seen by the compositor (not identity strings).
-    # Verify these after boot with: niri msg outputs
-    # (Nvidia may rename DP-1/DP-2 after driver updates — update accordingly)
-    # home.file.".cache/noctalia/wallpapers.json" is set below.
-  };
-
-  # Wallpaper JSON — set separately since it's a cache file, not a settings file.
-  # Adjust connector names after verifying with `niri msg outputs` or `wlr-randr`.
-  home.file.".cache/noctalia/wallpapers.json" = {
-    text = builtins.toJSON {
-      defaultWallpaper = "/home/gav/Pictures/backgrounds/apeiros";
-      wallpapers = {
-        # Replace with your actual connector names as reported by the compositor
-        # "DP-2" = "/home/gav/Pictures/backgrounds/dreamcore";
-        # "DP-1" = "/home/gav/Pictures/backgrounds/chillop";
+        darkMode = true;
       };
     };
   };
 
-  # ── Fish ─────────────────────────────────────────────────────────────────────
+  # ── Shell & Terminal ────────────────────────────────────────────────────────
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
       set fish_greeting ""
-      # pokemon-colorscripts on launch
-      # pokemon-colorscripts --no-title -r 2>/dev/null || true
     '';
     shellAliases = {
-      ls   = "eza --icons --group-directories-first";
-      la   = "eza -la --icons --group-directories-first";
-      ll   = "eza -l --icons --group-directories-first";
-      tree = "eza --tree --icons --group-directories-first";
-      cat  = "bat --style=plain";
+      ls = "eza --icons --group-directories-first";
+      cat = "bat --style=plain";
       grep = "rg";
     };
   };
 
-  # ── Starship ──────────────────────────────────────────────────────────────────
   programs.starship = {
-    enable                = true;
-    enableFishIntegration = true;
-    # settings = builtins.fromTOML (builtins.readFile ./starship.toml);
-  };
-
-  # ── fzf ───────────────────────────────────────────────────────────────────────
-  programs.fzf = {
     enable = true;
-    # Fish integration disabled — it binds Ctrl+T which conflicts with
-    # Fish's built-in transpose-chars. Handled manually: bind ctrl-t fzf-file-widget
-    enableFishIntegration = false;
-  };
-
-  # ── zoxide ────────────────────────────────────────────────────────────────────
-  programs.zoxide = {
-    enable                = true;
     enableFishIntegration = true;
-  };
-
-  # ── bat ───────────────────────────────────────────────────────────────────────
-  programs.bat = {
-    enable = true;
-    config = {
-      theme = "base16";
-      style = "plain";
-    };
-  };
-
-  # ── Git ───────────────────────────────────────────────────────────────────────
-  programs.git = {
-    enable   = true;
     settings = {
-      user.name        = "Gavin";
-      user.email       = "";
-      init.defaultBranch   = "main";
-      push.autoSetupRemote = true;
+      palette = "noctalia";
+      palettes.noctalia = {
+        purple = "#bd93f9";
+        cyan = "#8be9fd";
+      };
+      character = {
+        success_symbol = "[❯](cyan)";
+        error_symbol = "[❯](red)";
+      };
+      os = { disabled = false; };
+      git_metrics = { disabled = false; };
+      line_break = { disabled = false; };
     };
   };
 
-  # ── Neovim ────────────────────────────────────────────────────────────────────
-  # LazyVim manages plugins via lazy.nvim — let stow handle ~/.config/nvim for now.
-  # Migrate to home-manager's programs.neovim.plugins only when you want lockfile
-  # reproducibility (i.e., pin plugin versions in the flake).
-  programs.neovim = {
-    enable        = true;
-    defaultEditor = true;
-    withRuby = false;
-    withPython3 = false;
-    vimAlias      = true;
+  programs.ghostty = {
+    enable = true;
+    settings = {
+      font-family = "MesloLGS Nerd Font";
+      font-size = 12;
+      background-opacity = 0.7;
+      window-decoration = false;
+      cursor-style = "block";
+      window-padding-x = 12;
+      window-padding-y = 12;
+      keybind = [ "ctrl+c=copy_to_clipboard" "ctrl+v=paste_from_clipboard" ];
+      command = "fish -C 'pokemon-colorscripts --no-title -r 2>/dev/null || true'";
+    };
   };
 
-  # ── OBS Studio plugins ────────────────────────────────────────────────────────
-  # programs.obs-studio = {
-  #   enable  = true;
-  #   plugins = with pkgs.obs-studio-plugins; [
-  #     obs-vaapi
-  #     obs-vkcapture
-  #   ];
-  # };
+  programs.kitty = {
+    enable = true;
+    font = { name = "MesloLGS Nerd Font"; size = 12; };
+    settings = {
+      background_opacity = "0.7";
+      window_padding_width = 12;
+      hide_window_decorations = "yes";
+    };
+  };
 
-  # ── Stow / dotfiles coexistence note ─────────────────────────────────────────
-  # Stow and home-manager coexist as long as they don't manage the same path.
-  # Suggested migration order:
-  #   1. starship, bat, zoxide (done above)
-  #   2. fish conf.d → interactiveShellInit / shellAliases (done above)
-  #   3. git, ssh
-  #   4. niri config → programs.niri.settings (once you want it declarative)
-  #   5. noctalia settings → programs.noctalia-shell.settings (done above)
-  #   6. neovim (last — LazyVim adds complexity)
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    extraPackages = with pkgs; [ gcc ripgrep fd nodejs_22 python311 ];
+  };
+
+  programs.tmux = { enable = true; mouse = true; keyMode = "vi"; };
+  programs.zoxide = { enable = true; enableFishIntegration = true; options = [ "--cmd cd" ]; };
+  programs.fzf = { enable = true; enableFishIntegration = false; };
+  programs.bat = { enable = true; config.theme = "base16"; };
+  programs.eza = { enable = true; };
+  programs.btop = { enable = true; };
+  programs.yazi = { enable = true; enableFishIntegration = true; };
+
+  programs.git = {
+    enable = true;
+    userName = "Gavin Turner";
+    userEmail = "service.haiku882@passinbox.com";
+    extraConfig = { credential.helper = "github"; };
+  };
+  programs.gh.enable = true;
+
+  # ── GTK & Qt Theming ────────────────────────────────────────────────────────
+  gtk = {
+    enable = true;
+    theme = { name = "adw-gtk3-dark"; package = pkgs.adw-gtk3; };
+    iconTheme = { name = "Tela-pink-dark"; package = pkgs.tela-icon-theme; };
+    cursorTheme = { name = "Bibata-Modern-Ice"; package = pkgs.bibata-cursors; size = 24; };
+    font = { name = "Adwaita Sans"; size = 11; };
+  };
+
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      accent-color = "teal";
+      font-antialiasing = "grayscale";
+      font-hinting = "slight";
+    };
+  };
+
+  qt = { enable = true; platformTheme.name = "qtct"; style.name = "kvantum"; };
+
+  # ── Fonts & Packages ────────────────────────────────────────────────────────
+  home.packages = with pkgs; [
+    (nerdfonts.override { fonts = [ "Meslo" ]; })
+    noto-fonts noto-fonts-cjk-sans noto-fonts-emoji
+    liberation_ttf dejavu_fonts open-sans font-awesome
+
+    sway labwc
+    inputs.zen-browser.packages."${pkgs.system}".default
+    vivaldi vesktop signal-desktop element-desktop telegram-desktop
+    tidal-hifi cider spotify spicetify-cli mpv vlc obs-studio cava playerctl
+    obsidian lunatask meld qbittorrent
+    zed-editor ollama mullvad-vpn
+    polychromatic input-remapper keyd
+    fuzzel walker cliphist grim slurp wl-clipboard wtype wev
+    nautilus zathura gnome-disk-utility
+    duf glances fastfetch tree pv lsd
+    matugen kvantum nwg-look papirus-icon-theme nordzy-icon-theme
+    pavucontrol stow
+  ];
 }
