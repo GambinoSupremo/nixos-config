@@ -197,4 +197,11 @@
     matugen kdePackages.qtstyleplugin-kvantum nwg-look papirus-icon-theme nordzy-icon-theme
     pavucontrol stow pokemon-colorscripts
   ];
+
+  # Remove files that GTK or a previous run may have created before home-manager
+  # gets to write them — prevents "would be clobbered" activation failures.
+  home.activation.clearConflicts = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
+    rm -f  $HOME/.gtkrc-2.0 $HOME/.gtkrc
+    rm -rf $HOME/.config/gtk-3.0 $HOME/.config/gtk-4.0
+  '';
 }
