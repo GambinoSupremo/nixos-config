@@ -14,31 +14,29 @@
 
   networking.hostName = "nix-vm";
 
-  # Autologin directly into MangoWM.
-  # initial_session runs on first boot; after logout falls back to tuigreet picker.
-  services.greetd.settings = lib.mkForce {
-    default_session = {
-      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --remember-session --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions";
-      user    = "greeter";
-    };
-    initial_session = {
-      command = "mango";
-      user    = "gav";
+  # Exactly as MangoWM docs recommend:
+  # https://github.com/mangowm/mango#nixos
+  services.greetd = lib.mkForce {
+    enable = true;
+    settings = {
+      initial_session = {
+        command = "mango";
+        user    = "gav";
+      };
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --cmd mango";
+        user    = "greeter";
+      };
     };
   };
 
-  # QEMU guest agent — graceful shutdown, snapshot integration with Proxmox
-  services.qemuGuest.enable = true;
-
-  # SPICE agent — clipboard passthrough + dynamic resolution
+  services.qemuGuest.enable     = true;
   services.spice-vdagentd.enable = true;
+  hardware.graphics.enable       = true;
 
-  hardware.graphics.enable = true;
-
-  # Disable services that do not make sense in a VM
-  services.sunshine.enable   = lib.mkForce false;
-  hardware.openrazer.enable  = lib.mkForce false;
-  hardware.bluetooth.enable  = lib.mkForce false;
-  services.blueman.enable    = lib.mkForce false;
-  programs.gamemode.enable   = lib.mkForce false;
+  services.sunshine.enable  = lib.mkForce false;
+  hardware.openrazer.enable = lib.mkForce false;
+  hardware.bluetooth.enable = lib.mkForce false;
+  services.blueman.enable   = lib.mkForce false;
+  programs.gamemode.enable  = lib.mkForce false;
 }
