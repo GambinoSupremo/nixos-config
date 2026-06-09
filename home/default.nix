@@ -11,23 +11,21 @@
   programs.home-manager.enable = true;
 
   # ── Noctalia Shell ────────────────────────────────────────────────────────────
-  programs.noctalia-shell = {
-    enable = true;
-    settings = {
-      wallpaper = {
-        enabled = true;
-        directory = "/home/gav/Pictures/backgrounds";
-        automationEnabled = true;
-        wallpaperChangeMode = "random";
-        randomIntervalSec = 2700;
-      };
-      appLauncher = {
-        iconMode = "tabler";
-        terminalCommand = "ghostty --";
-        enableClipboardHistory = true;
-        sortByMostUsed = true;
-      };
-      colorSchemes.darkMode = true;
+  systemd.user.services.noctalia-shell = {
+    Unit = {
+      Description = "Noctalia Shell";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+    };
+
+    Service = {
+      ExecStart = "${inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/noctalia-shell";
+      Restart = "on-failure";
+      RestartSec = 2;
+    };
+
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
     };
   };
 
