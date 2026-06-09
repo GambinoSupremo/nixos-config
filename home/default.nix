@@ -242,3 +242,4 @@ home.activation.clearConflicts = lib.hm.dag.entryBefore [ "checkLinkTargets" ] '
     rm -rf -- "$HOME/$target"
   done
 '';
+}
