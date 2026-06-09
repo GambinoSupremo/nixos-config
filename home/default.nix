@@ -265,7 +265,18 @@
     # These temporary stubs keep require("noctalia") from failing before
     # Noctalia writes its real runtime module.
     "hypr/hyprland.conf" = {
-      source = "${inputs.dotfiles}/hypr/hyprland.conf";
+      source = pkgs.runCommand "hyprland.conf" {} ''
+        cat ${inputs.dotfiles}/hypr/hyprland.conf > $out
+        echo "" >> $out
+        echo "source = ~/.config/hypr/noctalia-start.conf" >> $out
+      '';
+      force = true;
+    };
+
+    "hypr/noctalia-start.conf" = {
+      text = ''
+        exec-once = sh -lc 'if command -v noctalia-shell >/dev/null 2>&1; then noctalia-shell; elif command -v quickshell >/dev/null 2>&1; then quickshell -c noctalia; fi'
+      '';
       force = true;
     };
 
