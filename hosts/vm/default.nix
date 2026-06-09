@@ -1,5 +1,8 @@
-{ config, pkgs, lib, inputs, ...}:
+{ config, pkgs, lib, inputs, ... }:
 
+let
+  mangoCmd = "${config.programs.mango.package}/bin/mango";
+in
 {
   imports = [
     ./hardware.nix
@@ -14,29 +17,25 @@
 
   networking.hostName = "nix-vm";
 
-  # Exactly as MangoWM docs recommend:
-  # https://github.com/mangowm/mango#nixos
   services.greetd = lib.mkForce {
     enable = true;
+    useTextGreeter = true;
+
     settings = {
-      initial_session = {
-        command = "mango";
-        user    = "gav";
-      };
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --cmd mango";
-        user    = "greeter";
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --asterisks --cmd ${mangoCmd}";
+        user = "greeter";
       };
     };
   };
 
-  services.qemuGuest.enable     = true;
+  services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true;
-  hardware.graphics.enable       = true;
+  hardware.graphics.enable = true;
 
-  services.sunshine.enable  = lib.mkForce false;
+  services.sunshine.enable = lib.mkForce false;
   hardware.openrazer.enable = lib.mkForce false;
   hardware.bluetooth.enable = lib.mkForce false;
-  services.blueman.enable   = lib.mkForce false;
-  programs.gamemode.enable  = lib.mkForce false;
+  services.blueman.enable = lib.mkForce false;
+  programs.gamemode.enable = lib.mkForce false;
 }
