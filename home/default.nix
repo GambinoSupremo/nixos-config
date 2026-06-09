@@ -364,6 +364,7 @@
       source = "${inputs.dotfiles}/hypr/workspaces.lua";
       force = true;
     };
+  };
 
   # ── Packages ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [
