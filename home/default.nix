@@ -448,6 +448,8 @@
       ".config/mango/autostart.conf" \
       ".config/mango/bind.conf" \
       ".config/hypr/hyprland.conf" \
+      ".config/hypr/noctalia.lua" \
+      ".config/hypr/noctalia/init.lua" \
       ".config/hypr/hyprland.lua" \
       ".config/hypr/autostart.lua" \
       ".config/hypr/bind.lua" \
