@@ -21,12 +21,19 @@ in
     enable = true;
 
     settings = {
+      initial_session = {
+        command = mangoCmd;
+        user = "gav";
+      };
+
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --asterisks --cmd ${mangoCmd}";
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --asterisks --cmd ${mangoCmd}";
         user = "greeter";
       };
     };
   };
+
+  systemd.services.greetd.serviceConfig.TTYPath = lib.mkForce "/dev/tty1";
 
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true;
