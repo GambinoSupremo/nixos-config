@@ -14,21 +14,28 @@
 
   networking.hostName = "nix-vm";
 
-  # Temporary recovery mode:
-  # Disable greetd/Mango autostart so the VM always boots to a usable tty.
+  # Use SDDM for the VM so we can choose sessions interactively.
   services.greetd.enable = lib.mkForce false;
-  services.getty.autologinUser = "gav";
+
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
+
+  # Preselect Mango if SDDM sees the session name.
+  # If this exact name does not match, SDDM will still show the session picker.
+  services.displayManager.defaultSession = "mango";
+
+  # Make sure sessions are visible to the display manager.
+  services.displayManager.sessionPackages = [
+    config.programs.mango.package
+    pkgs.hyprland
+    pkgs.niri
+  ];
 
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true;
   hardware.graphics.enable = true;
-
-  # Temporary VM debugging SSH.
-  services.openssh.enable = true;
-  services.openssh.settings = {
-    PasswordAuthentication = lib.mkForce true;
-    KbdInteractiveAuthentication = lib.mkForce true;
-  };
 
   services.sunshine.enable = lib.mkForce false;
   hardware.openrazer.enable = lib.mkForce false;
