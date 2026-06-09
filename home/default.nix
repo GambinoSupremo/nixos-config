@@ -198,10 +198,47 @@
     pavucontrol stow pokemon-colorscripts
   ];
 
-  # Remove files that GTK or a previous run may have created before home-manager
-  # gets to write them — prevents "would be clobbered" activation failures.
-  home.activation.clearConflicts = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
-    rm -f  $HOME/.gtkrc-2.0 $HOME/.gtkrc
-    rm -rf $HOME/.config/gtk-3.0 $HOME/.config/gtk-4.0
-  '';
-}
+home.activation.clearConflicts = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+  if [ -z "$HOME" ] || [ "$HOME" = "/" ]; then
+    echo "Refusing to clear Home Manager conflicts with unsafe HOME=$HOME" >&2
+    exit 1
+  fi
+
+  for target in \
+    ".gtkrc-2.0" \
+    ".gtkrc" \
+    ".config/gtk-3.0/settings.ini" \
+    ".config/gtk-4.0/settings.ini" \
+    ".config/niri/config.kdl" \
+    ".config/niri/binds.kdl" \
+    ".config/niri/windowrules.kdl" \
+    ".config/niri/alttab.kdl" \
+    ".config/niri/outputs.kdl" \
+    ".config/mango/config.conf" \
+    ".config/mango/monitor.conf" \
+    ".config/mango/tag.conf" \
+    ".config/mango/rule.conf" \
+    ".config/mango/env.conf" \
+    ".config/mango/autostart.conf" \
+    ".config/mango/bind.conf" \
+    ".config/hypr/hyprland.conf" \
+    ".config/hypr/hyprland.lua" \
+    ".config/hypr/autostart.lua" \
+    ".config/hypr/bind.lua" \
+    ".config/hypr/config.lua" \
+    ".config/hypr/env.lua" \
+    ".config/hypr/monitor.lua" \
+    ".config/hypr/rule.lua" \
+    ".config/hypr/theme.lua" \
+    ".config/hypr/workspaces.lua"
+  do
+    case "$target" in
+      ""|"."|"/"|/*|../*|*/../*)
+        echo "Refusing to remove unsafe Home Manager target: $target" >&2
+        exit 1
+        ;;
+    esac
+
+    rm -rf -- "$HOME/$target"
+  done
+'';
