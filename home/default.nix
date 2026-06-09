@@ -261,10 +261,57 @@
     };
 
     # Hyprland — deploy all lua config files from dotfiles.
-    # noctalia.lua and noctalia/noctalia-colors.conf are NOT deployed.
-    # This patches require("noctalia") so Hyprland can start before Noctalia writes runtime files.
+    # noctalia.lua and noctalia/noctalia-colors.conf are runtime files.
+    # These temporary stubs keep require("noctalia") from failing before
+    # Noctalia writes its real runtime module.
     "hypr/hyprland.conf" = {
       source = "${inputs.dotfiles}/hypr/hyprland.conf";
+      force = true;
+    };
+
+    "hypr/noctalia.lua" = {
+      text = ''
+        local proxy = {}
+
+        local mt = {
+          __index = function(_, _)
+            return proxy
+          end,
+          __call = function(_, ...)
+            return nil
+          end,
+          __tostring = function()
+            return ""
+          end
+        }
+
+        setmetatable(proxy, mt)
+
+        return proxy
+      '';
+      force = true;
+    };
+
+    "hypr/noctalia/init.lua" = {
+      text = ''
+        local proxy = {}
+
+        local mt = {
+          __index = function(_, _)
+            return proxy
+          end,
+          __call = function(_, ...)
+            return nil
+          end,
+          __tostring = function()
+            return ""
+          end
+        }
+
+        setmetatable(proxy, mt)
+
+        return proxy
+      '';
       force = true;
     };
 
@@ -317,7 +364,6 @@
       source = "${inputs.dotfiles}/hypr/workspaces.lua";
       force = true;
     };
-  };
 
   # ── Packages ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [
