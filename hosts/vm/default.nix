@@ -19,7 +19,6 @@ in
 
   services.greetd = lib.mkForce {
     enable = true;
-    useTextGreeter = true;
 
     settings = {
       default_session = {
