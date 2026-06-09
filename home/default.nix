@@ -275,7 +275,7 @@
 
     "hypr/noctalia-start.conf" = {
       text = ''
-        exec-once = sh -lc 'if command -v noctalia-shell >/dev/null 2>&1; then noctalia-shell; elif command -v quickshell >/dev/null 2>&1; then quickshell -c noctalia; fi'
+        exec-once = ${inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/noctalia-shell
       '';
       force = true;
     };
@@ -379,6 +379,8 @@
 
   # ── Packages ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [
+    inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+
     nerd-fonts.meslo-lg
     noto-fonts
     noto-fonts-cjk-sans
