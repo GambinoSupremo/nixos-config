@@ -26,8 +26,8 @@
   # Temporary VM debugging SSH.
   services.openssh.enable = true;
   services.openssh.settings = {
-    PasswordAuthentication = true;
-    KbdInteractiveAuthentication = true;
+    PasswordAuthentication = lib.mkForce true;
+    KbdInteractiveAuthentication = lib.mkForce true;
   };
 
   services.sunshine.enable = lib.mkForce false;
