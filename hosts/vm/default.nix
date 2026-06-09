@@ -1,8 +1,5 @@
 { config, pkgs, lib, inputs, ... }:
 
-let
-  mangoCmd = "${config.programs.mango.package}/bin/mango";
-in
 {
   imports = [
     ./hardware.nix
@@ -17,27 +14,21 @@ in
 
   networking.hostName = "nix-vm";
 
-  services.greetd = lib.mkForce {
-    enable = true;
-
-    settings = {
-      initial_session = {
-        command = mangoCmd;
-        user = "gav";
-      };
-
-      default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --asterisks --cmd ${mangoCmd}";
-        user = "greeter";
-      };
-    };
-  };
-
-  systemd.services.greetd.serviceConfig.TTYPath = lib.mkForce "/dev/tty1";
+  # Temporary recovery mode:
+  # Disable greetd/Mango autostart so the VM always boots to a usable tty.
+  services.greetd.enable = lib.mkForce false;
+  services.getty.autologinUser = "gav";
 
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true;
   hardware.graphics.enable = true;
+
+  # Temporary VM debugging SSH.
+  services.openssh.enable = true;
+  services.openssh.settings = {
+    PasswordAuthentication = true;
+    KbdInteractiveAuthentication = true;
+  };
 
   services.sunshine.enable = lib.mkForce false;
   hardware.openrazer.enable = lib.mkForce false;
