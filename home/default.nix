@@ -55,15 +55,9 @@
         success_symbol = "[❯](cyan)";
         error_symbol = "[❯](red)";
       };
-      os = {
-        disabled = false;
-      };
-      git_metrics = {
-        disabled = false;
-      };
-      line_break = {
-        disabled = false;
-      };
+      os.disabled = false;
+      git_metrics.disabled = false;
+      line_break.disabled = false;
     };
   };
 
@@ -194,8 +188,7 @@
   # ── WM configs from dotfiles repo ─────────────────────────────────────────────
   xdg.configFile = {
     # Niri: patch config.kdl so noctalia.kdl includes are optional.
-    # Noctalia writes ~/.config/niri/noctalia.kdl at runtime — we must not
-    # deploy it as a read-only nix store symlink or Noctalia can't update it.
+    # Noctalia writes ~/.config/niri/noctalia.kdl at runtime.
     "niri/config.kdl" = {
       source = pkgs.runCommand "niri-config.kdl" {} ''
         sed 's|^include "./noctalia.kdl"|include optional=true "./noctalia.kdl"|g' \
@@ -224,10 +217,8 @@
       force = true;
     };
 
-    # Mango: autostart.conf patches out the Arch-specific portal exec-once
-    # (NixOS activates portals via D-Bus, not exec-once).
+    # Mango: autostart.conf patches out the Arch-specific portal exec-once.
     # bind.conf patches out the hardcoded /usr/bin/ghostty path.
-    # noctalia.conf is NOT deployed — Noctalia manages it at runtime.
     "mango/config.conf" = {
       source = "${inputs.dotfiles}/mango/config.conf";
       force = true;
@@ -270,15 +261,20 @@
     };
 
     # Hyprland — deploy all lua config files from dotfiles.
-    # noctalia.lua and noctalia/noctalia-colors.conf are NOT deployed —
-    # Noctalia writes them at runtime.
+    # noctalia.lua and noctalia/noctalia-colors.conf are NOT deployed.
+    # This patches require("noctalia") so Hyprland can start before Noctalia writes runtime files.
     "hypr/hyprland.conf" = {
       source = "${inputs.dotfiles}/hypr/hyprland.conf";
       force = true;
     };
 
     "hypr/hyprland.lua" = {
-      source = "${inputs.dotfiles}/hypr/hyprland.lua";
+      source = pkgs.runCommand "hyprland.lua" {} ''
+        sed \
+          -e 's|require("noctalia")|pcall(require, "noctalia")|g' \
+          -e "s|require('noctalia')|pcall(require, 'noctalia')|g" \
+          ${inputs.dotfiles}/hypr/hyprland.lua > $out
+      '';
       force = true;
     };
 
