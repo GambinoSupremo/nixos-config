@@ -1,6 +1,12 @@
 { config, pkgs, inputs, lib, ... }:
 
 let
+  # Noctalia from the flake package output — the HM module is NOT used
+  # (its option namespace changed between revisions: programs.noctalia-shell
+  # in v4, programs.noctalia on master), so we install the package and run
+  # it via our own systemd user service below.
+  noctaliaPkg = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
+
   # GambinoSupremo/dotfiles with Arch-specific bits patched for NixOS.
   # Files that Noctalia regenerates at runtime (mango/noctalia.conf,
   # niri/noctalia.kdl, ghostty/themes/noctalia) are removed here so they are
@@ -56,44 +62,38 @@ EOF
   '';
 in
 {
-  imports = [
-    # Noctalia home-manager module — provides programs.noctalia.*
-    inputs.noctalia.homeModules.default
-  ];
-
   home.username      = "gav";
   home.homeDirectory = "/home/gav";
   home.stateVersion  = "25.05";
   programs.home-manager.enable = true;
 
-  # ── Noctalia shell (v5) ──────────────────────────────────────────────────────
-  # The flake module's option namespace is programs.noctalia (NOT
-  # programs.noctalia-shell as the wiki says) and the binary is `noctalia`.
-  # systemd.enable creates noctalia.service, WantedBy graphical-session.target:
-  #   - niri:     niri-session starts graphical-session.target → auto-start
-  #   - hyprland: hyprland-session.target pulls graphical-session.target
-  #   - mango:    autostart.conf starts noctalia.service explicitly (patched above)
-  # Logs: journalctl --user -u noctalia.service
-  programs.noctalia = {
-    enable         = true;
-    systemd.enable = true;
+  # ── Noctalia shell ───────────────────────────────────────────────────────────
+  # Installed from the flake package; settings are managed at runtime by
+  # Noctalia itself (its config files stay writable, nothing is deployed).
+  home.packages = [ noctaliaPkg ];
 
-    # v5 settings are TOML (see example.toml in the noctalia repo). Keep this
-    # minimal — everything else is managed at runtime via the settings UI,
-    # which Noctalia persists itself (those files stay writable).
-    settings = {
-      shell.telemetry_enabled = false;
-      theme.mode = "dark";
-      wallpaper = {
-        enabled   = true;
-        directory = "~/Pictures/backgrounds";
-        automation = {
-          enabled          = true;
-          interval_minutes = 45;     # was randomIntervalSec = 2700
-          order            = "random";
-        };
-      };
+  # Plain systemd user service — no Noctalia HM module options involved.
+  # Start coverage per session:
+  #   - niri:     niri-session starts graphical-session.target → auto-start
+  #   - hyprland: hyprland-session.target pulls graphical-session.target,
+  #               plus an explicit exec-once in the patched hyprland.conf
+  #   - mango:    autostart.conf runs `systemctl --user start noctalia.service`
+  # Logs: journalctl --user -b -u noctalia.service
+  systemd.user.services.noctalia = {
+    Unit = {
+      Description   = "Noctalia - Wayland shell and bar";
+      Documentation = "https://docs.noctalia.dev";
+      PartOf        = [ "graphical-session.target" ];
+      After         = [ "graphical-session.target" ];
     };
+    Service = {
+      # getExe follows meta.mainProgram, so this resolves to bin/noctalia on
+      # current master and bin/noctalia-shell on v4-era locks alike.
+      ExecStart  = lib.getExe noctaliaPkg;
+      Restart    = "on-failure";
+      RestartSec = 2;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
   };
 
   # ── Dotfiles (GambinoSupremo/dotfiles) ───────────────────────────────────────
