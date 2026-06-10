@@ -1,13 +1,9 @@
 { config, pkgs, inputs, lib, ... }:
 
 let
-  # Noctalia from the flake package output — the HM module is NOT used
-  # (its option namespace changed between revisions: programs.noctalia-shell
-  # in v4, programs.noctalia on master), so we install the package and run
-  # it via our own systemd user service below.
-  noctaliaPkg = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
-
-  # GambinoSupremo/dotfiles with Arch-specific bits patched for NixOS.
+  # GambinoSupremo/dotfiles with Arch-specific and Noctalia-v4-era bits
+  # patched for NixOS + Noctalia v5 (binary `noctalia`, IPC via
+  # `noctalia msg ...`, run as noctalia.service).
   # Files that Noctalia regenerates at runtime (mango/noctalia.conf,
   # niri/noctalia.kdl, ghostty/themes/noctalia) are removed here so they are
   # never deployed as read-only store symlinks; they are seeded as writable
@@ -19,26 +15,88 @@ let
     done
     chmod -R u+w $out
 
-    # mango: portals are dbus-activated on NixOS (no /usr/lib path), and
-    # Noctalia v5 runs as a systemd user service so logs land in the journal.
-    sed -i \
-      -e 's|^exec-once=/usr/lib/xdg-desktop-portal-wlr$|exec-once=dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP|' \
-      -e "s|^exec-once=qs -c noctalia-shell$|exec-once=sh -c 'systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP; systemctl --user start noctalia.service'|" \
-      $out/mango/autostart.conf
-    sed -i 's|/usr/bin/ghostty|ghostty|g' $out/mango/bind.conf
+    # Guarded sed: fail the build if the dotfiles no longer contain the line
+    # a patch targets, instead of silently deploying an unpatched config.
+    mustSed() { # mustSed <file> <grep-pattern> <sed-expression>
+      grep -q -e "$2" "$1" || {
+        echo "dotfiles patch FAILED: pattern not found in $1: $2" >&2
+        exit 1
+      }
+      sed -i -e "$3" "$1"
+    }
 
-    # niri: noctalia.service is started by graphical-session.target under
+    # ── mango ────────────────────────────────────────────────────────────
+    # Portals are dbus-activated on NixOS (no /usr/lib path).
+    mustSed $out/mango/autostart.conf \
+      '^exec-once=/usr/lib/xdg-desktop-portal-wlr$' \
+      '\|^exec-once=/usr/lib/xdg-desktop-portal-wlr$|d'
+    # Mango launched from SDDM does not activate the systemd user session by
+    # itself: import the session env, then start mango-session.target (from
+    # the mangowm HM module below), which binds graphical-session.target and
+    # thereby pulls up noctalia.service.
+    mustSed $out/mango/autostart.conf \
+      '^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$' \
+      "s|^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$|exec-once=sh -c 'systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY; dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY; systemctl --user reset-failed; systemctl --user start mango-session.target'|"
+    # v4 launched the shell directly; v5 comes up via mango-session.target.
+    mustSed $out/mango/autostart.conf \
+      '^exec-once=qs -c noctalia-shell$' \
+      '/^exec-once=qs -c noctalia-shell$/d'
+
+    mustSed $out/mango/bind.conf '/usr/bin/ghostty' 's|/usr/bin/ghostty|ghostty|g'
+    # v4 `qs -c noctalia-shell ipc call ...` → v5 `noctalia msg ...`
+    mustSed $out/mango/bind.conf \
+      'qs -c noctalia-shell ipc call launcher toggle' \
+      's|qs -c noctalia-shell ipc call launcher toggle|noctalia msg panel-toggle launcher|'
+    mustSed $out/mango/bind.conf \
+      'qs -c noctalia-shell ipc call launcher emoji' \
+      's|qs -c noctalia-shell ipc call launcher emoji|noctalia msg panel-open launcher /emo|'
+    mustSed $out/mango/bind.conf \
+      'qs -c noctalia-shell ipc call wallpaper toggle' \
+      's|qs -c noctalia-shell ipc call wallpaper toggle|noctalia msg panel-toggle wallpaper|'
+    mustSed $out/mango/bind.conf \
+      '^bind=SUPER+ALT,r,spawn,bash' \
+      's|^bind=SUPER+ALT,r,spawn,bash .*$|bind=SUPER+ALT,r,spawn,systemctl --user restart noctalia.service|'
+
+    # ── niri ─────────────────────────────────────────────────────────────
+    # noctalia.service is started by graphical-session.target under
     # niri-session, and the unconditional trailing include of the
     # runtime-generated noctalia.kdl is dropped (the optional include stays).
-    sed -i \
-      -e '/^spawn-at-startup "qs" "-c" "noctalia-shell"$/d' \
-      -e '/^include "\.\/noctalia\.kdl"$/d' \
-      $out/niri/config.kdl
+    mustSed $out/niri/config.kdl \
+      '^spawn-at-startup "qs" "-c" "noctalia-shell"$' \
+      '/^spawn-at-startup "qs" "-c" "noctalia-shell"$/d'
+    mustSed $out/niri/config.kdl \
+      '^include "\./noctalia\.kdl"$' \
+      '/^include "\.\/noctalia\.kdl"$/d'
 
-    # hypr: the .lua config is loaded by an Arch-only plugin, so the effective
-    # config is just hyprland.conf (whose noctalia source is already optional).
+    mustSed $out/niri/binds.kdl \
+      'spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"' \
+      's|spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"|spawn "noctalia" "msg" "panel-toggle" "launcher"|'
+    mustSed $out/niri/binds.kdl \
+      'spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "emoji"' \
+      's|spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "emoji"|spawn "noctalia" "msg" "panel-open" "launcher" "/emo"|'
+    mustSed $out/niri/binds.kdl \
+      'spawn "qs" "-c" "noctalia-shell" "ipc" "call" "wallpaper" "toggle"' \
+      's|spawn "qs" "-c" "noctalia-shell" "ipc" "call" "wallpaper" "toggle"|spawn "noctalia" "msg" "panel-toggle" "wallpaper"|'
+    mustSed $out/niri/binds.kdl \
+      'spawn-sh "killall qs' \
+      's|spawn-sh "killall qs.*$|spawn-sh "systemctl --user restart noctalia.service"; }|'
+
+    # ── hypr ─────────────────────────────────────────────────────────────
+    # The .lua config is loaded by an Arch-only plugin, so the effective
+    # config on NixOS is just hyprland.conf; the lua files are still patched
+    # to v5 so nothing in the deployed tree references the v4 CLI.
+    mustSed $out/hypr/workspaces.lua '/usr/bin/ghostty' 's|/usr/bin/ghostty|ghostty|g'
+    mustSed $out/hypr/bind.lua \
+      'qs -c noctalia-shell ipc call launcher emoji' \
+      's|qs -c noctalia-shell ipc call launcher emoji|noctalia msg panel-open launcher /emo|'
+    mustSed $out/hypr/bind.lua \
+      'qs -c noctalia-shell ipc call wallpaper toggle' \
+      's|qs -c noctalia-shell ipc call wallpaper toggle|noctalia msg panel-toggle wallpaper|'
+    mustSed $out/hypr/bind.lua \
+      '" + ALT + R"' \
+      's|^hl.bind(mod .. " + ALT + R".*$|hl.bind(mod .. " + ALT + R", hl.dsp.exec_cmd("systemctl --user restart noctalia.service"))|'
+
     # Append a minimal usable fallback so the session is never a dead end.
-    sed -i 's|/usr/bin/ghostty|ghostty|g' $out/hypr/workspaces.lua
     cat >> $out/hypr/hyprland.conf <<'EOF'
 
 # ── NixOS additions ─────────────────────────────────────────────────────────
@@ -51,49 +109,62 @@ bind = SUPER, Q, killactive
 bind = SUPER SHIFT, E, exit
 EOF
 
-    # ghostty: drop the Arch zsh/pokemon-colorscripts command; the login
-    # shell on NixOS is fish.
-    sed -i '/^command = /d' $out/ghostty/config
+    # ── ghostty ──────────────────────────────────────────────────────────
+    # Drop the Arch zsh/pokemon-colorscripts command; the login shell on
+    # NixOS is fish.
+    mustSed $out/ghostty/config '^command = ' '/^command = /d'
 
     # Runtime-generated by Noctalia — never deploy read-only (seeded instead)
     rm $out/mango/noctalia.conf
     rm $out/niri/noctalia.kdl
     rm $out/ghostty/themes/noctalia
+
+    # No v4-era Noctalia invocations may survive the patching above.
+    if grep -rn 'qs -c\|noctalia-shell ipc' $out; then
+      echo "dotfiles patch FAILED: v4 Noctalia references remain (see above)" >&2
+      exit 1
+    fi
   '';
 in
 {
+  imports = [
+    # Noctalia v5 upstream HM module → programs.noctalia.*
+    inputs.noctalia.homeModules.default
+    # MangoWM upstream HM module → wayland.windowManager.mango.*
+    inputs.mangowm.hmModules.mango
+  ];
+
   home.username      = "gav";
   home.homeDirectory = "/home/gav";
   home.stateVersion  = "25.05";
   programs.home-manager.enable = true;
 
-  # ── Noctalia shell ───────────────────────────────────────────────────────────
-  # Installed from the flake package; settings are managed at runtime by
-  # Noctalia itself (its config files stay writable, nothing is deployed).
-  home.packages = [ noctaliaPkg ];
-
-  # Plain systemd user service — no Noctalia HM module options involved.
+  # ── Noctalia v5 ──────────────────────────────────────────────────────────────
+  # Upstream HM module: installs the package and runs noctalia.service,
+  # WantedBy graphical-session.target. `settings` is deliberately left empty
+  # so ~/.config/noctalia/config.toml stays runtime-writable and Noctalia
+  # keeps managing its own configuration (matches the CachyOS setup).
   # Start coverage per session:
-  #   - niri:     niri-session starts graphical-session.target → auto-start
+  #   - mango:    patched autostart.conf starts mango-session.target, which
+  #               binds graphical-session.target
+  #   - niri:     niri-session starts graphical-session.target
   #   - hyprland: hyprland-session.target pulls graphical-session.target,
   #               plus an explicit exec-once in the patched hyprland.conf
-  #   - mango:    autostart.conf runs `systemctl --user start noctalia.service`
   # Logs: journalctl --user -b -u noctalia.service
-  systemd.user.services.noctalia = {
-    Unit = {
-      Description   = "Noctalia - Wayland shell and bar";
-      Documentation = "https://docs.noctalia.dev";
-      PartOf        = [ "graphical-session.target" ];
-      After         = [ "graphical-session.target" ];
-    };
-    Service = {
-      # getExe follows meta.mainProgram, so this resolves to bin/noctalia on
-      # current master and bin/noctalia-shell on v4-era locks alike.
-      ExecStart  = lib.getExe noctaliaPkg;
-      Restart    = "on-failure";
-      RestartSec = 2;
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
+  programs.noctalia = {
+    enable = true;
+    systemd.enable = true;
+  };
+
+  # ── Mango systemd session plumbing ──────────────────────────────────────────
+  # The mango *session* (binary + SDDM entry) comes from the NixOS module in
+  # modules/desktop.nix. This HM module is used only for its systemd unit:
+  # mango-session.target (BindsTo graphical-session.target), started from the
+  # patched autostart.conf above. `settings` stays empty, so the module does
+  # NOT generate mango/config.conf — the dotfiles below remain authoritative.
+  wayland.windowManager.mango = {
+    enable = true;
+    systemd.enable = true;
   };
 
   # ── Dotfiles (GambinoSupremo/dotfiles) ───────────────────────────────────────

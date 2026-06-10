@@ -1,7 +1,7 @@
 {
   description = "gav's nixos configuration";
 
-  # Noctalia binary cache — avoids compiling quickshell from source locally
+  # Noctalia binary cache — prebuilt noctalia packages when available
   nixConfig = {
     extra-substituters      = [ "https://noctalia.cachix.org" ];
     extra-trusted-public-keys = [
@@ -23,9 +23,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Noctalia shell — only the package output is used (home/default.nix runs
-    # it via a plain systemd user service). The HM module is avoided because
-    # its option namespace differs between revisions.
+    # Noctalia v5 — native Wayland shell (C++/OpenGL ES; no longer built on
+    # Quickshell). home/default.nix imports homeModules.default, which
+    # provides programs.noctalia.* and the noctalia.service user unit.
     noctalia = {
       url   = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
