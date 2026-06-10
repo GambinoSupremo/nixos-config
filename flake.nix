@@ -53,6 +53,19 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./hosts/vm/default.nix
+          # Temporary compatibility overlay: top-level 'qt6ct' became a throw
+          # alias in nixpkgs on 2025-10-27 (moved to qt6Packages.qt6ct), but
+          # older expressions in flake inputs (e.g. home-manager's qt module
+          # before it switched to the scoped path) may still reference
+          # pkgs.qt6ct. Home Manager picks this up too via useGlobalPkgs.
+          # Remove once all inputs are updated past the rename.
+          {
+            nixpkgs.overlays = [
+              (final: prev: {
+                qt6ct = final.qt6Packages.qt6ct;
+              })
+            ];
+          }
           home-manager.nixosModules.home-manager
           {
             home-manager = {

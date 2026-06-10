@@ -94,7 +94,7 @@ in
     adw-gtk3                     # was adw-gtk-theme
     kdePackages.qtstyleplugin-kvantum  # Qt6 Kvantum style plugin
     libsForQt5.qtstyleplugin-kvantum   # Qt5 Kvantum style plugin (was kvantum)
-    qt6ct
+    qt6Packages.qt6ct            # top-level qt6ct became a throw alias 2025-10-27
     libsForQt5.qt5ct             # was qt5ct-kde (AUR; verify nixpkgs name)
     kdePackages.breeze           # was breeze
 
