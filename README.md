@@ -14,9 +14,10 @@ SDDM (Wayland greeter) with three sessions; **mango** is the default
 | Niri       | `programs.niri` (nixpkgs)           | `niri`       |
 | Hyprland   | `programs.hyprland` (nixpkgs)       | `hyprland`   |
 
-Noctalia v5 runs as a systemd user service (`noctalia.service`, binary
-`noctalia`). Niri and Hyprland start it via `graphical-session.target`;
-Mango starts it explicitly from its patched `autostart.conf`.
+Noctalia is installed from the flake package and runs as a hand-rolled
+systemd user service (`noctalia.service`) — the Noctalia HM module is not
+used. Niri and Hyprland start it via `graphical-session.target`; Mango
+starts it explicitly from its patched `autostart.conf`.
 
 Dotfiles come from the `dotfiles` flake input (GambinoSupremo/dotfiles),
 patched for NixOS in `home/default.nix` (no `/usr/bin` paths, portals via
@@ -56,7 +57,7 @@ journalctl --user -b -u noctalia.service --no-pager -n 200
 | CachyOS package              | Status                                              |
 |------------------------------|-----------------------------------------------------|
 | `mangowm`                    | Available via flake: `github:mangowm/mango`. NixOS module + `programs.mango.enable`. |
-| `noctalia-git` / `noctalia-shell` | Available via flake: `github:noctalia-dev/noctalia-shell`. HM module provides `programs.noctalia` (v5; binary is `noctalia`). |
+| `noctalia-git` / `noctalia-shell` | Available via flake: `github:noctalia-dev/noctalia-shell`. Package output only; started by a systemd user service (HM module options vary by revision, so they are not used). |
 | `scenefx0.4`                 | Likely bundled in the MangoWM flake output. Verify after enabling. |
 | `cachyos-*` / `cachy-update` | CachyOS-specific. No NixOS equivalents needed. |
 | `chwd`                       | CachyOS hardware detection. Not needed. |

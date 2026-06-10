@@ -23,8 +23,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Noctalia shell — provides homeModules.default and programs.noctalia-shell
-    # Also in nixpkgs-unstable as pkgs.noctalia-shell, but flake gives the HM module
+    # Noctalia shell — only the package output is used (home/default.nix runs
+    # it via a plain systemd user service). The HM module is avoided because
+    # its option namespace differs between revisions.
     noctalia = {
       url   = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
