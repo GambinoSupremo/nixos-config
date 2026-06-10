@@ -221,11 +221,11 @@ in
   };
 
   # ── Wallpapers ───────────────────────────────────────────────────────────────
-  # CachyOS keeps wallpapers in ~/dotfiles/backgrounds (the dotfiles clone);
-  # mirror that exact path here as a symlink into the flake input so Noctalia
-  # can use the same wallpaper folder. Read-only is fine — Noctalia only
-  # reads it — and `nix flake update dotfiles` pulls new wallpapers.
-  home.file."dotfiles/backgrounds".source = "${inputs.dotfiles}/backgrounds";
+  # The CachyOS Noctalia settings.json points wallpaper.directory at
+  # /home/gav/Pictures/backgrounds; mirror that exact path as a symlink into
+  # the flake input. Read-only is fine — Noctalia only reads it — and
+  # `nix flake update dotfiles` pulls new wallpapers.
+  home.file."Pictures/backgrounds".source = "${inputs.dotfiles}/backgrounds";
 
   # Seed Noctalia's runtime template files once, as writable copies, so the
   # first boot has colors and mango's `source = .../noctalia.conf` resolves.
@@ -241,6 +241,17 @@ in
     seedNoctalia ${inputs.dotfiles}/mango/noctalia.conf     ${config.xdg.configHome}/mango/noctalia.conf
     seedNoctalia ${inputs.dotfiles}/niri/noctalia.kdl       ${config.xdg.configHome}/niri/noctalia.kdl
     seedNoctalia ${inputs.dotfiles}/ghostty/themes/noctalia ${config.xdg.configHome}/ghostty/themes/noctalia
+
+    # Noctalia v5 runtime config (settings.json, colors.json, plugins.json,
+    # user-templates.toml, templates/, plugins/) — snapshot of the CachyOS
+    # setup kept in the dotfiles repo under noctalia/. Noctalia mutates these
+    # at runtime (settings UI, plugin manager, template editor), so every
+    # file is seeded as a writable copy and only when missing: the first
+    # rebuild reproduces the CachyOS setup, later rebuilds preserve edits.
+    find ${inputs.dotfiles}/noctalia -type f -print0 \
+      | while IFS= read -r -d "" src; do
+          seedNoctalia "$src" "${config.xdg.configHome}/noctalia/''${src#${inputs.dotfiles}/noctalia/}"
+        done
   '';
 
   # ── GTK / Qt theming ─────────────────────────────────────────────────────────
