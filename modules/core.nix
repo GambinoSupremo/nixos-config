@@ -38,11 +38,9 @@
       # substituters      = [ "https://cache.nixos.org" ];
       # trusted-public-keys = [ ... ];
     };
-    gc = {
-      automatic = true;
-      dates     = "weekly";
-      options   = "--delete-older-than 14d";
-    };
+    # Automatic GC stays off while this config stabilizes — old generations
+    # are the recovery path. Re-enable later with something like:
+    #   gc = { automatic = true; dates = "weekly"; options = "--delete-older-than 14d"; };
   };
 
   # Required for obsidian, vivaldi, nvidia, spotify, etc.

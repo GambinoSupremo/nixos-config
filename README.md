@@ -3,6 +3,43 @@
 Nix translation of the CachyOS setup (pacman-explicit.txt → nixpkgs equivalents).
 Targeting nixos-unstable for a rolling-adjacent experience.
 
+## Sessions
+
+SDDM (Wayland greeter) with three sessions; **mango** is the default
+(`services.displayManager.defaultSession = "mango"`):
+
+| Session    | Source                              | Session name |
+|------------|-------------------------------------|--------------|
+| MangoWM    | `inputs.mangowm` NixOS module       | `mango`      |
+| Niri       | `programs.niri` (nixpkgs)           | `niri`       |
+| Hyprland   | `programs.hyprland` (nixpkgs)       | `hyprland`   |
+
+Noctalia v5 runs as a systemd user service (`noctalia.service`, binary
+`noctalia`). Niri and Hyprland start it via `graphical-session.target`;
+Mango starts it explicitly from its patched `autostart.conf`.
+
+Dotfiles come from the `dotfiles` flake input (GambinoSupremo/dotfiles),
+patched for NixOS in `home/default.nix` (no `/usr/bin` paths, portals via
+dbus activation, Noctalia runtime theme files kept writable). To pull new
+dotfiles: `nix flake update dotfiles` then rebuild.
+
+## Validation
+
+```bash
+# Rebuild
+sudo nixos-rebuild switch --flake .#vm --show-trace
+
+# Home Manager applied?
+sudo systemctl status home-manager-gav.service --no-pager
+
+# Sessions registered? (expect mango.desktop, niri.desktop, hyprland.desktop)
+ls -la /run/current-system/sw/share/wayland-sessions
+
+# Noctalia running? (note: service is `noctalia`, not `noctalia-shell`)
+systemctl --user status noctalia.service --no-pager
+journalctl --user -b -u noctalia.service --no-pager -n 200
+```
+
 ## Quick start
 
 ```bash
@@ -19,7 +56,7 @@ Targeting nixos-unstable for a rolling-adjacent experience.
 | CachyOS package              | Status                                              |
 |------------------------------|-----------------------------------------------------|
 | `mangowm`                    | Available via flake: `github:mangowm/mango`. NixOS module + `programs.mango.enable`. |
-| `noctalia-git` / `noctalia-shell` | Available via flake: `github:noctalia-dev/noctalia-shell`. Also in `pkgs.noctalia-shell` (nixpkgs-unstable). HM module provides `programs.noctalia-shell`. |
+| `noctalia-git` / `noctalia-shell` | Available via flake: `github:noctalia-dev/noctalia-shell`. HM module provides `programs.noctalia` (v5; binary is `noctalia`). |
 | `scenefx0.4`                 | Likely bundled in the MangoWM flake output. Verify after enabling. |
 | `cachyos-*` / `cachy-update` | CachyOS-specific. No NixOS equivalents needed. |
 | `chwd`                       | CachyOS hardware detection. Not needed. |
@@ -34,7 +71,7 @@ Targeting nixos-unstable for a rolling-adjacent experience.
 | `dgop`                       | Not identified / not in nixpkgs. |
 | `shelly`                     | Not in nixpkgs (possibly proprietary SSH client). |
 | `sddm-silent-theme-git`      | AUR only. Package manually or use default SDDM theme. |
-| `nordzy-icon-theme`          | AUR only. Not in nixpkgs. |
+| `nordzy-icon-theme`          | In nixpkgs as `nordzy-icon-theme`. |
 | `python-pywalfox`            | AUR only. |
 | `opencode-bin`               | Not in nixpkgs. |
 | `gemini-cli`                 | Check nixpkgs; may be `google-gemini-cli` or absent. |
