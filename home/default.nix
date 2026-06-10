@@ -220,6 +220,13 @@ in
     "ghostty" = { source = "${dotfiles}/ghostty"; recursive = true; force = true; };
   };
 
+  # ── Wallpapers ───────────────────────────────────────────────────────────────
+  # CachyOS keeps wallpapers in ~/dotfiles/backgrounds (the dotfiles clone);
+  # mirror that exact path here as a symlink into the flake input so Noctalia
+  # can use the same wallpaper folder. Read-only is fine — Noctalia only
+  # reads it — and `nix flake update dotfiles` pulls new wallpapers.
+  home.file."dotfiles/backgrounds".source = "${inputs.dotfiles}/backgrounds";
+
   # Seed Noctalia's runtime template files once, as writable copies, so the
   # first boot has colors and mango's `source = .../noctalia.conf` resolves.
   # Noctalia overwrites them whenever the theme changes.
@@ -292,6 +299,12 @@ in
   programs.starship = {
     enable                = true;
     enableFishIntegration = true;
+    # Put `starship init fish | source` into fish's shellInitLast — the very
+    # last line of the generated config.fish, run in every fish shell — rather
+    # than the is-interactive-gated interactiveShellInit. This guarantees
+    # nothing sourced later can shadow fish_prompt, runs for `fish -lc` too,
+    # and matches the CachyOS dotfiles (top-level init in config.fish).
+    enableInteractive     = false;
     # settings = builtins.fromTOML (builtins.readFile ./starship.toml);
   };
 
