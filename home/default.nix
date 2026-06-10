@@ -1,6 +1,11 @@
-{ config, pkgs, inputs, lib, ... }:
+{ config, pkgs, inputs, lib, osConfig ? { }, ... }:
 
 let
+  # Host-awareness: hosts/vm enables the QEMU guest agent, physical hosts
+  # won't — used to skip the heavy chat/media autostarts inside the VM while
+  # keeping them for the future desktop host.
+  isVM = osConfig.services.qemuGuest.enable or false;
+
   # Session bootstrap run from mango's autostart.conf. Mango executes each
   # exec-once value via `sh -c`, but its config parser truncates values at
   # 255 chars (char value[256] in parse_config.h) — an inline one-liner here
@@ -55,6 +60,21 @@ let
     mustSed $out/mango/autostart.conf \
       '^exec-once=qs -c noctalia-shell$' \
       '/^exec-once=qs -c noctalia-shell$/d'
+
+    ${lib.optionalString isVM ''
+      # VM only: don't autostart the heavy chat/media apps. The lines are
+      # mustSed-guarded so a wording change in the dotfiles fails the build
+      # instead of silently re-enabling them.
+      mustSed $out/mango/autostart.conf \
+        '^exec-once=sleep 5 && mullvad-exclude vesktop$' \
+        '/^exec-once=sleep 5 && mullvad-exclude vesktop$/d'
+      mustSed $out/mango/autostart.conf \
+        '^exec-once=sleep 5 && signal-desktop$' \
+        '/^exec-once=sleep 5 && signal-desktop$/d'
+      mustSed $out/mango/autostart.conf \
+        '^exec-once=sleep 5 && tidal-hifi$' \
+        '/^exec-once=sleep 5 && tidal-hifi$/d'
+    ''}
 
     mustSed $out/mango/bind.conf '/usr/bin/ghostty' 's|/usr/bin/ghostty|ghostty|g'
     # v4 `qs -c noctalia-shell ipc call ...` → v5 `noctalia msg ...`
@@ -246,12 +266,17 @@ in
   };
 
   # ── Fish ─────────────────────────────────────────────────────────────────────
+  # pokemon-colorscripts: CachyOS parity (the dotfiles' ghostty command line
+  # used it); package exists in nixpkgs (pkgs/by-name/po/pokemon-colorscripts).
+  home.packages = [ pkgs.pokemon-colorscripts ];
+
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
       set fish_greeting ""
-      # pokemon-colorscripts on launch
-      # pokemon-colorscripts --no-title -r 2>/dev/null || true
+      # pokemon-colorscripts on launch — guarded so a missing package can
+      # never break the shell startup
+      command -q pokemon-colorscripts; and pokemon-colorscripts --no-title -r 2>/dev/null || true
     '';
     shellAliases = {
       ls   = "eza --icons --group-directories-first";
