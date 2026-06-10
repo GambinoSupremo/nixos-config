@@ -81,8 +81,8 @@ in
     wayland-protocols
     uwsm                # Wayland session manager (also used by niri session)
     # mangowm       — provided via inputs.mangowm.nixosModules.mango in desktop.nix
-    # noctalia — installed from inputs.noctalia package in home/default.nix
-    #            and run via a systemd user service (no HM module)
+    # noctalia — v5, managed by the upstream HM module (programs.noctalia)
+    #            in home/default.nix; runs as noctalia.service
     # scenefx        — wlroots-effects; likely bundled in MangoWM's flake output
 
     # ── Themes / Appearance ───────────────────────────────────────────────────
