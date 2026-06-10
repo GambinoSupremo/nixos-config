@@ -242,12 +242,14 @@ in
     seedNoctalia ${inputs.dotfiles}/niri/noctalia.kdl       ${config.xdg.configHome}/niri/noctalia.kdl
     seedNoctalia ${inputs.dotfiles}/ghostty/themes/noctalia ${config.xdg.configHome}/ghostty/themes/noctalia
 
-    # Noctalia v5 runtime config (settings.json, colors.json, plugins.json,
-    # user-templates.toml, templates/, plugins/) — snapshot of the CachyOS
-    # setup kept in the dotfiles repo under noctalia/. Noctalia mutates these
-    # at runtime (settings UI, plugin manager, template editor), so every
-    # file is seeded as a writable copy and only when missing: the first
-    # rebuild reproduces the CachyOS setup, later rebuilds preserve edits.
+    # Noctalia v5 config — snapshot of the CachyOS setup kept in the dotfiles
+    # repo under noctalia/. The pinned v5 rev merges ~/.config/noctalia/*.toml
+    # (config.toml carries the wallpaper setup); settings.json & co are legacy
+    # files read only by older pre-TOML v5 builds and kept for CachyOS parity.
+    # Noctalia mutates this directory at runtime (plugin manager, templates),
+    # so every file is seeded as a writable copy and only when missing: the
+    # first rebuild reproduces the CachyOS setup, later rebuilds preserve
+    # edits.
     find ${inputs.dotfiles}/noctalia -type f -print0 \
       | while IFS= read -r -d "" src; do
           seedNoctalia "$src" "${config.xdg.configHome}/noctalia/''${src#${inputs.dotfiles}/noctalia/}"
