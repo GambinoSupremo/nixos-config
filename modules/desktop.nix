@@ -60,7 +60,7 @@
       cantarell-fonts
       noto-fonts
       noto-fonts-cjk-sans       # was noto-fonts-cjk
-      noto-fonts-emoji
+      noto-fonts-color-emoji    # top-level noto-fonts-emoji became a throw alias 2025-10-27
       dejavu_fonts              # was ttf-dejavu
       liberation_ttf            # was ttf-liberation
       open-sans                 # was ttf-opensans
