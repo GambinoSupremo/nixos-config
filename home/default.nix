@@ -1,6 +1,20 @@
 { config, pkgs, inputs, lib, ... }:
 
 let
+  # Session bootstrap run from mango's autostart.conf. Mango executes each
+  # exec-once value via `sh -c`, but its config parser truncates values at
+  # 255 chars (char value[256] in parse_config.h) — an inline one-liner here
+  # was silently cut mid-command, so the bootstrap lives in a script and the
+  # exec-once line stays short. Mango's own set_activation_env() imports the
+  # env too, but asynchronously and without --systemd for dbus, so the script
+  # re-does it to make the ordering deterministic before the target starts.
+  mangoSessionBootstrap = pkgs.writeShellScript "mango-session-bootstrap" ''
+    systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY
+    dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY
+    systemctl --user reset-failed
+    systemctl --user start mango-session.target
+  '';
+
   # GambinoSupremo/dotfiles with Arch-specific and Noctalia-v4-era bits
   # patched for NixOS + Noctalia v5 (binary `noctalia`, IPC via
   # `noctalia msg ...`, run as noctalia.service).
@@ -31,12 +45,12 @@ let
       '^exec-once=/usr/lib/xdg-desktop-portal-wlr$' \
       '\|^exec-once=/usr/lib/xdg-desktop-portal-wlr$|d'
     # Mango launched from SDDM does not activate the systemd user session by
-    # itself: import the session env, then start mango-session.target (from
-    # the mangowm HM module below), which binds graphical-session.target and
-    # thereby pulls up noctalia.service.
+    # itself: run the bootstrap script (import session env, then start
+    # mango-session.target from the mangowm HM module below, which binds
+    # graphical-session.target and thereby pulls up noctalia.service).
     mustSed $out/mango/autostart.conf \
       '^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$' \
-      "s|^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$|exec-once=sh -c 'systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY; dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY; systemctl --user reset-failed; systemctl --user start mango-session.target'|"
+      's|^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$|exec-once=${mangoSessionBootstrap}|'
     # v4 launched the shell directly; v5 comes up via mango-session.target.
     mustSed $out/mango/autostart.conf \
       '^exec-once=qs -c noctalia-shell$' \
@@ -122,6 +136,14 @@ EOF
     # No v4-era Noctalia invocations may survive the patching above.
     if grep -rn 'qs -c\|noctalia-shell ipc' $out; then
       echo "dotfiles patch FAILED: v4 Noctalia references remain (see above)" >&2
+      exit 1
+    fi
+
+    # Mango's config parser silently truncates values at 255 chars; reject
+    # any line long enough to be eaten (this is what broke the inline
+    # session bootstrap before it was moved into a script).
+    if grep -rn '.\{256,\}' $out/mango; then
+      echo "dotfiles patch FAILED: mango config line exceeds the 255-char parser limit" >&2
       exit 1
     fi
   '';
