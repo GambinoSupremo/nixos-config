@@ -332,6 +332,10 @@ in
   # layout (dotfiles win) and carries over the palette block Noctalia last
   # generated for the current theme.
   home.activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    # Subshell so the PATH override cannot leak into later activation
+    # entries; the HM activation environment does not provide awk/cmp.
+    (
+    PATH=${lib.makeBinPath (with pkgs; [ coreutils gnugrep gnused gawk diffutils ])}:$PATH
     starshipSrc=${inputs.dotfiles}/starship/starship.toml
     starshipDst=${config.xdg.configHome}/starship.toml
     starshipMb="# >>> NOCTALIA STARSHIP PALETTE >>>"
@@ -361,6 +365,7 @@ in
       run install -m644 "$starshipTmp" "$starshipDst"
     fi
     rm -f "$starshipTmp" "$starshipBlk"
+    )
   '';
 
   # ── fzf ───────────────────────────────────────────────────────────────────────
