@@ -318,8 +318,50 @@ in
     # nothing sourced later can shadow fish_prompt, runs for `fish -lc` too,
     # and matches the CachyOS dotfiles (top-level init in config.fish).
     enableInteractive     = false;
-    # settings = builtins.fromTOML (builtins.readFile ./starship.toml);
+    # settings is left unset: ~/.config/starship.toml is managed by
+    # home.activation.starshipConfig below (dotfiles layout + Noctalia's
+    # runtime palette block), which needs a writable regular file.
   };
+
+  # ── Starship config ──────────────────────────────────────────────────────────
+  # ~/.config/starship.toml = dotfiles prompt layout + Noctalia palette block.
+  # Noctalia's starship template only manages the `palette = "noctalia"` line
+  # and its marker-delimited [palettes.noctalia] block appended at the end —
+  # it preserves the rest, but sed -i's the file, so it must stay a writable
+  # regular file (not a store symlink). Each rebuild re-asserts the dotfiles
+  # layout (dotfiles win) and carries over the palette block Noctalia last
+  # generated for the current theme.
+  home.activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    starshipSrc=${inputs.dotfiles}/starship/starship.toml
+    starshipDst=${config.xdg.configHome}/starship.toml
+    starshipMb="# >>> NOCTALIA STARSHIP PALETTE >>>"
+    starshipMe="# <<< NOCTALIA STARSHIP PALETTE <<<"
+    starshipTmp=$(mktemp)
+    starshipBlk=$(mktemp)
+    # Layout from the dotfiles, minus the palette block committed with it
+    # (the CachyOS file was committed live, Noctalia block included).
+    awk -v mb="$starshipMb" -v me="$starshipMe" \
+      '$0 == mb {skip=1} !skip {print} $0 == me {skip=0}' \
+      "$starshipSrc" > "$starshipTmp"
+    # Exactly one palette block: prefer the one Noctalia generated on this
+    # machine (current theme), fall back to the one from the dotfiles.
+    if [ -f "$starshipDst" ] && grep -qF "$starshipMb" "$starshipDst"; then
+      starshipBlkSrc=$starshipDst
+    else
+      starshipBlkSrc=$starshipSrc
+    fi
+    awk -v mb="$starshipMb" -v me="$starshipMe" \
+      '$0 == mb {keep=1} keep {print} $0 == me {keep=0}' \
+      "$starshipBlkSrc" > "$starshipBlk"
+    if [ -s "$starshipBlk" ]; then
+      echo "" >> "$starshipTmp"
+      cat "$starshipBlk" >> "$starshipTmp"
+    fi
+    if ! cmp -s "$starshipTmp" "$starshipDst" 2>/dev/null; then
+      run install -m644 "$starshipTmp" "$starshipDst"
+    fi
+    rm -f "$starshipTmp" "$starshipBlk"
+  '';
 
   # ── fzf ───────────────────────────────────────────────────────────────────────
   programs.fzf = {
