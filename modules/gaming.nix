@@ -14,7 +14,7 @@
     lutris
     heroic
     protonup-qt
-    obs-vkcapture
+    obs-studio-plugins.obs-vkcapture
     mangohud
   ];
 }
