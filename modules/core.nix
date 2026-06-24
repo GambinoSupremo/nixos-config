@@ -2,8 +2,8 @@
 
 {
   # ── Boot ─────────────────────────────────────────────────────────────────────
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
+  # Boot loader is configured per-host (hosts/*/default.nix) since VM and
+  # physical machines need different loaders.
 
   # nixos-unstable ships recent kernels.
   # linux-cachyos (BORE scheduler, NTSYNC, etc.) is NOT in nixpkgs.

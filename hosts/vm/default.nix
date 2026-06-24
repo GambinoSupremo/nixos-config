@@ -14,6 +14,9 @@
 
   networking.hostName = "nix-vm";
 
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda";
+
   # QEMU guest agent — graceful shutdown, snapshot integration with Proxmox
   services.qemuGuest.enable = true;
 
