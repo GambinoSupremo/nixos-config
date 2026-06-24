@@ -82,12 +82,32 @@
         ];
       };
 
-      # Future: physical desktop (MangoWM primary, full GPU stack)
-      # desktop = nixpkgs.lib.nixosSystem {
-      #   system      = "x86_64-linux";
-      #   specialArgs = { inherit inputs; };
-      #   modules     = [ ./hosts/desktop/default.nix ... ];
-      # };
+      # Physical desktop — gavos
+      desktop = nixpkgs.lib.nixosSystem {
+        system      = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/desktop/default.nix
+          {
+            nixpkgs.overlays = [
+              (final: prev: {
+                qt6ct            = final.qt6Packages.qt6ct;
+                noto-fonts-emoji = final.noto-fonts-color-emoji;
+              })
+            ];
+          }
+          home-manager.nixosModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs    = true;
+              useUserPackages  = true;
+              extraSpecialArgs = { inherit inputs; };
+              users.gav        = import ./home/default.nix;
+              backupFileExtension = "hm-bak";
+            };
+          }
+        ];
+      };
     };
   };
 }
