@@ -33,7 +33,6 @@
 
   # Desktop-hardware services that make no sense in a VM.
   # mkForce because modules/services.nix enables them for the physical machine.
-  services.sunshine.enable  = lib.mkForce false;  # needs KMS capture
   hardware.openrazer.enable = lib.mkForce false;  # no Razer hardware in VM
   hardware.bluetooth.enable = lib.mkForce false;  # no BT in VM
   services.blueman.enable   = lib.mkForce false;
