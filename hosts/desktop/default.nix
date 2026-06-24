@@ -19,9 +19,6 @@
   boot.loader.systemd-boot.enable      = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Ollama with CUDA (overrides the CPU-only default in services.nix)
-  services.ollama.acceleration = "cuda";
-
   # Btrfs snapshots for /home
   services.snapper.configs.home = {
     SUBVOLUME        = "/home";

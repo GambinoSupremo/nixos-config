@@ -36,16 +36,6 @@
   # Overridden to false in hosts/vm/default.nix; enable on physical machine.
   programs.gamemode.enable = true;
 
-  # ── Sunshine ──────────────────────────────────────────────────────────────────
-  # Overridden to false in hosts/vm/default.nix; enable on physical machine.
-  # capSysAdmin is required for KMS direct capture (used with Moonlight).
-  services.sunshine = {
-    enable       = true;
-    autoStart    = false;      # toggle to true if you always want it running
-    capSysAdmin  = true;       # needed for KMS capture
-    openFirewall = true;       # opens 47984/47989/48010 TCP, 47998-48000 UDP
-  };
-
   # ── SSH ───────────────────────────────────────────────────────────────────────
   services.openssh = {
     enable   = true;
@@ -54,12 +44,6 @@
       PermitRootLogin        = "no";
     };
   };
-
-  # ── Flatpak ───────────────────────────────────────────────────────────────────
-  # Your only flatpak is me.proton.Mail — run after boot:
-  #   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-  #   flatpak install flathub me.proton.Mail
-  services.flatpak.enable = true;
 
   # ── locate / plocate ──────────────────────────────────────────────────────────
   services.locate = {
@@ -86,12 +70,6 @@
 
   # ── D-Bus ─────────────────────────────────────────────────────────────────────
   services.dbus.enable = true;
-
-  # ── Ollama ────────────────────────────────────────────────────────────────────
-  services.ollama = {
-    enable       = true;
-    # acceleration = "cuda";  # uncomment on physical machine with Nvidia GPU
-  };
 
   # ── Snapper ───────────────────────────────────────────────────────────────────
   # Only relevant if this VM uses btrfs. Configure per your filesystem setup.
