@@ -155,6 +155,7 @@
         "mangowm": "mangowm",
         "nixpkgs": "nixpkgs",
         "noctalia": "noctalia",
+        "silentSDDM": "silentSDDM",
         "zen-browser": "zen-browser"
       }
     },
@@ -176,6 +177,26 @@
       "original": {
         "owner": "wlrfx",
         "repo": "scenefx",
+        "type": "github"
+      }
+    },
+    "silentSDDM": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782166309,
+        "narHash": "sha256-RekdwajKfglwIS/uudP+N+AeqFKI5OooHD6HgjW/x8s=",
+        "owner": "uiriansan",
+        "repo": "SilentSDDM",
+        "rev": "0155bbfa9be2ee6aa5fee1e2fa10e7107c57efe9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "uiriansan",
+        "repo": "SilentSDDM",
         "type": "github"
       }
     },

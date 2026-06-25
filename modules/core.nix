@@ -49,5 +49,5 @@
   # ── System version ────────────────────────────────────────────────────────────
   # Do NOT change this after first install. It controls stateful service migrations.
   # See: https://nixos.org/manual/nixos/stable/#sec-upgrading
-  system.stateVersion = "25.05";
+  system.stateVersion = "26.05";
 }
