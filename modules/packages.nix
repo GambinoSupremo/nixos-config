@@ -43,6 +43,7 @@ in
     # ── Dev tools ─────────────────────────────────────────────────────────────
     git
     github-cli
+    claude-code
     cmake
     ninja
     python3
@@ -72,12 +73,13 @@ in
     grim
     slurp
     wl-clipboard
+    wlr-randr
     wtype
     wev
     playerctl
     fuzzel
     xwayland-satellite  # rootless Xwayland for pure-Wayland compositors
-    xorg.xrandr
+    xrandr
     wayland-protocols
     uwsm                # Wayland session manager (also used by niri session)
     # mangowm       — provided via inputs.mangowm.nixosModules.mango in desktop.nix
@@ -148,6 +150,6 @@ in
     # gamemode managed via programs.gamemode in services.nix
     # keyd managed via services.keyd in services.nix
 
-    # python-pywalfox            # AUR only — pywalfox Firefox theme sync
+    pywalfox-native              # native messaging host for the Pywalfox browser extension
   ];
 }

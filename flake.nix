@@ -37,6 +37,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # SilentSDDM — Wayland SDDM theme with multiple presets
+    silentSDDM = {
+      url   = "github:uiriansan/SilentSDDM";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Dotfiles deployed declaratively via home-manager (see home/default.nix)
     dotfiles = {
       url   = "github:GambinoSupremo/dotfiles";
