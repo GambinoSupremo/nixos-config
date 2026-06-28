@@ -5,10 +5,20 @@
   # Boot loader is configured per-host (hosts/*/default.nix) since VM and
   # physical machines need different loaders.
 
-  # nixos-unstable ships recent kernels.
-  # linux-cachyos (BORE scheduler, NTSYNC, etc.) is NOT in nixpkgs.
-  # If you need it later, look at the chaotic-nyx flake or package it yourself.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # Kernel: this shared module sets NOTHING, so each host gets the nixpkgs DEFAULT
+  # (pkgs.linuxPackages) unless it overrides. The VM stays on the default (stable,
+  # conservative). The desktop overrides to pkgs.linuxPackages_latest (mainline
+  # 7.x) in hosts/desktop/default.nix.
+  #
+  # Historical note: an earlier theory blamed linuxPackages_latest (kernel 7.1.1)
+  # for the AW3423DW scanout bug. That was WRONG — the bug is intermittent and was
+  # isolated to the NVIDIA 595 driver branch (now on 610); the kernel is exonerated.
+  # So linuxPackages_latest is a fine, fully-cached way to be on kernel 7.
+  #
+  # linux-cachyos (BORE, etc.) is NOT in nixpkgs. We tried it via the chaotic-nyx
+  # flake and abandoned it: its broad module forces a from-source rebuild of the
+  # whole base system, and its cache-friendly overlay drops allowUnfree (breaks
+  # NVIDIA). Don't re-add chaotic without solving both.
 
   # Plymouth boot animation — uncomment if you want a splash screen
   # boot.plymouth.enable = true;
@@ -38,9 +48,11 @@
       # substituters      = [ "https://cache.nixos.org" ];
       # trusted-public-keys = [ ... ];
     };
-    # Automatic GC stays off while this config stabilizes — old generations
-    # are the recovery path. Re-enable later with something like:
-    #   gc = { automatic = true; dates = "weekly"; options = "--delete-older-than 14d"; };
+    gc = {
+      automatic = true;
+      dates     = "weekly";
+      options   = "--delete-older-than 14d";
+    };
   };
 
   # Required for obsidian, vivaldi, nvidia, spotify, etc.
