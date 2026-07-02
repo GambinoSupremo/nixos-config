@@ -44,6 +44,9 @@
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store   = true;
       trusted-users         = [ "root" "gav" ];
+      # Build one derivation per CPU core — the default (1) makes rebuilds
+      # painfully sequential on a multi-core Ryzen.
+      max-jobs              = "auto";
       # Binary caches — add cachix caches here if you set them up
       # substituters      = [ "https://cache.nixos.org" ];
       # trusted-public-keys = [ ... ];

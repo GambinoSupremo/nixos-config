@@ -16,7 +16,13 @@
 
   # Mullvad VPN daemon.
   # After first boot: mullvad account login <your-account-number>
-  services.mullvad-vpn.enable = true;
+  # package = pkgs.mullvad-vpn so the daemon binary comes from the same 2026.3 derivation
+  # as the GUI. The default (pkgs.mullvad) is the headless daemon-only package which can
+  # lag behind the GUI release and produce the "inconsistent version" out-of-sync error.
+  services.mullvad-vpn = {
+    enable  = true;
+    package = pkgs.mullvad-vpn;
+  };
 
   # systemd-resolved for local DNS caching.
   # DNSSEC must be false — it breaks Mullvad's DNS.

@@ -31,7 +31,6 @@ in
     rsync
     unrar
     unzip
-    lsd           # explicitly installed on CachyOS alongside eza
 
     # ── Editors ───────────────────────────────────────────────────────────────
     neovim         # also configured in home/default.nix
@@ -94,19 +93,23 @@ in
     tela-icon-theme
     nordzy-icon-theme            # in nixpkgs (pkgs/by-name) despite old AUR-only note
     adw-gtk3                     # was adw-gtk-theme
-    kdePackages.qtstyleplugin-kvantum  # Qt6 Kvantum style plugin
-    libsForQt5.qtstyleplugin-kvantum   # Qt5 Kvantum style plugin (was kvantum)
     qt6Packages.qt6ct            # top-level qt6ct became a throw alias 2025-10-27
     libsForQt5.qt5ct             # was qt5ct-kde (AUR; verify nixpkgs name)
     kdePackages.breeze           # was breeze
+    # kvantum (kdePackages.qtstyleplugin-kvantum) intentionally NOT installed
+    # system-wide: Plasma 6.7's Kirigami detects kvantum presence and imports
+    # it as a QML module; when its QML plugin isn't on the KDE session's
+    # QML2_IMPORT_PATH the import fails and plasmashell black-screens. KDE uses
+    # Breeze by default (correct). If you want kvantum in non-KDE compositors,
+    # install it per-user and set QT_STYLE_OVERRIDE in the compositor env file.
 
     # ── Applications ─────────────────────────────────────────────────────────
     obsidian
     signal-desktop
     vesktop                      # Discord
     element-desktop
-    vivaldi
     zen                          # zen-browser from flake input
+    tidal-hifi                   # Tidal music — Electron/Wayland via NIXOS_OZONE_WL
     mpv
     vlc                          # was vlc-plugins-all (plugins included)
     loupe                        # GNOME image viewer
@@ -124,13 +127,11 @@ in
 
     # ── Media ────────────────────────────────────────────────────────────────
     spotify                      # was spotify-launcher (AUR downloader wrapper)
-    tidal-hifi                   # was tidal-hifi-tidaluna; tidaluna variant NOT in nixpkgs
+    # tidal-hifi                 # replaced by sone via Flatpak (Electron GPU issues on NVIDIA)
     # cider                      # NOT in nixpkgs — Apple Music client
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
-    obs-studio
-    # obs-studio plugins are better managed via home-manager:
-    #   programs.obs-studio.plugins = with pkgs.obs-studio-plugins; [ obs-vaapi obs-vkcapture ];
+    # obs-studio and plugins managed via programs.obs-studio in home/default.nix
     protonplus
     # millennium                 # NOT in nixpkgs — Steam Millennium patcher
     # moondeckbuddy              # NOT in nixpkgs — MoonDeck companion app
@@ -139,9 +140,11 @@ in
     polychromatic    # Razer lighting GUI; openrazer daemon via hardware.openrazer in services.nix
 
     # ── Networking ────────────────────────────────────────────────────────────
-    # mullvad-vpn daemon managed via services.mullvad-vpn in networking.nix
-    # CLI tools still useful to have in PATH:
-    mullvad           # mullvad CLI
+    # mullvad-vpn provides CLI + GUI + daemon. services.mullvad-vpn (networking.nix)
+    # also sets package = pkgs.mullvad-vpn so daemon and GUI versions always match.
+    # pkgs.mullvad (headless-only) is intentionally absent — it lags behind mullvad-vpn
+    # and would put a stale CLI binary in PATH alongside the one from mullvad-vpn.
+    mullvad-vpn
 
     # ── Misc ─────────────────────────────────────────────────────────────────
     # ollama managed via services.ollama in services.nix
