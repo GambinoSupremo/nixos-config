@@ -53,9 +53,8 @@
   };
 
   # ── Profile Sync Daemon ───────────────────────────────────────────────────────
-  # Moves browser profiles to tmpfs for speed and SSD longevity.
-  # Verify this option path against your nixpkgs revision if it errors.
-  # services.psd.enable = true;  # verify module exists
+  # Enabled on the physical desktop only (hosts/desktop/default.nix) — the VM
+  # has no persistent browser sessions so there is nothing to sync.
 
   # ── Power profiles daemon ─────────────────────────────────────────────────────
   services.power-profiles-daemon.enable = true;
@@ -67,6 +66,16 @@
   # ── gvfs (SMB / network browsing) ────────────────────────────────────────────
   # Needed for Nautilus to browse SMB shares (replaces gvfs-smb).
   services.gvfs.enable = true;
+
+  # ── Flatpak ───────────────────────────────────────────────────────────────────
+  # Used for apps not in nixpkgs or with broken nix packaging (e.g. sone).
+  # After first enable: flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  services.flatpak.enable = true;
+
+  # ── Firmware updates ──────────────────────────────────────────────────────────
+  # fwupd covers SSD firmware, BIOS updates, and peripheral firmware via LVFS.
+  # Run: fwupdmgr get-updates && fwupdmgr update
+  services.fwupd.enable = true;
 
   # ── D-Bus ─────────────────────────────────────────────────────────────────────
   services.dbus.enable = true;

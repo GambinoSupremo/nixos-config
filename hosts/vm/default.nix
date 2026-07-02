@@ -20,6 +20,11 @@
   # QEMU guest agent — graceful shutdown, snapshot integration with Proxmox
   services.qemuGuest.enable = true;
 
+  # modules/desktop.nix enables SDDM globally. The desktop uses an X11 greeter
+  # (SilentSDDM targets X11). In the VM there is no reason for X11, so use the
+  # Wayland SDDM backend instead to satisfy the assertion.
+  services.displayManager.sddm.wayland.enable = true;
+
   # SPICE agent — clipboard passthrough + dynamic resolution in Proxmox console
   services.spice-vdagentd.enable = true;
 

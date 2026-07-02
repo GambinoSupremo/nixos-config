@@ -16,6 +16,8 @@
         size  = 24;
       };
       iconTheme = "Papirus-Dark";
+      # Match noctalia's current wallpaper so clicking the desktop shows the same image.
+      wallpaper = "/home/gav/Pictures/backgrounds/abstract/a_painting_of_a_man_with_a_dripping_face.jpg";
     };
 
     # ── Panel removal ────────────────────────────────────────────────────────────
@@ -45,6 +47,11 @@
         key     = "Meta+Space";
         command = "noctalia msg panel-toggle launcher";
       };
+      "zen-private" = {
+        name    = "Zen Private Window";
+        key     = "Meta+Shift+Alt+B";
+        command = "zen-beta --private-window";
+      };
     };
 
     # ── KWin ─────────────────────────────────────────────────────────────────────
@@ -63,45 +70,114 @@
         rows  = 1;
       };
 
-      effects.desktopSwitching = {
-        animation          = "slide";
-        navigationWrapping = true;   # kwinrc [Windows] RollOverDesktops
+      effects = {
+        desktopSwitching = {
+          animation          = "slide";
+          navigationWrapping = true;
+        };
+        # Dim unfocused windows → active window stands out without needing a colored outline.
+        dimInactive.enable = true;
+        # Background blur: lets ghostty's 0.7 background-opacity actually look blurred.
+        blur.enable = true;
       };
     };
 
     # ── Raw kwinrc overrides ─────────────────────────────────────────────────────
     configFile."kwinrc" = {
-      # Per-screen virtual desktops (KDE 6.7+ feature).
-      # Key confirmed in src/kcms/desktop/virtualdesktopssettings.kcfg.
       Windows.PerOutputVirtualDesktops = true;
-
-      # SUPER+scroll → previous/next virtual desktop.
-      # CommandAllKey: modifier that activates the "All windows" mouse binding.
-      # CommandAllWheel enum value confirmed in kwinoptions_settings.kcfg.
       MouseBindings.CommandAllKey   = "Meta";
-      MouseBindings.CommandAllWheel = "Previous/Next Desktop";
+      # CommandAllWheel "Previous/Next Desktop" moves the focused window to the
+      # next desktop (window command) — not a viewport switch. Set Nothing to
+      # stop windows following the scroll. Use Meta+Ctrl+Left/Right for desktop nav.
+      MouseBindings.CommandAllWheel = "Nothing";
+
+      # Focus follows mouse: hovering over a window focuses it, matching Hyprland/Niri defaults.
+      Windows.FocusPolicy = "FocusFollowsMouse";
+
+      # Breeze decoration border: shows a thin colored border on all four sides.
+      # Active window gets noctalia's accent color; inactive is dimmed by dimInactive.
+      "org.kde.kdecoration2".BorderSize     = "Normal";
+      "org.kde.kdecoration2".BorderSizeAuto = false;
+
+      # dimInactive strength: 0–100. 40 dims unfocused windows noticeably.
+      "Effect-DimInactive".Strength = 40;
+    };
+
+    # ── VRR / G-Sync ─────────────────────────────────────────────────────────
+    # KWin VRR is stored in kscreen2 output config, not kwinrc, and plasma-manager
+    # does not expose an option for it. Enable it once manually:
+    #   System Settings → Display & Monitor → select the AW3423DW → enable VRR
+    # KWin persists the choice in ~/.local/share/kscreen/ across reboots.
+
+    # ── KWin window opacity rules ─────────────────────────────────────────────
+    # Match niri/mango: focused=0.95 unfocused=0.85 for the same app set.
+    # Ghostty is excluded — its background-opacity=0.7 is set in ghostty/config directly.
+    configFile."kwinrulesrc" = {
+      General.rules = "signal-opacity,vesktop-opacity,zen-opacity,obsidian-opacity";
+
+      "signal-opacity" = {
+        Description          = "Signal transparency";
+        wmclass              = "signal";
+        wmclassmatch         = 3;
+        opacityactive        = 95;
+        opacityactiverule    = 2;
+        opacityinactive      = 85;
+        opacityinactiverule  = 2;
+      };
+
+      "vesktop-opacity" = {
+        Description          = "Vesktop transparency";
+        wmclass              = "vesktop";
+        wmclassmatch         = 3;
+        opacityactive        = 95;
+        opacityactiverule    = 2;
+        opacityinactive      = 85;
+        opacityinactiverule  = 2;
+      };
+
+      "zen-opacity" = {
+        Description          = "Zen Browser transparency";
+        wmclass              = "zen";
+        wmclassmatch         = 3;
+        opacityactive        = 95;
+        opacityactiverule    = 2;
+        opacityinactive      = 85;
+        opacityinactiverule  = 2;
+      };
+
+      "obsidian-opacity" = {
+        Description          = "Obsidian transparency";
+        wmclass              = "obsidian";
+        wmclassmatch         = 3;
+        opacityactive        = 95;
+        opacityactiverule    = 2;
+        opacityinactive      = 85;
+        opacityinactiverule  = 2;
+      };
     };
 
     # ── 3-tier KWin shortcuts ────────────────────────────────────────────────────
     shortcuts.kwin = {
       # ── SUPER — focus / window state ─────────────────────────────────────────
-      "Switch Window Left"  = "Meta+H";
-      "Switch Window Down"  = "Meta+J";
-      "Switch Window Up"    = "Meta+K";
-      "Switch Window Right" = "Meta+L";
+      # Switch Window Left/Right/Up/Down are cleared (set to "none") so that
+      # Polonium's PoloniumActivateLeft/Right/Above/Below own Meta+H/J/K/L
+      # without conflict. KWin and Polonium both registered Meta+H here, making
+      # focus navigation unreliable. Polonium is tiling-aware; KWin's is not.
+      "Switch Window Left"  = "none";
+      "Switch Window Down"  = "none";
+      "Switch Window Up"    = "none";
+      "Switch Window Right" = "none";
       "Window Close"        = "Meta+Q";
       "Window Maximize"     = "Meta+F";
       "Window Minimize"     = "Meta+W";
 
-      # ── SUPER+SHIFT — move window within workspace ────────────────────────────
-      # KWin quick-tile (snap to edge) as the movement primitive for now.
-      # Polonium swap shortcuts (group "polonium" in kglobalshortcutsrc) will be
-      # added to shortcuts.polonium after first boot via rc2nix to get exact
-      # action names; quick-tile and Polonium coexist without conflict.
-      "Window Quick Tile Left"   = "Meta+Shift+H";
-      "Window Quick Tile Bottom" = "Meta+Shift+J";
-      "Window Quick Tile Top"    = "Meta+Shift+K";
-      "Window Quick Tile Right"  = "Meta+Shift+L";
+      # ── SUPER+SHIFT — move window within tiling layout ───────────────────────
+      # Polonium's PlaceLeft/Right/Above/Below (Meta+Shift+H/J/K/L) handle this.
+      # Quick-tile is cleared too to avoid duplicating the same keys.
+      "Window Quick Tile Left"   = "none";
+      "Window Quick Tile Bottom" = "none";
+      "Window Quick Tile Top"    = "none";
+      "Window Quick Tile Right"  = "none";
 
       # ── SUPER+CTRL — workspace / monitor navigation ───────────────────────────
       "Switch to Desktop 1" = "Meta+Ctrl+1";
