@@ -34,10 +34,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # zen-browser is not in nixpkgs
+    # zen-browser is not in nixpkgs. home/zen.nix imports homeModules.beta,
+    # which provides programs.zen-browser (mirrors programs.firefox).
     zen-browser = {
       url   = "github:0xc000022070/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows      = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     # SilentSDDM — Wayland SDDM theme with multiple presets

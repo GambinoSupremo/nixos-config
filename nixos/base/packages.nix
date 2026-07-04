@@ -1,9 +1,5 @@
 { config, pkgs, inputs, lib, ... }:
 
-let
-  # zen-browser is not in nixpkgs; pull from the flake input declared in flake.nix
-  zen = inputs.zen-browser.packages.${pkgs.system}.default;
-in
 {
   environment.systemPackages = with pkgs; [
 
@@ -108,7 +104,7 @@ in
     signal-desktop
     vesktop                      # Discord
     element-desktop
-    zen                          # zen-browser from flake input
+    # zen-browser moved to home-manager (home/zen.nix, programs.zen-browser)
     tidal-hifi                   # Tidal music — Electron/Wayland via NIXOS_OZONE_WL
     mpv
     vlc                          # was vlc-plugins-all (plugins included)
