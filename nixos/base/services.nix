@@ -2,7 +2,7 @@
 
 {
   # ── Bluetooth ─────────────────────────────────────────────────────────────────
-  # Overridden to false in hosts/vm/default.nix; enable on physical machine.
+  # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
   hardware.bluetooth = {
     enable      = true;
     powerOnBoot = true;
@@ -26,14 +26,14 @@
   };
 
   # ── OpenRazer ─────────────────────────────────────────────────────────────────
-  # Overridden to false in hosts/vm/default.nix; enable on physical machine.
+  # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
   hardware.openrazer = {
     enable = true;
     users  = [ "gav" ];
   };
 
   # ── GameMode ──────────────────────────────────────────────────────────────────
-  # Overridden to false in hosts/vm/default.nix; enable on physical machine.
+  # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
   programs.gamemode.enable = true;
 
   # ── SSH ───────────────────────────────────────────────────────────────────────
@@ -53,7 +53,7 @@
   };
 
   # ── Profile Sync Daemon ───────────────────────────────────────────────────────
-  # Enabled on the physical desktop only (hosts/desktop/default.nix) — the VM
+  # Enabled on the physical desktop only (nixos/hosts/desktop/configuration.nix) — the VM
   # has no persistent browser sessions so there is nothing to sync.
 
   # ── Power profiles daemon ─────────────────────────────────────────────────────

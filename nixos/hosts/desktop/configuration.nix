@@ -1,17 +1,21 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
+  # NOTE: import order is load-bearing — NixOS merges list options
+  # (systemPackages etc.) in import order, so reordering changes the built
+  # system hash even when nothing functional changes.
   imports = [
-    ./hardware.nix
-    ../../modules/hardware/nvidia.nix
-    ../../modules/core.nix
-    ../../modules/users.nix
-    ../../modules/networking.nix
-    ../../modules/desktop.nix
-    ../../modules/audio.nix
-    ../../modules/services.nix
-    ../../modules/packages.nix
-    ../../modules/gaming.nix
+    ./hardware-configuration.nix
+    ../../features/nvidia.nix
+    ../../base/core.nix
+    ../../base/users.nix
+    ../../base/networking.nix
+    ../../features/desktop.nix
+    ../../base/audio.nix
+    ../../base/services.nix
+    ../../base/packages.nix
+    ../../features/gaming.nix
+    ../../features/sunshine.nix
     inputs.silentSDDM.nixosModules.default
   ];
 
@@ -57,7 +61,7 @@
   ];
 
   # KWallet: disable PAM auto-start so it doesn't open in non-KDE sessions.
-  # GNOME Keyring (enabled in modules/desktop.nix) handles SecretService D-Bus
+  # GNOME Keyring (enabled in nixos/features/desktop.nix) handles SecretService D-Bus
   # for Niri/Mango/Hyprland — and KDE works fine with it too. KWallet can still
   # be opened manually inside KDE if ever needed.
   security.pam.services.login.kwallet.enable  = lib.mkForce false;

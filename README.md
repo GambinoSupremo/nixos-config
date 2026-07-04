@@ -3,6 +3,28 @@
 Nix translation of the CachyOS setup (pacman-explicit.txt → nixpkgs equivalents).
 Targeting nixos-unstable for a rolling-adjacent experience.
 
+## Layout
+
+Folder structure modelled on [vimjoyer/nixconf](https://github.com/vimjoyer/nixconf):
+
+```
+flake.nix                 # inputs + nixosConfigurations (desktop, vm)
+nixos/
+  base/                   # imported by every host
+    core.nix users.nix networking.nix audio.nix services.nix packages.nix
+  features/               # opt-in per host
+    desktop.nix           # SDDM + compositors + portals (all hosts import this today)
+    nvidia.nix amd.nix    # GPU/CPU-specific hardware config
+    gaming.nix sunshine.nix
+  hosts/
+    desktop/              # gavos — physical machine
+    vm/                   # Proxmox VM
+    laptop/               # spare AMD laptop config (not wired into flake outputs)
+      configuration.nix   # host entry point: imports base + features
+      hardware-configuration.nix
+home/                     # home-manager config for gav (shared by all hosts)
+```
+
 ## Sessions
 
 SDDM (Wayland greeter) with three sessions; **mango** is the default
@@ -49,7 +71,7 @@ journalctl --user -b -u noctalia.service --no-pager -n 200
 ```bash
 # 1. Boot NixOS ISO, partition, mount at /mnt
 # 2. Run nixos-generate-config --root /mnt
-# 3. Copy the generated hardware-configuration.nix values into hosts/vm/hardware.nix
+# 3. Copy the generated hardware-configuration.nix values into nixos/hosts/vm/hardware-configuration.nix
 # 4. Clone this repo to /mnt/etc/nixos (or anywhere)
 # 5. nixos-install --flake .#vm
 # 6. Reboot, then: home-manager switch --flake .#gav (if managing separately)

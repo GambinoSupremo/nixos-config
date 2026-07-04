@@ -12,7 +12,7 @@
   inputs = {
     # nixpkgs tracks rolling unstable. Stays fully current; nothing is frozen
     # with it. The NVIDIA driver branch is selected (not frozen) in
-    # hosts/desktop/hardware-nvidia.nix.
+    # nixos/features/nvidia.nix.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     home-manager = {
@@ -53,7 +53,7 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # nixos-hardware — used by hosts/laptop for AMD CPU module
+    # nixos-hardware — used by nixos/hosts/laptop for AMD CPU module
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     # hyprland-scroll-overview — niri-style overview plugin for Hyprland.
@@ -119,7 +119,7 @@
         system      = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
-          ./hosts/vm/default.nix
+          ./nixos/hosts/vm/configuration.nix
           { nixpkgs.overlays = [ commonOverlay ]; }
           home-manager.nixosModules.home-manager
           hmModule
@@ -131,7 +131,7 @@
         system      = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
-          ./hosts/desktop/default.nix
+          ./nixos/hosts/desktop/configuration.nix
           { nixpkgs.overlays = [ commonOverlay ]; }
           home-manager.nixosModules.home-manager
           hmModule
