@@ -30,7 +30,7 @@
   # only GPU and every compositor (mango, niri, hyprland, KWin) selects it
   # deterministically. (An earlier theory blamed a dual-GPU/amdgpu render race and
   # blacklisted amdgpu for it; that was wrong — the real DSC scanout bug was the
-  # kernel, fixed in modules/core.nix. With the iGPU off in BIOS there is no amdgpu
+  # kernel, fixed in nixos/base/core.nix. With the iGPU off in BIOS there is no amdgpu
   # to blacklist.) nvidia-drm modeset/fbdev are left at the NixOS module defaults.
 
   environment.sessionVariables = {

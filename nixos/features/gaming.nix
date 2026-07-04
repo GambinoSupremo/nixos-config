@@ -6,6 +6,12 @@
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
     extraCompatPackages = with pkgs; [ proton-ge-bin ];
+    # Steam injects desktop-mode controller input (Steam Controller trackpad
+    # mouse) as XTEST — X11-only fake input that never reaches the Wayland
+    # cursor, so the pointer only "works" over XWayland windows like Steam
+    # itself. extest is preloaded into Steam and rewrites those XTEST calls
+    # into real uinput events.
+    extest.enable = true;
   };
 
   # programs.gamemode.enable is set in services.nix.

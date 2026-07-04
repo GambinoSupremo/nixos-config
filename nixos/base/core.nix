@@ -2,13 +2,13 @@
 
 {
   # ── Boot ─────────────────────────────────────────────────────────────────────
-  # Boot loader is configured per-host (hosts/*/default.nix) since VM and
+  # Boot loader is configured per-host (nixos/hosts/*/configuration.nix) since VM and
   # physical machines need different loaders.
 
   # Kernel: this shared module sets NOTHING, so each host gets the nixpkgs DEFAULT
   # (pkgs.linuxPackages) unless it overrides. The VM stays on the default (stable,
   # conservative). The desktop overrides to pkgs.linuxPackages_latest (mainline
-  # 7.x) in hosts/desktop/default.nix.
+  # 7.x) in nixos/hosts/desktop/configuration.nix.
   #
   # Historical note: an earlier theory blamed linuxPackages_latest (kernel 7.1.1)
   # for the AW3423DW scanout bug. That was WRONG — the bug is intermittent and was

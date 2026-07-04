@@ -8,9 +8,8 @@
     # Open specific ports here rather than via ufw rules.
     firewall = {
       enable = true;
-      # Sunshine streaming ports — uncomment on physical machine
-      # allowedTCPPorts = [ 47984 47989 48010 ];
-      # allowedUDPPorts = [ 47998 47999 48000 ];
+      # Sunshine streaming ports are opened by services.sunshine.openFirewall
+      # (nixos/features/sunshine.nix).
     };
   };
 

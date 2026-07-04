@@ -42,6 +42,9 @@ let
     dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
     systemctl --user reset-failed
     systemctl --user restart noctalia.service
+    # Sunshine (Moonlight streaming host) is also WantedBy graphical-session
+    # and needs the compositor env for wlr screen capture.
+    systemctl --user restart sunshine.service
   '';
 
   # GambinoSupremo/dotfiles with Arch-specific and Noctalia-v4-era bits
@@ -371,7 +374,7 @@ in
   };
 
   # ── Mango systemd session plumbing ───────────────────────────────────────────
-  # The session binary + SDDM entry come from the NixOS module (modules/desktop.nix).
+  # The session binary + SDDM entry come from the NixOS module (nixos/features/desktop.nix).
   # This HM module is used only for mango-session.target (BindsTo
   # graphical-session.target). settings is empty → the module does NOT generate
   # mango/config.conf; the dotfiles below remain authoritative.
