@@ -13,6 +13,7 @@
     ./programs.nix   # git, neovim, obs, signal, pywalfox
     ./services.nix   # mullvad-gui systemd user service
     ./plasma.nix     # KDE plasma-manager config
+    ./zen.nix        # Zen Browser — declarative profile, extensions, policies
   ];
 
   home.username      = "gav";
