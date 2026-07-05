@@ -13,6 +13,22 @@
       allowed_extensions  = [ "pywalfox@frewacom.org" ];
     };
 
+  # ── Default apps (mime associations) ─────────────────────────────────────────
+  # Canon RAW photos open in nomacs (built with libraw; loupe can't read them).
+  # The association is declared here because nomacs' .desktop file doesn't
+  # advertise the RAW mime types itself.
+  xdg.mimeApps = {
+    enable = true;
+    associations.added = {
+      "image/x-canon-cr2" = [ "org.nomacs.ImageLounge.desktop" ];
+      "image/x-canon-cr3" = [ "org.nomacs.ImageLounge.desktop" ];
+    };
+    defaultApplications = {
+      "image/x-canon-cr2" = [ "org.nomacs.ImageLounge.desktop" ];
+      "image/x-canon-cr3" = [ "org.nomacs.ImageLounge.desktop" ];
+    };
+  };
+
   # ── Git ──────────────────────────────────────────────────────────────────────
   programs.git = {
     enable   = true;

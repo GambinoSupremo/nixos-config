@@ -60,6 +60,41 @@
     };
 
     profiles.default = {
+      # Kagi is always the default search engine — declared here (not left to
+      # the Kagi extension) so it's the default from first launch on a fresh
+      # machine, before Sync has installed any extensions.
+      # force = true: home-manager owns search.json.mozlz4 and re-asserts this
+      # on every rebuild — engines added by hand in the browser won't survive.
+      search = {
+        force   = true;
+        default = "kagi";
+        engines = {
+          kagi = {
+            name = "Kagi";
+            urls = [
+              { template = "https://kagi.com/search?q={searchTerms}"; }
+              { template = "https://kagi.com/api/autosuggest?q={searchTerms}";
+                type = "application/x-suggestions+json"; }
+            ];
+            icon = "https://kagi.com/favicon.ico";
+            definedAliases = [ "@k" ];
+          };
+
+          # The Kagi extension registers its own engine once Sync installs it;
+          # hide it so "Kagi" doesn't appear twice (extension features are
+          # unaffected — this only removes the duplicate picker entry).
+          "search@kagi.comdefault".metaData.hidden = true;
+
+          # Built-in engines we never want offered (ids from the live
+          # search.json.mozlz4; ddg and wikipedia stay visible).
+          google.metaData.hidden             = true;
+          bing.metaData.hidden               = true;
+          "amazondotcom-us".metaData.hidden  = true;
+          ebay.metaData.hidden               = true;
+          perplexity.metaData.hidden         = true;
+        };
+      };
+
       # prefs.js defaults — changeable in the browser, re-asserted on rebuild.
       # Zen-specific prefs are discoverable in about:config under "zen.".
       #

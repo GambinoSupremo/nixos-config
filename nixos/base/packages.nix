@@ -105,10 +105,11 @@
     vesktop                      # Discord
     element-desktop
     # zen-browser moved to home-manager (home/zen.nix, programs.zen-browser)
-    tidal-hifi                   # Tidal music — Electron/Wayland via NIXOS_OZONE_WL
     mpv
     vlc                          # was vlc-plugins-all (plugins included)
     loupe                        # GNOME image viewer
+    nomacs                       # Qt image viewer with RAW support (libraw) —
+                                 # default handler for Canon CR2/CR3 (home/programs.nix)
     nautilus
     gnome-disk-utility
     pavucontrol
@@ -123,7 +124,10 @@
 
     # ── Media ────────────────────────────────────────────────────────────────
     spotify                      # was spotify-launcher (AUR downloader wrapper)
-    # tidal-hifi                 # replaced by sone via Flatpak (Electron GPU issues on NVIDIA)
+    sone                         # native Tidal client, hi-res FLAC up to 24/192
+                                 # (was the Flathub flatpak; now in nixpkgs)
+    # tidal-hifi                 # broken upstream — white screen on launch:
+                                 # github.com/Mastermindzh/tidal-hifi/issues/958
     # cider                      # NOT in nixpkgs — Apple Music client
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
