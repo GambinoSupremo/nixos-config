@@ -68,7 +68,8 @@
   services.gvfs.enable = true;
 
   # ── Flatpak ───────────────────────────────────────────────────────────────────
-  # Used for apps not in nixpkgs or with broken nix packaging (e.g. sone).
+  # Used for apps not in nixpkgs. Currently nothing installed — sone moved to
+  # nixpkgs (nixos/base/packages.nix); kept enabled as an escape hatch.
   # After first enable: flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
   services.flatpak.enable = true;
 
