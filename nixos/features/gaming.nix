@@ -12,6 +12,13 @@
     # itself. extest is preloaded into Steam and rewrites those XTEST calls
     # into real uinput events.
     extest.enable = true;
+    protontricks.enable = true;
+  };
+
+  # HDR + VRR scaler; use --hdr-enabled for the AW3423DW
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;   # lets gamescope keep its compositor thread scheduled under load
   };
 
   # programs.gamemode.enable is set in services.nix.
@@ -34,11 +41,26 @@
 
   boot.kernel.sysctl."vm.max_map_count" = 2147483642;
 
+  # Split-lock mitigation throttles a core hard when a process does a
+  # misaligned atomic — a server-side protection that several Windows games
+  # trip constantly under Proton (God of War, THPS1+2, Sable, ...), showing
+  # up as massive unexplained stutter. Desktop box, no untrusted tenants:
+  # turn it off.
+  boot.kernel.sysctl."kernel.split_lock_mitigate" = 0;
+
   environment.systemPackages = with pkgs; [
+    # Steam launch-option wrapper: `novpn %command%` runs the game outside the
+    # Mullvad tunnel (EOS/P2P matchmaking fails behind the VPN — Rivals 2).
+    # mullvad-exclude can't be used there: it's a setuid wrapper and Steam's
+    # FHS/bwrap sandbox mounts nosuid, so it dies on the cgroup write. Instead
+    # ask the daemon over RPC to exclude this PID; exec keeps the PID and
+    # children inherit the exclusion cgroup.
+    (writeShellScriptBin "novpn" ''
+      mullvad split-tunnel add $$ >/dev/null 2>&1 || true
+      exec "$@"
+    '')
     lutris
     heroic
-    protonup-qt
-    gamescope      # HDR + VRR scaler; use --hdr-enabled for the AW3423DW
     mangohud
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
   ];
