@@ -395,6 +395,9 @@ in
     # Suppress the stale XDG autostart entry so the mullvad-gui systemd user
     # service (services.nix) controls launch timing instead.
     "autostart/mullvad-vpn.desktop" = { force = true; text = "[Desktop Entry]\nHidden=true\n"; };
+    # Ad-hoc nix-shell/nix-env read this instead of the system config, which
+    # already allows unfree in /etc/nixos/configuration.nix.
+    "nixpkgs/config.nix" = { force = true; text = "{ allowUnfree = true; }\n"; };
   };
 
   # ── Wallpapers ───────────────────────────────────────────────────────────────
