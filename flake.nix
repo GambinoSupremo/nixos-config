@@ -55,8 +55,13 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # nixos-hardware — used by nixos/hosts/laptop for AMD CPU module
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    # nixos-hardware — used by nixos/hosts/laptop for AMD CPU module.
+    # follows keeps its (otherwise unused) nixpkgs pin out of the lock file —
+    # without it a second, months-stale nixpkgs copy lingers there.
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # hyprland-scroll-overview — niri-style overview plugin for Hyprland.
     # Consumed as a plain source tree (flake = false) and built with
