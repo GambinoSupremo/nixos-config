@@ -40,23 +40,12 @@
         Fingerprinting = true;
       };
 
-      # Most extensions come from Firefox Sync after signing in (settings
-      # included) — declaring them here would fight Sync as a second source of
-      # truth. Keeper is the exception: it holds the passwords needed to sign
-      # into Sync in the first place, so it must exist before Sync does.
-      # Todoist is declared only to get default_area pinning, which Sync
-      # doesn't carry. default_area applies at install time — extensions
-      # already installed by Sync won't be re-pinned retroactively.
-      ExtensionSettings = let
-        pinned = builtins.mapAttrs (guid: slug: {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/${slug}/latest.xpi";
-          installation_mode = "force_installed";
-          default_area = "navbar";
-        });
-      in pinned {
-        "KeeperFFStoreExtension@KeeperSecurityInc" = "keeper-password-manager";
-        "support@todoist.com"                      = "todoist";
-      };
+      # All extensions come from Firefox Sync after signing in — nothing is
+      # force-installed here. On a fresh machine: install Keeper manually
+      # first (it holds the Sync password), sign into Sync, everything else
+      # follows. Keeper/Todoist were force_installed via ExtensionSettings
+      # until 2026-07-05; removed so Sync is the single source of truth and
+      # extensions aren't policy-managed.
     };
 
     profiles.default = {
