@@ -15,7 +15,10 @@
   };
 
   # ── Cursor ───────────────────────────────────────────────────────────────────
+  # enable must be explicit — home-manager deprecated inferring it from the
+  # attrset being defined (warning added upstream in home-cursor.nix).
   home.pointerCursor = {
+    enable     = true;
     gtk.enable = true;
     name       = "Bibata-Modern-Ice";
     package    = pkgs.bibata-cursors;
