@@ -19,9 +19,13 @@
     keyboards.default = {
       ids      = [ "*" ];
       settings = {
-        main = {
-          "super+c" = "C-insert";
-          "super+v" = "S-insert";
+        # keyd can't bind combos like "super+c" in [main] (logs "super is
+        # not a valid key" and drops the line) — modifier combos live in a
+        # layer section named after the modifier. [meta] = Super; unlisted
+        # keys fall through with Super held, so other Super binds still work.
+        meta = {
+          c = "C-insert";
+          v = "S-insert";
         };
       };
     };
