@@ -26,6 +26,9 @@
       # update` only rewrites flake.lock — nothing lands until the rebuild
       # (which is how a 2026-07-13 update sat unapplied on a 07-09 system).
       update  = "nix flake update --flake ~/nixos-config && sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
+      # dotsync = deploy dotfile edits only: refresh just the dotfiles pin
+      # and rebuild, leaving nixpkgs and every other input untouched.
+      dotsync = "nix flake update dotfiles --flake ~/nixos-config && sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
       # Ported from the Arch-era zsh config (dotfiles zsh/.zshrc). Path
       # updated: the Zen profile on NixOS is ~/.config/zen/default, not
       # ~/.zen/<hash>.Default Profile. CURRENTLY INERT: updater.sh is not
