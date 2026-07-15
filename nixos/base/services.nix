@@ -82,11 +82,6 @@
   services.dbus.enable = true;
 
   # ── Snapper ───────────────────────────────────────────────────────────────────
-  # Only relevant if this VM uses btrfs. Configure per your filesystem setup.
-  # services.snapper.configs.root = {
-  #   SUBVOLUME        = "/";
-  #   ALLOW_USERS      = [ "gav" ];
-  #   TIMELINE_CREATE  = true;
-  #   TIMELINE_CLEANUP = true;
-  # };
+  # Btrfs snapshot configs are host-specific (the VM doesn't use btrfs) —
+  # see nixos/hosts/desktop/configuration.nix.
 }
