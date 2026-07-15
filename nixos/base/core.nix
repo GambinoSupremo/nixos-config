@@ -20,8 +20,8 @@
   # whole base system, and its cache-friendly overlay drops allowUnfree (breaks
   # NVIDIA). Don't re-add chaotic without solving both.
 
-  # Plymouth boot animation — uncomment if you want a splash screen
-  # boot.plymouth.enable = true;
+  # Plymouth boot animation is configured per-host (desktop has it; the VM
+  # doesn't need a splash).
 
   # ── Locale / Time ─────────────────────────────────────────────────────────────
   time.timeZone      = "America/Los_Angeles";

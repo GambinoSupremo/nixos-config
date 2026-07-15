@@ -67,12 +67,40 @@
   security.pam.services.login.kwallet.enable  = lib.mkForce false;
   security.pam.services.sddm.kwallet.enable   = lib.mkForce false;
 
+  # systemd-boot: plain but instant. (Tried themed GRUB 2026-07-09, reverted —
+  # the menu load lag wasn't worth cosmetics on a menu that's hidden anyway.)
   boot.loader.systemd-boot.enable      = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   # systemd initrd: faster boot, cleaner Plymouth, better error reporting.
   # Safe on this hardware — the AW3423DW scanout fix is in the driver, not initrd.
   boot.initrd.systemd.enable = true;
+
+  # ── Quiet, pretty boot ────────────────────────────────────────────────────────
+  # Skip the generation menu (hold any key during firmware handoff to show it,
+  # e.g. to roll back) and keep the entry list short.
+  boot.loader.timeout = 0;
+  boot.loader.systemd-boot.configurationLimit = 10;
+
+  # Plymouth splash covers boot AND shutdown. Theme comes from the adi1090x
+  # community pack — swap the name in BOTH places to try another (pack list:
+  # https://github.com/adi1090x/plymouth-themes). Press Esc during boot to
+  # drop to the full text log if something hangs.
+  boot.plymouth = {
+    enable = true;
+    theme  = "rings";
+    themePackages = [
+      (pkgs.adi1090x-plymouth-themes.override { selected_themes = [ "rings" ]; })
+    ];
+  };
+
+  # Silence the console text Plymouth would otherwise paint over.
+  boot.consoleLogLevel = 3;
+  boot.initrd.verbose  = false;
+  boot.kernelParams = [
+    "quiet"
+    "udev.log_priority=3"
+  ];
 
   # ── Btrfs snapshots ───────────────────────────────────────────────────────────
   # Root snapshot lets you roll back a broken nixos-rebuild without needing to
