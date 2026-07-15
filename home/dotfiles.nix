@@ -427,9 +427,19 @@ in
     seedNoctalia ${inputs.dotfiles}/mango/noctalia.conf     ${config.xdg.configHome}/mango/noctalia.conf
     seedNoctalia ${inputs.dotfiles}/niri/noctalia.kdl       ${config.xdg.configHome}/niri/noctalia.kdl
     seedNoctalia ${inputs.dotfiles}/ghostty/themes/noctalia ${config.xdg.configHome}/ghostty/themes/noctalia
+    # hypr/noctalia.lua has no template in the dotfiles — Noctalia generates
+    # it at runtime. Seed an empty stub so hyprland.lua's require("noctalia")
+    # doesn't fail on a machine where Noctalia has never run (an empty lua
+    # module loads fine); Noctalia overwrites it with real theme colors.
+    seedNoctalia ${pkgs.writeText "noctalia-lua-stub" ''
+      -- Placeholder seeded by home-manager; Noctalia overwrites this with
+      -- theme colors on first run.
+    ''} ${config.xdg.configHome}/hypr/noctalia.lua
 
     # Noctalia v5 config dir. config.toml comes from home/noctalia/config.toml
-    # in this repo (bar layout, opacity, shortcuts) — the dotfiles version is skipped.
+    # in this repo (bar layout, opacity, shortcuts) — the filter below guards
+    # against a config.toml ever reappearing in the dotfiles (the old copy
+    # was deleted from there 2026-07-14).
     find ${inputs.dotfiles}/noctalia -type f -not -name "config.toml" -print0 \
       | while IFS= read -r -d "" src; do
           seedNoctalia "$src" "${config.xdg.configHome}/noctalia/''${src#${inputs.dotfiles}/noctalia/}"
