@@ -1,3 +1,5 @@
+# Systemd user services owned by home-manager. Currently only the Mullvad
+# GUI launcher (the daemon is a system service in nixos/base/networking.nix).
 { pkgs, lib, osConfig ? {}, ... }:
 
 let

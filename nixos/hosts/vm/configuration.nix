@@ -1,3 +1,5 @@
+# Proxmox VM — no GPU (software rendering), physical-hardware services
+# forced off. Used as a safe testbed for the shared modules.
 { config, pkgs, lib, inputs, ... }:
 
 {

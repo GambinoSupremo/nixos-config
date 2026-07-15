@@ -1,3 +1,6 @@
+# gavos — the physical desktop (Ryzen + RTX 3090 Ti; AW3423DW ultrawide +
+# Philips 4K). Adds NVIDIA, gaming, Sunshine, KDE, and boot cosmetics on
+# top of the shared base.
 { config, pkgs, lib, inputs, ... }:
 
 {

@@ -1,3 +1,6 @@
+# NVIDIA RTX 3090 Ti (desktop host only): driver-branch pin, open kernel
+# modules, and the Wayland/gaming session env. The branch pin and its
+# retirement condition are documented inline below.
 { config, pkgs, lib, ... }:
 
 {

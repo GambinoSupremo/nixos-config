@@ -1,3 +1,8 @@
+# Dotfiles deployment: patches the dotfiles flake input for NixOS +
+# Noctalia v5, deploys mango/niri/hypr/ghostty into ~/.config as store
+# symlinks, and seeds Noctalia's runtime-writable files.
+# Constraint: every mustSed below matches exact line text in the dotfiles
+# repo — the matched files carry warning headers pointing back here.
 { config, pkgs, lib, inputs, osConfig ? {}, ... }:
 
 let

@@ -1,3 +1,6 @@
+# Sunshine (Moonlight streaming host) with a per-stream headless virtual
+# display sized to the client. Hyprland-only; other sessions stream the
+# physical (letterboxed) desktop.
 { config, lib, pkgs, ... }:
 
 let

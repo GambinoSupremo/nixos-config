@@ -1,3 +1,5 @@
+# Hardware and misc system services shared by all hosts. The VM host
+# force-disables the physical-hardware ones (nixos/hosts/vm).
 { config, pkgs, ... }:
 
 {
