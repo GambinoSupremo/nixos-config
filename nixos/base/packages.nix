@@ -100,7 +100,8 @@
     # it as a QML module; when its QML plugin isn't on the KDE session's
     # QML2_IMPORT_PATH the import fails and plasmashell black-screens. KDE uses
     # Breeze by default (correct). If you want kvantum in non-KDE compositors,
-    # install it per-user and set QT_STYLE_OVERRIDE in the compositor env file.
+    # install it per-user and set QT_STYLE_OVERRIDE in the compositor env
+    # file. Re-test after each Plasma major bump (see home/theming.nix).
 
     # ── Applications ─────────────────────────────────────────────────────────
     obsidian
