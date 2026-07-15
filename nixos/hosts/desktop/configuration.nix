@@ -77,9 +77,11 @@
   boot.initrd.systemd.enable = true;
 
   # ── Quiet, pretty boot ────────────────────────────────────────────────────────
-  # Skip the generation menu (hold any key during firmware handoff to show it,
-  # e.g. to roll back) and keep the entry list short.
-  boot.loader.timeout = 0;
+  # Show the generation menu for 5s at boot. Each entry displays its NixOS
+  # version + build date (e.g. "NixOS 26.11.20260702... Generation 79"), so you
+  # can see exactly what you're booting and roll back without holding a key.
+  # Set back to 0 to boot straight through again.
+  boot.loader.timeout = 5;
   boot.loader.systemd-boot.configurationLimit = 10;
 
   # Plymouth splash covers boot AND shutdown. Theme comes from the adi1090x
