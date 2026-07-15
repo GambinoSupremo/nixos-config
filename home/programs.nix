@@ -1,3 +1,6 @@
+# Per-app home-manager config: git, neovim, OBS, pywalfox, RAW-photo mime
+# defaults, and desktop-entry overrides (Signal keyring pin, Vesktop VPN
+# bypass).
 { pkgs, ... }:
 
 {

@@ -1,3 +1,6 @@
+# Shell stack: fish (aliases, greeting), starship, fzf, zoxide, bat.
+# The standalone fish config in the dotfiles repo is NOT deployed on NixOS;
+# this file is the single owner of interactive-shell behavior here.
 { pkgs, ... }:
 
 {
@@ -23,6 +26,14 @@
       # update` only rewrites flake.lock — nothing lands until the rebuild
       # (which is how a 2026-07-13 update sat unapplied on a 07-09 system).
       update  = "nix flake update --flake ~/nixos-config && sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
+      # Ported from the Arch-era zsh config (dotfiles zsh/.zshrc). Path
+      # updated: the Zen profile on NixOS is ~/.config/zen/default, not
+      # ~/.zen/<hash>.Default Profile. CURRENTLY INERT: updater.sh is not
+      # installed, and user.js is a read-only home-manager symlink (zen.nix
+      # settings), which the arkenfox updater would need to overwrite.
+      # Before first use: decide arkenfox vs declarative zen.nix prefs —
+      # they fight over user.js and can't both own it.
+      arkenfox-update = "bash ~/.config/zen/default/updater.sh";
     };
   };
 
