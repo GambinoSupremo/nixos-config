@@ -1,3 +1,5 @@
+# Spare AMD laptop — kept as a reference host; deliberately NOT wired
+# into flake.nix outputs. Wire it up (and re-check amd.nix) before use.
 { inputs, ... }:
 {
   imports = [

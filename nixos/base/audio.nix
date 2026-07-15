@@ -1,3 +1,4 @@
+# PipeWire audio stack: ALSA + PulseAudio shims, WirePlumber, rtkit.
 { config, pkgs, ... }:
 
 {

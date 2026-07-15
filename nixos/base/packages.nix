@@ -1,3 +1,6 @@
+# System-wide packages. Anything managed by a NixOS module or a
+# home-manager programs.* block is deliberately absent — the section
+# comments below say where each of those lives.
 { config, pkgs, inputs, lib, ... }:
 
 {

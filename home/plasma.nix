@@ -1,3 +1,6 @@
+# KDE Plasma via plasma-manager: appearance, default-panel removal
+# (Noctalia is the bar), Polonium tiling, and the 3-tier shortcut scheme
+# kept in step with the Mango/Niri/Hyprland binds.
 { config, lib, pkgs, ... }:
 
 {

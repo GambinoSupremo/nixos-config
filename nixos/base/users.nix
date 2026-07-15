@@ -1,3 +1,4 @@
+# User account, groups, and login-shell registration.
 { config, pkgs, ... }:
 
 {

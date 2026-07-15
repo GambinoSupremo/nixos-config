@@ -1,3 +1,5 @@
+# Graphical stack: SDDM plus the three Wayland sessions (Mango primary,
+# Niri secondary, Hyprland tertiary/HDR) with portals, keyring, and fonts.
 { config, pkgs, inputs, ... }:
 
 {
