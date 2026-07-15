@@ -80,8 +80,4 @@
 
   # ── D-Bus ─────────────────────────────────────────────────────────────────────
   services.dbus.enable = true;
-
-  # ── Snapper ───────────────────────────────────────────────────────────────────
-  # Btrfs snapshot configs are host-specific (the VM doesn't use btrfs) —
-  # see nixos/hosts/desktop/configuration.nix.
 }
