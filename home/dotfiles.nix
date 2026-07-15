@@ -335,8 +335,10 @@ EOF
     # one that isn't present.
     cat > $out/mango/monitor.conf <<'EOF'
 # Monitors — Dell AW3423DW ultrawide (left). Name is DP-2 or DP-4 by probe order.
-monitorrule=name:DP-2,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:1
-monitorrule=name:DP-4,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:1
+# vrr:0 + rule.conf's vrr_only_fullscreen:1 on steam_app_ = fullscreen-only
+# VRR (mango has no vrr:2; always-on VRR gamma-flickers the QD-OLED desktop).
+monitorrule=name:DP-2,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
+monitorrule=name:DP-4,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
 # Philips 278E1 4K (right). Name is DP-1 or DP-3 by probe order.
 monitorrule=name:DP-1,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
 monitorrule=name:DP-3,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
