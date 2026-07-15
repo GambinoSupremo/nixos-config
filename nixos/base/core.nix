@@ -1,3 +1,5 @@
+# Shared basics for every host: locale/time, nix daemon + GC settings,
+# allowUnfree, stateVersion. Kernel and boot loader are per-host.
 { config, pkgs, lib, ... }:
 
 {

@@ -1,3 +1,5 @@
+# Graphical stack: SDDM plus the three Wayland sessions (Mango primary,
+# Niri secondary, Hyprland tertiary/HDR) with portals, keyring, and fonts.
 { config, pkgs, inputs, ... }:
 
 {
@@ -16,12 +18,17 @@
   # session and the gnome/gtk portal config for it.
   programs.niri.enable = true;
 
-  # Hyprland — fallback session. Built with systemd support, so it starts
-  # hyprland-session.target → graphical-session.target → noctalia.service.
+  # Hyprland — fallback session. Built with systemd support
+  # (hyprland-session.target), but in practice the session env import and
+  # noctalia.service startup are driven by hyprSessionBootstrap in
+  # home/dotfiles.nix — the bare target ordering raced noctalia into
+  # start-limit-hit.
   # withUWSM=false alone is NOT enough to drop the duplicate SDDM entry: the
   # hyprland package itself ships hyprland-uwsm.desktop in
   # share/wayland-sessions and the module registers the whole package. The
   # symlinkJoin strips that one file without recompiling Hyprland.
+  # Remove the wrapper when programs.hyprland can skip the uwsm session
+  # file itself (or the package stops shipping hyprland-uwsm.desktop).
   programs.hyprland = {
     enable    = true;
     withUWSM  = false;

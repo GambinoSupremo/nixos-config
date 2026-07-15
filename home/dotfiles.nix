@@ -1,3 +1,8 @@
+# Dotfiles deployment: patches the dotfiles flake input for NixOS +
+# Noctalia v5, deploys mango/niri/hypr/ghostty into ~/.config as store
+# symlinks, and seeds Noctalia's runtime-writable files.
+# Constraint: every mustSed below matches exact line text in the dotfiles
+# repo — the matched files carry warning headers pointing back here.
 { config, pkgs, lib, inputs, osConfig ? {}, ... }:
 
 let
@@ -224,9 +229,8 @@ EOF
     mustSed $out/hypr/autostart.lua \
       'sleep 5 && signal-desktop"' \
       's|sleep 5 && signal-desktop"|sleep 5 \&\& signal-desktop --password-store=gnome-libsecret"|'
-    mustSed $out/hypr/bind.lua \
-      'hl.dsp.exec_cmd("signal-desktop")' \
-      's|hl.dsp.exec_cmd("signal-desktop")|hl.dsp.exec_cmd("signal-desktop --password-store=gnome-libsecret")|'
+    # (No signal-desktop sed for bind.lua: the spawn bind was removed from
+    # the dotfiles — it double-bound SUPER+SHIFT+S with the screenshot.)
     # noctalia is owned by the HM noctalia.service (graphical-session.target);
     # the raw lua spawn raced it (service died with start-limit-hit and the
     # SUPER+ALT+R restart bind managed nothing).
@@ -331,8 +335,10 @@ EOF
     # one that isn't present.
     cat > $out/mango/monitor.conf <<'EOF'
 # Monitors — Dell AW3423DW ultrawide (left). Name is DP-2 or DP-4 by probe order.
-monitorrule=name:DP-2,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:1
-monitorrule=name:DP-4,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:1
+# vrr:0 + rule.conf's vrr_only_fullscreen:1 on steam_app_ = fullscreen-only
+# VRR (mango has no vrr:2; always-on VRR gamma-flickers the QD-OLED desktop).
+monitorrule=name:DP-2,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
+monitorrule=name:DP-4,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
 # Philips 278E1 4K (right). Name is DP-1 or DP-3 by probe order.
 monitorrule=name:DP-1,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
 monitorrule=name:DP-3,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
@@ -395,8 +401,8 @@ in
     # Suppress the stale XDG autostart entry so the mullvad-gui systemd user
     # service (services.nix) controls launch timing instead.
     "autostart/mullvad-vpn.desktop" = { force = true; text = "[Desktop Entry]\nHidden=true\n"; };
-    # Ad-hoc nix-shell/nix-env read this instead of the system config, which
-    # already allows unfree in /etc/nixos/configuration.nix.
+    # Ad-hoc nix-shell/nix-env read this instead of the system config
+    # (nixpkgs.config.allowUnfree in nixos/base/core.nix).
     "nixpkgs/config.nix" = { force = true; text = "{ allowUnfree = true; }\n"; };
   };
 
@@ -421,9 +427,19 @@ in
     seedNoctalia ${inputs.dotfiles}/mango/noctalia.conf     ${config.xdg.configHome}/mango/noctalia.conf
     seedNoctalia ${inputs.dotfiles}/niri/noctalia.kdl       ${config.xdg.configHome}/niri/noctalia.kdl
     seedNoctalia ${inputs.dotfiles}/ghostty/themes/noctalia ${config.xdg.configHome}/ghostty/themes/noctalia
+    # hypr/noctalia.lua has no template in the dotfiles — Noctalia generates
+    # it at runtime. Seed an empty stub so hyprland.lua's require("noctalia")
+    # doesn't fail on a machine where Noctalia has never run (an empty lua
+    # module loads fine); Noctalia overwrites it with real theme colors.
+    seedNoctalia ${pkgs.writeText "noctalia-lua-stub" ''
+      -- Placeholder seeded by home-manager; Noctalia overwrites this with
+      -- theme colors on first run.
+    ''} ${config.xdg.configHome}/hypr/noctalia.lua
 
     # Noctalia v5 config dir. config.toml comes from home/noctalia/config.toml
-    # in this repo (bar layout, opacity, shortcuts) — the dotfiles version is skipped.
+    # in this repo (bar layout, opacity, shortcuts) — the filter below guards
+    # against a config.toml ever reappearing in the dotfiles (the old copy
+    # was deleted from there 2026-07-14).
     find ${inputs.dotfiles}/noctalia -type f -not -name "config.toml" -print0 \
       | while IFS= read -r -d "" src; do
           seedNoctalia "$src" "${config.xdg.configHome}/noctalia/''${src#${inputs.dotfiles}/noctalia/}"

@@ -1,3 +1,5 @@
+# AMD graphics — used only by the laptop host (which is kept as a spare
+# and is not wired into flake.nix outputs).
 { pkgs, ... }:
 {
   hardware.graphics = {

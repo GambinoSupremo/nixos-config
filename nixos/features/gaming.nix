@@ -1,3 +1,5 @@
+# Gaming: Steam (+extest, protontricks), gamescope, gamemode tuning,
+# game-friendly sysctls, and the novpn launch-option wrapper.
 { pkgs, ... }:
 
 {

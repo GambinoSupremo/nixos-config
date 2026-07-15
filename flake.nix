@@ -81,29 +81,11 @@
 
   outputs = { self, nixpkgs, home-manager, mangowm, noctalia, zen-browser, nixos-hardware, ... }@inputs:
   let
-    # TEMPORARY compatibility aliases for top-level nixpkgs attributes that
-    # were converted to throw aliases (2025-10-27 cleanup batch). Our own
-    # references use the modern names; these exist only so any stale expression
-    # inside a flake input keeps evaluating. Remove once input updates stop
-    # needing them.
-    commonOverlay = final: prev: {
-      qt6ct            = final.qt6Packages.qt6ct;
-      noto-fonts-emoji = final.noto-fonts-color-emoji;
-      # fish >= 4.8 dropped create_manpage_completions.py (Rust rewrite),
-      # but some packages' *_fish-completions builds still call it. Add a
-      # no-op stub ONLY when the real script is absent, so older fish
-      # (4.7, which still ships it) is left untouched.
-      fish = prev.fish.overrideAttrs (old: {
-        postInstall = (old.postInstall or "") + ''
-          if [ ! -e "$out/share/fish/tools/create_manpage_completions.py" ]; then
-            mkdir -p "$out/share/fish/tools"
-            printf '#!/usr/bin/env python3\nimport sys\n' \
-              > "$out/share/fish/tools/create_manpage_completions.py"
-            chmod +x "$out/share/fish/tools/create_manpage_completions.py"
-          fi
-        '';
-      });
-    };
+    # (Removed 2026-07-14: a commonOverlay with qt6ct/noto-fonts-emoji
+    # throw-alias shims and a fish create_manpage_completions.py stub —
+    # a full desktop build without it passed, so the stale expressions it
+    # papered over are gone from the inputs. Resurrect from git history if
+    # an input update ever reintroduces one of those references.)
 
     # Shared home-manager config block applied to every host.
     hmModule = {
@@ -127,7 +109,6 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./nixos/hosts/vm/configuration.nix
-          { nixpkgs.overlays = [ commonOverlay ]; }
           home-manager.nixosModules.home-manager
           hmModule
         ];
@@ -139,7 +120,6 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./nixos/hosts/desktop/configuration.nix
-          { nixpkgs.overlays = [ commonOverlay ]; }
           home-manager.nixosModules.home-manager
           hmModule
         ];
