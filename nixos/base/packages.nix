@@ -126,8 +126,13 @@
     spotify                      # was spotify-launcher (AUR downloader wrapper)
     sone                         # native Tidal client, hi-res FLAC up to 24/192
                                  # (was the Flathub flatpak; now in nixpkgs)
-    # tidal-hifi                 # broken upstream — white screen on launch:
-                                 # github.com/Mastermindzh/tidal-hifi/issues/958
+    tidal-hifi                   # Tidal Electron client. The 2026-07 "gray screen"
+                                 # was NOT upstream (issue #958 is a red herring):
+                                 # the app's own gpuRasterization flag crashes the
+                                 # GPU process (zygote SIGTRAP) on NVIDIA+Wayland.
+                                 # Fix lives in ~/.config/tidal-hifi/config.json:
+                                 # flags.gpuRasterization = false. Don't re-enable
+                                 # it from the in-app settings menu.
     # cider                      # NOT in nixpkgs — Apple Music client
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
