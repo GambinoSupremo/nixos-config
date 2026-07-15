@@ -112,11 +112,7 @@
   # Desktop-only — the VM has no persistent browser sessions.
   services.psd.enable = true;
 
-  environment.systemPackages = with pkgs; [
-    # btrfs maintenance GUI (scrub, balance, subvolume view). Its snapshot tab
-    # is inert — snapper was removed 2026-07-14 (this install never had a
-    # working .snapshots subvolume layout).
-    btrfs-assistant
-  ];
-
+  # No btrfs-assistant: it pulls snapper back into the closure as a runtime
+  # dep (snapper was removed 2026-07-14 — no working .snapshots layout), and
+  # `btrfs scrub/balance/subvolume` covers the maintenance it wrapped.
 }
