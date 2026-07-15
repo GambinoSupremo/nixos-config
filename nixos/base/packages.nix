@@ -47,6 +47,7 @@
     git
     github-cli
     claude-code
+    jq             # JSON CLI; required by niri stack-comms.sh (dotfiles)
     cmake
     ninja
     python3
