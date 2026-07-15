@@ -137,7 +137,6 @@ journalctl --user -b -u noctalia.service --no-pager -n 200
 - `flatpak` → `services.flatpak.enable`
 - `mullvad-vpn` → `services.mullvad-vpn.enable`
 - `ufw` → replaced by `networking.firewall` (nftables)
-- `snapper` → `services.snapper`
 - `power-profiles-daemon` → `services.power-profiles-daemon.enable`
 - `profile-sync-daemon` → `services.psd.enable`
 - `sunshine` → `services.sunshine.*`

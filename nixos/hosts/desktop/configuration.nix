@@ -104,32 +104,16 @@
     "udev.log_priority=3"
   ];
 
-  # ── Btrfs snapshots ───────────────────────────────────────────────────────────
-  # Root snapshot lets you roll back a broken nixos-rebuild without needing to
-  # boot into an old generation. Home snapshot covers user data separately.
-  services.snapper.configs = {
-    root = {
-      SUBVOLUME        = "/";
-      ALLOW_USERS      = [ "gav" ];
-      TIMELINE_CREATE  = true;
-      TIMELINE_CLEANUP = true;
-    };
-    home = {
-      SUBVOLUME        = "/home";
-      ALLOW_USERS      = [ "gav" ];
-      TIMELINE_CREATE  = true;
-      TIMELINE_CLEANUP = true;
-    };
-  };
-
   # ── Profile Sync Daemon ───────────────────────────────────────────────────────
   # Moves Zen Browser profile to tmpfs for faster page loads and less SSD wear.
   # Desktop-only — the VM has no persistent browser sessions.
   services.psd.enable = true;
 
   environment.systemPackages = with pkgs; [
+    # btrfs maintenance GUI (scrub, balance, subvolume view). Its snapshot tab
+    # is inert — snapper was removed 2026-07-14 (this install never had a
+    # working .snapshots subvolume layout).
     btrfs-assistant
-    snapper
   ];
 
 }
