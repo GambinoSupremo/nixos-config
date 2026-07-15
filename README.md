@@ -27,8 +27,10 @@ home/                     # home-manager config for gav (shared by all hosts)
 
 ## Sessions
 
-SDDM (Wayland greeter) with three sessions; **mango** is the default
-(`services.displayManager.defaultSession = "mango"`):
+SDDM (SilentSDDM, X11 greeter on the desktop) with three wlroots-style
+sessions plus KDE Plasma 6 (desktop host only); **hyprland** is the default
+(`services.displayManager.defaultSession = "hyprland"` in
+nixos/features/desktop.nix):
 
 | Session    | Source                              | Session name |
 |------------|-------------------------------------|--------------|
