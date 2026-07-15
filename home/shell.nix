@@ -19,6 +19,10 @@
       cat     = "bat --style=plain";
       grep    = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
+      # update = lock refresh AND rebuild in one step. A bare `nix flake
+      # update` only rewrites flake.lock — nothing lands until the rebuild
+      # (which is how a 2026-07-13 update sat unapplied on a 07-09 system).
+      update  = "nix flake update --flake ~/nixos-config && sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
     };
   };
 
