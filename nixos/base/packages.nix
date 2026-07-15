@@ -1,6 +1,14 @@
 # System-wide packages. Anything managed by a NixOS module or a
 # home-manager programs.* block is deliberately absent — the section
 # comments below say where each of those lives.
+#
+# Root/TTY fallback set — the only packages here that home-manager ALSO
+# manages: git and neovim (plus fish, registered via programs.fish in
+# users.nix). Kept system-wide so root shells, TTYs, and recovery sessions
+# have a working editor + git without home-manager in the loop. Everything
+# else HM-managed was removed from here 2026-07-14: starship, bat, fzf,
+# zoxide (home/shell.nix) and mullvad-vpn (installed by the
+# services.mullvad-vpn module itself).
 { config, pkgs, inputs, lib, ... }:
 
 {
@@ -8,14 +16,11 @@
 
     # ── Shell / Terminal ──────────────────────────────────────────────────────
     # fish registered system-wide via programs.fish in users.nix
+    # starship / bat / fzf / zoxide: HM-owned — home/shell.nix
     ghostty
     kitty
-    starship
     tmux
-    bat
-    eza
-    fzf
-    zoxide
+    eza          # stays: only aliased (no programs.eza) in home/shell.nix
     ripgrep
     fd
     tree
@@ -32,7 +37,7 @@
     unzip
 
     # ── Editors ───────────────────────────────────────────────────────────────
-    neovim         # also configured in home/default.nix
+    neovim         # root/TTY fallback; HM config in home/programs.nix
     vim
     nano
     meld
@@ -149,11 +154,11 @@
     polychromatic    # Razer lighting GUI; openrazer daemon via hardware.openrazer in services.nix
 
     # ── Networking ────────────────────────────────────────────────────────────
-    # mullvad-vpn provides CLI + GUI + daemon. services.mullvad-vpn (networking.nix)
-    # also sets package = pkgs.mullvad-vpn so daemon and GUI versions always match.
-    # pkgs.mullvad (headless-only) is intentionally absent — it lags behind mullvad-vpn
-    # and would put a stale CLI binary in PATH alongside the one from mullvad-vpn.
-    mullvad-vpn
+    # mullvad-vpn (CLI + GUI + daemon) is NOT listed here: the
+    # services.mullvad-vpn module (networking.nix) installs its `package`
+    # into systemPackages itself, and package = pkgs.mullvad-vpn there keeps
+    # daemon and GUI versions matched. pkgs.mullvad (headless-only) stays
+    # absent — it lags mullvad-vpn and would shadow the CLI with a stale one.
 
     # ── Misc ─────────────────────────────────────────────────────────────────
     # ollama managed via services.ollama in services.nix
