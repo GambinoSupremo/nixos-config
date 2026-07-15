@@ -229,9 +229,8 @@ EOF
     mustSed $out/hypr/autostart.lua \
       'sleep 5 && signal-desktop"' \
       's|sleep 5 && signal-desktop"|sleep 5 \&\& signal-desktop --password-store=gnome-libsecret"|'
-    mustSed $out/hypr/bind.lua \
-      'hl.dsp.exec_cmd("signal-desktop")' \
-      's|hl.dsp.exec_cmd("signal-desktop")|hl.dsp.exec_cmd("signal-desktop --password-store=gnome-libsecret")|'
+    # (No signal-desktop sed for bind.lua: the spawn bind was removed from
+    # the dotfiles — it double-bound SUPER+SHIFT+S with the screenshot.)
     # noctalia is owned by the HM noctalia.service (graphical-session.target);
     # the raw lua spawn raced it (service died with start-limit-hit and the
     # SUPER+ALT+R restart bind managed nothing).
