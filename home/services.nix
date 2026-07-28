@@ -7,17 +7,12 @@ let
 in
 {
   # ── Mullvad VPN GUI ───────────────────────────────────────────────────────────
-  # Replaces the XDG autostart entry (suppressed in dotfiles.nix) with a systemd
-  # user service. ExecStartPre waits until the system daemon is active before
-  # launching the GUI, preventing the "App is out of sync" error at login.
-  # Both ExecStart and the daemon come from pkgs.mullvad-vpn so versions match.
+  # Systemd user service instead of XDG autostart; waits for the system daemon
+  # so the GUI doesn't show "App is out of sync" at login.
   systemd.user.services.mullvad-gui = lib.mkIf (!isVM) (
     let
-      # Bounded wait. A user unit cannot use After= on a system unit, so the
-      # daemon is polled — but an unbounded loop here hung this unit (and the
-      # rebuild switch with it) whenever mullvad-daemon was mid-restart during
-      # activation. After the deadline, launch the GUI anyway: worst case it
-      # briefly shows "out of sync" and Restart=on-failure retries.
+      # Bounded poll (user units can't After= system units); an unbounded loop
+      # here once hung rebuild switches. Past deadline, launch anyway.
       waitDaemon = pkgs.writeShellScript "mullvad-daemon-wait" ''
         for _ in $(seq 1 30); do
           systemctl is-active --quiet mullvad-daemon.service && exit 0

@@ -1,6 +1,6 @@
 # Graphical stack: SDDM plus the three Wayland sessions (Mango primary,
 # Niri secondary, Hyprland tertiary/HDR) with portals, keyring, and fonts.
-{ config, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
   imports = [
@@ -9,40 +9,37 @@
   ];
 
   # ── Compositors ───────────────────────────────────────────────────────────────
-  # MangoWM — dwl-based, primary compositor.
-  # The module registers a session (share/wayland-sessions/mango.desktop) via
-  # addLoginEntry (default true) and configures its own wlr/gtk portals.
+  # MangoWM — dwl-based, primary; module registers the session + its portals.
   programs.mango.enable = true;
 
-  # Niri — scrolling compositor, secondary. The nixpkgs module registers the
-  # session and the gnome/gtk portal config for it.
+  # Niri — secondary; nixpkgs module registers session + portal config.
+  # TEMP (2026-07-28): nixpkgs bumped libdisplay-info to 0.4.0 but niri 26.04's
+  # vendored libdisplay-info-sys 0.3.0 requires `< 0.4.0`, breaking the build.
+  # Pin niri back to libdisplay-info_0_2 (nixpkgs keeps it around already) until
+  # nixpkgs bumps niri to a release built against libdisplay-info-sys >= 0.4.
+  # Remove this overlay once a plain `programs.niri.enable = true;` builds again.
+  nixpkgs.overlays = [
+    (final: prev: {
+      niri = prev.niri.override { libdisplay-info = prev.libdisplay-info_0_2; };
+    })
+  ];
   programs.niri.enable = true;
 
-  # Hyprland — fallback session. Built with systemd support
-  # (hyprland-session.target), but in practice the session env import and
-  # noctalia.service startup are driven by hyprSessionBootstrap in
-  # home/dotfiles.nix — the bare target ordering raced noctalia into
-  # start-limit-hit.
-  # withUWSM=false alone is NOT enough to drop the duplicate SDDM entry: the
-  # hyprland package itself ships hyprland-uwsm.desktop in
-  # share/wayland-sessions and the module registers the whole package. The
-  # symlinkJoin strips that one file without recompiling Hyprland.
-  # Remove the wrapper when programs.hyprland can skip the uwsm session
-  # file itself (or the package stops shipping hyprland-uwsm.desktop).
+  # Hyprland — fallback. Session env / noctalia startup driven by
+  # hyprSessionBootstrap in home/dotfiles.nix (the bare target raced noctalia).
   programs.hyprland = {
     enable    = true;
+    # false alone doesn't drop the duplicate SDDM entry — the package ships
+    # hyprland-uwsm.desktop itself; the symlinkJoin strips that one file.
     withUWSM  = false;
-    # The module calls .override on the package (wayland/lib.nix), so the
-    # wrapper must re-expose it; the recursion re-strips after any override.
+    # The module calls .override on the package, so the wrapper re-exposes it
+    # (re-stripping after any override) plus the attrs the module reads.
     package   =
       let
         stripUwsmSession = hl: pkgs.symlinkJoin {
           name = "hyprland-single-session";
           paths = [ hl ];
           postBuild = "rm $out/share/wayland-sessions/hyprland-uwsm.desktop";
-          # The module also reads .version (xwayland default) and
-          # meta.mainProgram (getExe) off the package; meta.outputsToInstall
-          # names the man output, so expose it via passthru too.
           inherit (hl) version meta;
           passthru = hl.passthru or {} // {
             inherit (hl) man;
@@ -56,25 +53,20 @@
   # ── Display Manager ───────────────────────────────────────────────────────────
   services.displayManager.sddm = {
     enable = true;
-    # Greeter display server is left to the SilentSDDM module, which drives it to
-    # X11 (its theme targets X11, and X11 is the reliable path on this NVIDIA box).
-    # Don't set wayland.enable here — it conflicts with SilentSDDM's definition.
-    # The greeter's display server is independent of the session you pick: an X11
-    # greeter still launches the Wayland sessions (mango/niri/hyprland) fine.
-    #
-    # Point X11 SessionDir at an empty path so the "Plasma (X11)" entry from
-    # plasma-workspace.sessions doesn't appear in the SDDM session list.
+    # Wayland greeter on kwin: the X11 greeter fails to respawn after logout on
+    # this NVIDIA box (black screen). mkForce beats SilentSDDM's !xserver.enable.
+    wayland.enable = lib.mkForce true;
+    wayland.compositor = "kwin";
+    # Empty X11 SessionDir hides the "Plasma (X11)" entry from the session list.
     settings.X11.SessionDir = "/var/empty";
   };
 
-  # Session names are the wayland-sessions desktop file basenames:
-  #   mango.desktop → "mango", niri.desktop → "niri", hyprland.desktop → "hyprland"
-  # Verify with: ls /run/current-system/sw/share/wayland-sessions
-  services.displayManager.defaultSession = "hyprland";
+  # Fallback preselection only (SDDM remembers last-used); keep it on the daily
+  # driver — defaulting to hyprland once landed a quick login in the wrong WM.
+  services.displayManager.defaultSession = "niri";
 
   # ── XDG Portals ───────────────────────────────────────────────────────────────
-  # The mango, niri, and hyprland modules each register their own portal
-  # backends and per-compositor routing. Only the shared fallback lives here.
+  # Each compositor module registers its own backends; only the shared fallback here.
   xdg.portal = {
     enable       = true;
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];  # file dialogs everywhere

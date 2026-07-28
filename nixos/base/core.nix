@@ -4,26 +4,9 @@
 
 {
   # ── Boot ─────────────────────────────────────────────────────────────────────
-  # Boot loader is configured per-host (nixos/hosts/*/configuration.nix) since VM and
-  # physical machines need different loaders.
-
-  # Kernel: this shared module sets NOTHING, so each host gets the nixpkgs DEFAULT
-  # (pkgs.linuxPackages) unless it overrides. The VM stays on the default (stable,
-  # conservative). The desktop overrides to pkgs.linuxPackages_latest (mainline
-  # 7.x) in nixos/hosts/desktop/configuration.nix.
-  #
-  # Historical note: an earlier theory blamed linuxPackages_latest (kernel 7.1.1)
-  # for the AW3423DW scanout bug. That was WRONG — the bug is intermittent and was
-  # isolated to the NVIDIA 595 driver branch (now on 610); the kernel is exonerated.
-  # So linuxPackages_latest is a fine, fully-cached way to be on kernel 7.
-  #
-  # linux-cachyos (BORE, etc.) is NOT in nixpkgs. We tried it via the chaotic-nyx
-  # flake and abandoned it: its broad module forces a from-source rebuild of the
-  # whole base system, and its cache-friendly overlay drops allowUnfree (breaks
-  # NVIDIA). Don't re-add chaotic without solving both.
-
-  # Plymouth boot animation is configured per-host (desktop has it; the VM
-  # doesn't need a splash).
+  # Boot loader, kernel, and Plymouth are all per-host (nixos/hosts/*).
+  # Don't re-add chaotic-nyx for linux-cachyos: its module forces from-source
+  # rebuilds of the base system and its overlay drops allowUnfree (breaks NVIDIA).
 
   # ── Locale / Time ─────────────────────────────────────────────────────────────
   time.timeZone      = "America/Los_Angeles";
@@ -46,12 +29,8 @@
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store   = true;
       trusted-users         = [ "root" "gav" ];
-      # Build one derivation per CPU core — the default (1) makes rebuilds
-      # painfully sequential on a multi-core Ryzen.
+      # Default max-jobs of 1 makes rebuilds painfully sequential on this Ryzen.
       max-jobs              = "auto";
-      # Binary caches — add cachix caches here if you set them up
-      # substituters      = [ "https://cache.nixos.org" ];
-      # trusted-public-keys = [ ... ];
     };
     gc = {
       automatic = true;
@@ -60,11 +39,25 @@
     };
   };
 
+  # ── nix-ld ────────────────────────────────────────────────────────────────────
+  # Lets prebuilt dynamically-linked binaries (e.g. the Claude Code agent SDK
+  # that Zed downloads via npx) find a libc/loader outside the Nix store.
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    stdenv.cc.cc.lib
+    zlib
+    openssl
+    icu
+  ];
+
   # Required for obsidian, vivaldi, nvidia, spotify, etc.
   nixpkgs.config.allowUnfree = true;
 
+  # electron 40 went EOL 2026-07-15; tidal-hifi/obsidian still pin it.
+  # Drop once nixpkgs bumps them.
+  nixpkgs.config.permittedInsecurePackages = [ "electron-40.10.5" ];
+
   # ── System version ────────────────────────────────────────────────────────────
-  # Do NOT change this after first install. It controls stateful service migrations.
-  # See: https://nixos.org/manual/nixos/stable/#sec-upgrading
+  # Do NOT change after first install — controls stateful service migrations.
   system.stateVersion = "26.05";
 }

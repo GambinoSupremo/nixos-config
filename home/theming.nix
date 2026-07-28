@@ -25,13 +25,6 @@
     size       = 24;
   };
 
-  # qt home-manager block intentionally disabled. Setting qt.style globally
-  # injects QT_STYLE_OVERRIDE=kvantum, which makes KDE's QML code (Kirigami,
-  # KWin effects, plasmashell wallpaper) try to import "kvantum" as a QML
-  # module — it's not on KDE's QML path → black screen. KDE manages its own
-  # Qt style (Breeze). All three compositors currently set
-  # QT_QPA_PLATFORMTHEME=kde in their env configs (mango/env.conf,
-  # niri/config.kdl environment block, hypr/env.lua) — kvantum is not in
-  # use anywhere. Re-test the black-screen behavior after each Plasma major
-  # bump; if Kirigami stops probing kvantum, qt.style can come back.
+  # qt block intentionally disabled: qt.style injects QT_STYLE_OVERRIDE=kvantum,
+  # which black-screens plasmashell (Kirigami QML-imports it). Re-test per Plasma bump.
 }

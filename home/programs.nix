@@ -1,12 +1,11 @@
-# Per-app home-manager config: git, neovim, OBS, pywalfox, RAW-photo mime
-# defaults, and desktop-entry overrides (Signal keyring pin, Vesktop VPN
-# bypass).
+# Per-app home-manager config: git, neovim, OBS, pywalfox, RAW mime defaults,
+# and desktop-entry overrides (Signal keyring pin, Vesktop VPN bypass).
 { pkgs, ... }:
 
 {
   # ── Pywalfox native messaging host ───────────────────────────────────────────
-  # Registers pywalfox-native with Zen (and any Gecko browser) without needing
-  # programs.firefox.enable, which would pull Firefox in alongside Zen.
+  # Registers pywalfox-native with Zen without programs.firefox.enable
+  # (which would pull Firefox in alongside Zen).
   home.file.".mozilla/native-messaging-hosts/pywalfox.json".text =
     builtins.toJSON {
       name                = "pywalfox";
@@ -17,9 +16,8 @@
     };
 
   # ── Default apps (mime associations) ─────────────────────────────────────────
-  # Canon RAW photos open in nomacs (built with libraw; loupe can't read them).
-  # The association is declared here because nomacs' .desktop file doesn't
-  # advertise the RAW mime types itself.
+  # Canon RAW opens in nomacs (loupe can't read it); declared here because
+  # nomacs' .desktop doesn't advertise the RAW mime types.
   xdg.mimeApps = {
     enable = true;
     associations.added = {
@@ -44,9 +42,8 @@
   };
 
   # ── Neovim ───────────────────────────────────────────────────────────────────
-  # LazyVim manages plugins via lazy.nvim — nvim dotfiles are NOT deployed
-  # declaratively (lazy-lock.json is written at runtime into ~/.config/nvim).
-  # Clone/stow nvim dotfiles manually, or migrate to programs.neovim.plugins later.
+  # nvim dotfiles NOT deployed declaratively — lazy.nvim writes lazy-lock.json
+  # at runtime; clone/stow them manually.
   programs.neovim = {
     enable        = true;
     defaultEditor = true;
@@ -64,10 +61,8 @@
   };
 
   # ── Signal ───────────────────────────────────────────────────────────────────
-  # Force gnome-libsecret so the keyring backend is consistent across all
-  # compositors. Without this, Electron autodetects kwallet6 in KDE sessions and
-  # falls back to basic_text in Niri/Mango/Hyprland — "keyring backend changed"
-  # error loses the stored encryption key on every cross-session launch.
+  # Force gnome-libsecret: Electron otherwise picks a different keyring per
+  # compositor and "keyring backend changed" loses the encryption key.
   xdg.desktopEntries.signal-desktop = {
     name       = "Signal";
     exec       = "signal-desktop --password-store=gnome-libsecret %U";
@@ -78,12 +73,8 @@
   };
 
   # ── Vesktop ──────────────────────────────────────────────────────────────────
-  # Override the system .desktop entry so every launch path — KDE app menu,
-  # Noctalia launcher, rofi, etc. — goes through mullvad-exclude. Without this,
-  # Discord traffic bypasses the VPN tunnel and the app won't connect.
-  # Compositor autostarts are handled separately:
-  #   Mango/Niri: in the dotfiles autostart configs
-  #   Hyprland:   exec-once in the NixOS additions block (home/dotfiles.nix)
+  # Every launcher path goes through mullvad-exclude or Discord won't connect.
+  # Compositor autostarts handle themselves (dotfiles / home/dotfiles.nix).
   xdg.desktopEntries.vesktop = {
     name       = "Vesktop";
     exec       = "mullvad-exclude vesktop %U";

@@ -19,10 +19,8 @@
     keyboards.default = {
       ids      = [ "*" ];
       settings = {
-        # keyd can't bind combos like "super+c" in [main] (logs "super is
-        # not a valid key" and drops the line) — modifier combos live in a
-        # layer section named after the modifier. [meta] = Super; unlisted
-        # keys fall through with Super held, so other Super binds still work.
+        # Modifier combos must live in a layer named after the modifier —
+        # [main] can't bind "super+c". Unlisted keys fall through with Super held.
         meta = {
           c = "C-insert";
           v = "S-insert";
@@ -58,10 +56,6 @@
     interval = "hourly";
   };
 
-  # ── Profile Sync Daemon ───────────────────────────────────────────────────────
-  # Enabled on the physical desktop only (nixos/hosts/desktop/configuration.nix) — the VM
-  # has no persistent browser sessions so there is nothing to sync.
-
   # ── Power profiles daemon ─────────────────────────────────────────────────────
   services.power-profiles-daemon.enable = true;
 
@@ -74,14 +68,12 @@
   services.gvfs.enable = true;
 
   # ── Flatpak ───────────────────────────────────────────────────────────────────
-  # Used for apps not in nixpkgs. Currently nothing installed — sone moved to
-  # nixpkgs (nixos/base/packages.nix); kept enabled as an escape hatch.
-  # After first enable: flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  # Escape hatch for apps not in nixpkgs; currently nothing installed.
+  # First use: flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
   services.flatpak.enable = true;
 
   # ── Firmware updates ──────────────────────────────────────────────────────────
-  # fwupd covers SSD firmware, BIOS updates, and peripheral firmware via LVFS.
-  # Run: fwupdmgr get-updates && fwupdmgr update
+  # SSD/BIOS/peripheral firmware via LVFS: fwupdmgr get-updates && fwupdmgr update
   services.fwupd.enable = true;
 
   # ── D-Bus ─────────────────────────────────────────────────────────────────────

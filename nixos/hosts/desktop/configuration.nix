@@ -1,12 +1,8 @@
-# gavos — the physical desktop (Ryzen + RTX 3090 Ti; AW3423DW ultrawide +
-# Philips 4K). Adds NVIDIA, gaming, Sunshine, KDE, and boot cosmetics on
-# top of the shared base.
 { config, pkgs, lib, inputs, ... }:
 
 {
-  # NOTE: import order is load-bearing — NixOS merges list options
-  # (systemPackages etc.) in import order, so reordering changes the built
-  # system hash even when nothing functional changes.
+  # Import order is load-bearing: list options merge in order, so reordering
+  # changes the system hash even with nothing functional changed.
   imports = [
     ./hardware-configuration.nix
     ../../features/nvidia.nix
@@ -22,10 +18,8 @@
     inputs.silentSDDM.nixosModules.default
   ];
 
-  # Kernel: latest mainline (currently 7.x) from nixpkgs — fully cached, no
-  # third-party flake. Desktop only; the VM keeps the conservative default.
-  # The kernel was exonerated as the AW3423DW scanout regressor (that's the
-  # NVIDIA driver branch — now on 610), so running mainline 7.x here is fine.
+  # Latest mainline kernel, desktop only. The kernel was exonerated as the
+  # AW3423DW scanout regressor (that was the NVIDIA driver branch, now on 610).
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   programs.silentSDDM = {
@@ -63,10 +57,8 @@
     print-manager  # printing
   ];
 
-  # KWallet: disable PAM auto-start so it doesn't open in non-KDE sessions.
-  # GNOME Keyring (enabled in nixos/features/desktop.nix) handles SecretService D-Bus
-  # for Niri/Mango/Hyprland — and KDE works fine with it too. KWallet can still
-  # be opened manually inside KDE if ever needed.
+  # KWallet PAM auto-start off — GNOME Keyring handles SecretService for every
+  # session (KDE included); KWallet can still be opened manually.
   security.pam.services.login.kwallet.enable  = lib.mkForce false;
   security.pam.services.sddm.kwallet.enable   = lib.mkForce false;
 
@@ -76,21 +68,15 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # systemd initrd: faster boot, cleaner Plymouth, better error reporting.
-  # Safe on this hardware — the AW3423DW scanout fix is in the driver, not initrd.
   boot.initrd.systemd.enable = true;
 
   # ── Quiet, pretty boot ────────────────────────────────────────────────────────
-  # Show the generation menu for 5s at boot. Each entry displays its NixOS
-  # version + build date (e.g. "NixOS 26.11.20260702... Generation 79"), so you
-  # can see exactly what you're booting and roll back without holding a key.
-  # Set back to 0 to boot straight through again.
+  # 5s generation menu at boot — roll back without holding a key (0 = straight through).
   boot.loader.timeout = 5;
   boot.loader.systemd-boot.configurationLimit = 10;
 
-  # Plymouth splash covers boot AND shutdown. Theme comes from the adi1090x
-  # community pack — swap the name in BOTH places to try another (pack list:
-  # https://github.com/adi1090x/plymouth-themes). Press Esc during boot to
-  # drop to the full text log if something hangs.
+  # Plymouth theme from the adi1090x pack — swap the name in BOTH places to try
+  # another. Esc during boot drops to the text log.
   boot.plymouth = {
     enable = true;
     theme  = "rings";
@@ -108,11 +94,9 @@
   ];
 
   # ── Profile Sync Daemon ───────────────────────────────────────────────────────
-  # Moves Zen Browser profile to tmpfs for faster page loads and less SSD wear.
-  # Desktop-only — the VM has no persistent browser sessions.
+  # Zen profile in tmpfs: faster page loads, less SSD wear. Desktop only.
   services.psd.enable = true;
 
-  # No btrfs-assistant: it pulls snapper back into the closure as a runtime
-  # dep (snapper was removed 2026-07-14 — no working .snapshots layout), and
-  # `btrfs scrub/balance/subvolume` covers the maintenance it wrapped.
+  # No btrfs-assistant: it drags snapper back into the closure (removed
+  # 2026-07-14) and plain `btrfs` subcommands cover what it wrapped.
 }

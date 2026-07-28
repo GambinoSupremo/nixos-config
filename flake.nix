@@ -10,9 +10,7 @@
   };
 
   inputs = {
-    # nixpkgs tracks rolling unstable. Stays fully current; nothing is frozen
-    # with it. The NVIDIA driver branch is selected (not frozen) in
-    # nixos/features/nvidia.nix.
+    # Rolling unstable; NVIDIA driver branch selected in nixos/features/nvidia.nix.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     home-manager = {
@@ -26,16 +24,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Noctalia v5 — native Wayland shell (C++/OpenGL ES; no longer built on
-    # Quickshell). home/default.nix imports homeModules.default, which
-    # provides programs.noctalia.* and the noctalia.service user unit.
+    # Noctalia v5 — native Wayland shell; homeModules.default provides
+    # programs.noctalia.* + the noctalia.service user unit.
     noctalia = {
       url   = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # zen-browser is not in nixpkgs. home/zen.nix imports homeModules.beta,
-    # which provides programs.zen-browser (mirrors programs.firefox).
+    # Not in nixpkgs; homeModules.beta provides programs.zen-browser.
     zen-browser = {
       url   = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows      = "nixpkgs";
@@ -55,18 +51,15 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # nixos-hardware — used by nixos/hosts/laptop for AMD CPU module.
-    # follows keeps its (otherwise unused) nixpkgs pin out of the lock file —
-    # without it a second, months-stale nixpkgs copy lingers there.
+    # For the laptop's AMD module; follows keeps a second stale nixpkgs
+    # copy out of the lock file.
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # hyprland-scroll-overview — niri-style overview plugin for Hyprland.
-    # Consumed as a plain source tree (flake = false) and built with
-    # pkgs.hyprlandPlugins.mkHyprlandPlugin against the system Hyprland, so the
-    # plugin ABI always matches; the repo's own flake targets Hyprland master.
+    # Consumed as a plain source tree and built against the system Hyprland so
+    # the plugin ABI matches (the repo's own flake targets Hyprland master).
     hyprland-scroll-overview = {
       url   = "github:yayuuu/hyprland-scroll-overview";
       flake = false;
@@ -77,17 +70,18 @@
       url   = "path:/home/gav/Projects/dotfiles";
       flake = false;
     };
+
+    # Millennium — Steam client theming/plugin patcher; not in nixpkgs.
+    millennium = {
+      url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, mangowm, noctalia, zen-browser, nixos-hardware, ... }@inputs:
   let
-    # (Removed 2026-07-14: a commonOverlay with qt6ct/noto-fonts-emoji
-    # throw-alias shims and a fish create_manpage_completions.py stub —
-    # a full desktop build without it passed, so the stale expressions it
-    # papered over are gone from the inputs. Resurrect from git history if
-    # an input update ever reintroduces one of those references.)
-
-    # Shared home-manager config block applied to every host.
+    # Shared home-manager config block applied to every host. (A commonOverlay
+    # of throw-alias shims was removed 2026-07-14 — git history has it.)
     hmModule = {
       home-manager = {
         useGlobalPkgs    = true;
