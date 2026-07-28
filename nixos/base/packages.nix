@@ -1,14 +1,5 @@
-# System-wide packages. Anything managed by a NixOS module or a
-# home-manager programs.* block is deliberately absent — the section
-# comments below say where each of those lives.
-#
-# Root/TTY fallback set — the only packages here that home-manager ALSO
-# manages: git and neovim (plus fish, registered via programs.fish in
-# users.nix). Kept system-wide so root shells, TTYs, and recovery sessions
-# have a working editor + git without home-manager in the loop. Everything
-# else HM-managed was removed from here 2026-07-14: starship, bat, fzf,
-# zoxide (home/shell.nix) and mullvad-vpn (installed by the
-# services.mullvad-vpn module itself).
+# System-wide packages; anything owned by a NixOS module or HM programs.* is
+# deliberately absent. git + neovim duplicated on purpose for root/TTY recovery.
 { config, pkgs, inputs, lib, ... }:
 
 {
@@ -37,17 +28,18 @@
     unzip
 
     # ── Editors ───────────────────────────────────────────────────────────────
-    neovim         # root/TTY fallback; HM config in home/programs.nix
+    neovim
     vim
     nano
     meld
-    zed-editor     # was `zed`
+    zed-editor
 
     # ── Dev tools ─────────────────────────────────────────────────────────────
     git
     github-cli
     claude-code
-    jq             # JSON CLI; required by niri stack-comms.sh (dotfiles)
+    nil            # Nix language server — Zed's Nix extension shells out to it
+    jq             # JSON CLI; required by niri
     cmake
     ninja
     python3
@@ -101,13 +93,8 @@
     qt6Packages.qt6ct            # top-level qt6ct became a throw alias 2025-10-27
     libsForQt5.qt5ct             # was qt5ct-kde (AUR; verify nixpkgs name)
     kdePackages.breeze           # was breeze
-    # kvantum (kdePackages.qtstyleplugin-kvantum) intentionally NOT installed
-    # system-wide: Plasma 6.7's Kirigami detects kvantum presence and imports
-    # it as a QML module; when its QML plugin isn't on the KDE session's
-    # QML2_IMPORT_PATH the import fails and plasmashell black-screens. KDE uses
-    # Breeze by default (correct). If you want kvantum in non-KDE compositors,
-    # install it per-user and set QT_STYLE_OVERRIDE in the compositor env
-    # file. Re-test after each Plasma major bump (see home/theming.nix).
+    # kvantum intentionally NOT system-wide: Plasma's Kirigami QML-imports it and
+    # black-screens plasmashell. Want it elsewhere? Per-user + QT_STYLE_OVERRIDE.
 
     # ── Applications ─────────────────────────────────────────────────────────
     obsidian
@@ -118,8 +105,7 @@
     mpv
     vlc                          # was vlc-plugins-all (plugins included)
     loupe                        # GNOME image viewer
-    nomacs                       # Qt image viewer with RAW support (libraw) —
-                                 # default handler for Canon CR2/CR3 (home/programs.nix)
+    nomacs                       # RAW-capable viewer; default for CR2/CR3 (home/programs.nix)
     nautilus
     gnome-disk-utility
     pavucontrol
@@ -134,32 +120,23 @@
 
     # ── Media ────────────────────────────────────────────────────────────────
     spotify                      # was spotify-launcher (AUR downloader wrapper)
-    sone                         # native Tidal client, hi-res FLAC up to 24/192
-                                 # (was the Flathub flatpak; now in nixpkgs)
-    tidal-hifi                   # Tidal Electron client. The 2026-07 "gray screen"
-                                 # was NOT upstream (issue #958 is a red herring):
-                                 # the app's own gpuRasterization flag crashes the
-                                 # GPU process (zygote SIGTRAP) on NVIDIA+Wayland.
-                                 # Fix lives in ~/.config/tidal-hifi/config.json:
-                                 # flags.gpuRasterization = false. Don't re-enable
-                                 # it from the in-app settings menu.
+    sone                         # native Tidal client, hi-res FLAC (was flatpak)
+    tidal-hifi                   # "gray screen" = its gpuRasterization flag crashing NVIDIA+Wayland
+                                 # (not upstream #958); keep it off in config.json AND in-app settings
     # cider                      # NOT in nixpkgs — Apple Music client
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
     protonplus
-    # millennium                 # NOT in nixpkgs — Steam Millennium patcher
+    # millennium: via its own flake, wired as the Steam package in features/gaming.nix
     # moondeckbuddy              # NOT in nixpkgs — MoonDeck companion app
 
     # ── Peripherals ───────────────────────────────────────────────────────────
     polychromatic    # Razer lighting GUI; openrazer daemon via hardware.openrazer in services.nix
 
     # ── Networking ────────────────────────────────────────────────────────────
-    # mullvad-vpn (CLI + GUI + daemon) is NOT listed here: the
-    # services.mullvad-vpn module (networking.nix) installs its `package`
-    # into systemPackages itself, and package = pkgs.mullvad-vpn there keeps
-    # daemon and GUI versions matched. pkgs.mullvad (headless-only) stays
-    # absent — it lags mullvad-vpn and would shadow the CLI with a stale one.
+    # mullvad-vpn comes from the services.mullvad-vpn module (keeps daemon + GUI
+    # matched); pkgs.mullvad (headless) lags and would shadow the CLI — keep out.
 
     # ── Misc ─────────────────────────────────────────────────────────────────
     # ollama managed via services.ollama in services.nix

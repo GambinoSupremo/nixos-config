@@ -1,16 +1,12 @@
-# Dotfiles deployment: patches the dotfiles flake input for NixOS +
-# Noctalia v5, deploys mango/niri/hypr/ghostty into ~/.config as store
-# symlinks, and seeds Noctalia's runtime-writable files.
-# Constraint: every mustSed below matches exact line text in the dotfiles
-# repo — the matched files carry warning headers pointing back here.
+# Dotfiles deployment: patch the dotfiles input for NixOS + Noctalia v5, deploy
+# into ~/.config. Every mustSed matches exact line text in the dotfiles repo.
 { config, pkgs, lib, inputs, osConfig ? {}, ... }:
 
 let
   isVM = osConfig.services.qemuGuest.enable or false;
 
-  # niri-style scrollable overview for Hyprland. Built against pkgs.hyprland
-  # (the same package programs.hyprland uses) so the plugin ABI matches; the
-  # upstream flake pins Hyprland master, which would be rejected at load time.
+  # niri-style scrollable overview for Hyprland, built against pkgs.hyprland so
+  # the plugin ABI matches (the upstream flake pins Hyprland master).
   scrollOverview = pkgs.hyprlandPlugins.mkHyprlandPlugin {
     pluginName = "scrolloverview";
     version    = "0-unstable";
@@ -24,13 +20,8 @@ let
     meta.description = "Scrollable niri-like overview plugin for Hyprland";
   };
 
-  # Session bootstrap run from mango's autostart.conf. Mango executes each
-  # exec-once value via `sh -c`, but its config parser truncates values at
-  # 255 chars (char value[256] in parse_config.h) — an inline one-liner here
-  # was silently cut mid-command, so the bootstrap lives in a script and the
-  # exec-once line stays short. Mango's own set_activation_env() imports the
-  # env too, but asynchronously and without --systemd for dbus, so the script
-  # re-does it to make the ordering deterministic before the target starts.
+  # Run from mango's autostart.conf. A script, not inline: mango's parser
+  # truncates exec-once at 255 chars, and env import must precede the target.
   mangoSessionBootstrap = pkgs.writeShellScript "mango-session-bootstrap" ''
     systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY
     dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY
@@ -38,27 +29,19 @@ let
     systemctl --user start mango-session.target
   '';
 
-  # Hyprland has no session target on NixOS (that was uwsm's job, and uwsm is
-  # gone), so nothing pulls graphical-session.target → noctalia.service.
-  # Import the session env synchronously, then hand noctalia to its service.
-  # restart (not start) also recovers from an earlier start-limit-hit.
+  # Hyprland has no session target without uwsm, so nothing pulls
+  # graphical-session.target; restart (not start) recovers from start-limit-hit.
   hyprSessionBootstrap = pkgs.writeShellScript "hypr-session-bootstrap" ''
     systemctl --user import-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE HYPRLAND_INSTANCE_SIGNATURE
     dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
     systemctl --user reset-failed
     systemctl --user restart noctalia.service
-    # Sunshine (Moonlight streaming host) is also WantedBy graphical-session
-    # and needs the compositor env for wlr screen capture.
+    # Sunshine needs the compositor env for wlr screen capture.
     systemctl --user restart sunshine.service
   '';
 
-  # GambinoSupremo/dotfiles with Arch-specific and Noctalia-v4-era bits
-  # patched for NixOS + Noctalia v5 (binary `noctalia`, IPC via
-  # `noctalia msg ...`, run as noctalia.service).
-  # Files that Noctalia regenerates at runtime (mango/noctalia.conf,
-  # niri/noctalia.kdl, ghostty/themes/noctalia) are removed here so they are
-  # never deployed as read-only store symlinks; they are seeded as writable
-  # copies by home.activation.seedNoctaliaTemplates below.
+  # Dotfiles patched for NixOS + Noctalia v5 (`noctalia` binary, `noctalia msg`
+  # IPC). Files Noctalia regenerates are removed here and seeded writable below.
   dotfiles = pkgs.runCommandLocal "dotfiles-patched" { } ''
     mkdir -p $out
     for d in mango niri hypr ghostty; do
@@ -81,10 +64,8 @@ let
     mustSed $out/mango/autostart.conf \
       '^exec-once=/usr/lib/xdg-desktop-portal-wlr$' \
       '\|^exec-once=/usr/lib/xdg-desktop-portal-wlr$|d'
-    # Mango launched from SDDM does not activate the systemd user session by
-    # itself: run the bootstrap script (import session env, then start
-    # mango-session.target from the mangowm HM module below, which binds
-    # graphical-session.target and thereby pulls up noctalia.service).
+    # SDDM-launched mango doesn't activate the systemd user session itself; the
+    # bootstrap imports env then starts mango-session.target → noctalia.service.
     mustSed $out/mango/autostart.conf \
       '^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$' \
       's|^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$|exec-once=${mangoSessionBootstrap}|'
@@ -94,9 +75,8 @@ let
       '/^exec-once=qs -c noctalia-shell$/d'
 
     ${lib.optionalString isVM ''
-      # VM only: don't autostart the heavy chat/media apps. The lines are
-      # mustSed-guarded so a wording change in the dotfiles fails the build
-      # instead of silently re-enabling them.
+      # VM only: no heavy chat/media autostarts (mustSed-guarded so a dotfiles
+      # wording change fails the build instead of silently re-enabling them).
       mustSed $out/mango/autostart.conf \
         '^exec-once=sleep 5 && mullvad-exclude vesktop$' \
         '/^exec-once=sleep 5 && mullvad-exclude vesktop$/d'
@@ -133,11 +113,9 @@ let
       's|zen-browser|zen-beta|g'
 
     # ── niri ─────────────────────────────────────────────────────────────
-    # Keep the dotfiles' `spawn-at-startup "noctalia"`: under niri the user
-    # session does NOT reliably reach graphical-session.target, so the
-    # noctalia.service (WantedBy that target) doesn't start — observed as "niri
-    # came up with no noctalia". Letting niri spawn it directly is the reliable
-    # path; mango/hyprland still use the service via their session targets.
+    # Keep the dotfiles' `spawn-at-startup "noctalia"`: under niri the session
+    # doesn't reliably reach graphical-session.target, so the service alone
+    # left niri with no shell.
     mustSed $out/niri/config.kdl \
       '/home/gav/dotfiles/niri/scripts/stack-comms.sh' \
       's|/home/gav/dotfiles/niri/scripts/stack-comms.sh|${config.xdg.configHome}/niri/scripts/stack-comms.sh|'
@@ -208,11 +186,8 @@ window-rule {
 EOF
 
     # ── hypr ─────────────────────────────────────────────────────────────
-    # Hyprland prefers hyprland.lua over hyprland.conf when both exist
-    # (confirmed in the session log: "[cfg] Using lua config found at
-    # …/hyprland.lua"), so the lua tree IS the effective config on NixOS.
-    # The hyprland.conf additions below remain only as a fallback for a
-    # broken lua config.
+    # Hyprland prefers hyprland.lua over hyprland.conf, so the lua tree is the
+    # effective config; the hyprland.conf additions are only a fallback.
     mustSed $out/hypr/workspaces.lua '/usr/bin/ghostty' 's|/usr/bin/ghostty|ghostty|g'
     mustSed $out/hypr/bind.lua \
       'qs -c noctalia-shell ipc call launcher emoji' \
@@ -229,16 +204,12 @@ EOF
     mustSed $out/hypr/autostart.lua \
       'sleep 5 && signal-desktop"' \
       's|sleep 5 && signal-desktop"|sleep 5 \&\& signal-desktop --password-store=gnome-libsecret"|'
-    # (No signal-desktop sed for bind.lua: the spawn bind was removed from
-    # the dotfiles — it double-bound SUPER+SHIFT+S with the screenshot.)
-    # noctalia is owned by the HM noctalia.service (graphical-session.target);
-    # the raw lua spawn raced it (service died with start-limit-hit and the
-    # SUPER+ALT+R restart bind managed nothing).
+    # noctalia is owned by noctalia.service; the raw lua spawn raced it into
+    # start-limit-hit.
     mustSed $out/hypr/autostart.lua \
       'hl.exec_cmd("noctalia")' \
       '/hl\.exec_cmd("noctalia")/d'
-    # Replace the two async env-import exec_cmds with the sequential session
-    # bootstrap (env import → reset-failed → restart noctalia.service).
+    # Replace the async env-import exec_cmds with the sequential bootstrap.
     mustSed $out/hypr/autostart.lua \
       'hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")' \
       's|hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")|hl.exec_cmd("${hyprSessionBootstrap}")|'
@@ -250,15 +221,12 @@ EOF
     cat >> $out/hypr/hyprland.conf <<'EOF'
 
 # ── NixOS additions ─────────────────────────────────────────────────────────
-# The lua-based config in this directory needs an Arch-only plugin; keep a
-# minimal fallback so the Hyprland session is usable on NixOS.
-# NVIDIA wlroots vars scoped here so they don't poison KWin when using KDE.
+# Minimal fallback so the session is never a dead end (the lua config needs an
+# Arch-only plugin). NVIDIA wlroots vars scoped here so they don't poison KWin.
 env = GBM_BACKEND,nvidia-drm
 env = __GLX_VENDOR_LIBRARY_NAME,nvidia
 env = WLR_NO_HARDWARE_CURSORS,1
-# Dell ultrawide left @ 0,0; Philips 4K right @ 3440,0. The NVIDIA DP index
-# varies by probe order, so list both names per panel; the catch-all wildcard
-# at the end handles whichever name is actually present.
+# NVIDIA DP index varies by probe order — both names per panel, wildcard catch-all.
 monitor = DP-2, 3440x1440@174, 0x0, 1
 monitor = DP-4, 3440x1440@174, 0x0, 1
 monitor = DP-1, 3840x2160@60, 3440x0, 1.5
@@ -282,9 +250,7 @@ windowrulev2 = opacity 0.95 0.85, class:^(obsidian)$
 EOF
 
     ${lib.optionalString (!isVM) ''
-      # scroll-overview plugin — desktop only (skip the compile on the VM).
-      # Wired into hyprland.lua (the effective config); the hyprland.conf
-      # lines are the same wiring for the fallback path.
+      # scroll-overview — desktop only, wired into hyprland.lua + conf fallback.
       # Unquoted heredocs: ''${scrollOverview} must interpolate.
       cat >> $out/hypr/hyprland.lua <<EOF
 
@@ -324,22 +290,18 @@ EOF
     ''}
 
     # ── ghostty ──────────────────────────────────────────────────────────
-    # Drop the Arch zsh/pokemon-colorscripts command; the login shell on
-    # NixOS is fish.
+    # Drop the Arch zsh command; the login shell on NixOS is fish.
     mustSed $out/ghostty/config '^command = ' '/^command = /d'
 
     # ── monitor layout ───────────────────────────────────────────────────────
-    # The NVIDIA DP connector index depends on GPU probe order, which has been
-    # seen both ways on this box (DP-1/DP-2 when NVIDIA probes first, DP-3/DP-4
-    # when the iGPU did). Both names are listed so mango silently ignores the
-    # one that isn't present.
+    # NVIDIA DP index depends on GPU probe order (seen both ways on this box);
+    # both names listed per panel — mango ignores the absent one.
     cat > $out/mango/monitor.conf <<'EOF'
-# Monitors — Dell AW3423DW ultrawide (left). Name is DP-2 or DP-4 by probe order.
-# vrr:0 + rule.conf's vrr_only_fullscreen:1 on steam_app_ = fullscreen-only
+# Dell AW3423DW (left). vrr:0 + rule.conf's vrr_only_fullscreen:1 = fullscreen-only
 # VRR (mango has no vrr:2; always-on VRR gamma-flickers the QD-OLED desktop).
 monitorrule=name:DP-2,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
 monitorrule=name:DP-4,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
-# Philips 278E1 4K (right). Name is DP-1 or DP-3 by probe order.
+# Philips 278E1 4K (right).
 monitorrule=name:DP-1,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
 monitorrule=name:DP-3,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
 EOF
@@ -365,34 +327,24 @@ EOF
 in
 {
   # ── Noctalia v5 ──────────────────────────────────────────────────────────────
-  # Upstream HM module installs the package and runs noctalia.service,
-  # WantedBy graphical-session.target. settings left empty so
-  # ~/.config/noctalia/config.toml stays runtime-writable.
-  # Session start coverage:
-  #   mango     → patched autostart.conf starts mango-session.target
-  #   niri      → niri-session starts graphical-session.target
-  #   hyprland  → hyprland-session.target + explicit exec-once in patched conf
-  #   KDE       → noctalia.service is WantedBy plasma-core.target via systemd
-  # Logs: journalctl --user -b -u noctalia.service
+  # Upstream HM module runs noctalia.service (WantedBy graphical-session.target);
+  # settings left empty so ~/.config/noctalia/config.toml stays runtime-writable.
   programs.noctalia = {
     enable = true;
     systemd.enable = true;
   };
 
   # ── Mango systemd session plumbing ───────────────────────────────────────────
-  # The session binary + SDDM entry come from the NixOS module (nixos/features/desktop.nix).
-  # This HM module is used only for mango-session.target (BindsTo
-  # graphical-session.target). settings is empty → the module does NOT generate
-  # mango/config.conf; the dotfiles below remain authoritative.
+  # Only for mango-session.target; session binary + SDDM entry come from the
+  # NixOS module. settings empty → the dotfiles stay authoritative for config.conf.
   wayland.windowManager.mango = {
     enable = true;
     systemd.enable = true;
   };
 
   # ── Dotfiles deployment ───────────────────────────────────────────────────────
-  # recursive = true links each file individually so directories stay writable
-  # for runtime-generated files. force = true overwrites leftovers from earlier
-  # non-declarative deployments instead of aborting.
+  # recursive keeps directories writable for runtime-generated files; force
+  # overwrites leftovers from pre-declarative deployments.
   xdg.configFile = {
     "mango"   = { source = "${dotfiles}/mango";   recursive = true; force = true; };
     "niri"    = { source = "${dotfiles}/niri";    recursive = true; force = true; };
@@ -407,15 +359,12 @@ in
   };
 
   # ── Wallpapers ───────────────────────────────────────────────────────────────
-  # Symlink the dotfiles backgrounds/ into ~/Pictures/backgrounds — the path
-  # Noctalia's settings.json points at. Read-only is fine; Noctalia only reads it.
+  # Noctalia's settings.json points at ~/Pictures/backgrounds; read-only is fine.
   home.file."Pictures/backgrounds".source = "${inputs.dotfiles}/backgrounds";
 
   # ── Noctalia runtime seed ─────────────────────────────────────────────────────
-  # Seed Noctalia's runtime template files once as writable copies so the first
-  # boot has colors and mango's `source = .../noctalia.conf` resolves.
-  # Noctalia overwrites them whenever the theme changes; later rebuilds skip
-  # files that already exist (preserving runtime edits).
+  # Seed Noctalia's runtime templates once as writable copies; rebuilds skip
+  # existing files so runtime edits survive.
   home.activation.seedNoctaliaTemplates = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     seedNoctalia() {
       if [ ! -e "$2" ]; then
@@ -427,19 +376,14 @@ in
     seedNoctalia ${inputs.dotfiles}/mango/noctalia.conf     ${config.xdg.configHome}/mango/noctalia.conf
     seedNoctalia ${inputs.dotfiles}/niri/noctalia.kdl       ${config.xdg.configHome}/niri/noctalia.kdl
     seedNoctalia ${inputs.dotfiles}/ghostty/themes/noctalia ${config.xdg.configHome}/ghostty/themes/noctalia
-    # hypr/noctalia.lua has no template in the dotfiles — Noctalia generates
-    # it at runtime. Seed an empty stub so hyprland.lua's require("noctalia")
-    # doesn't fail on a machine where Noctalia has never run (an empty lua
-    # module loads fine); Noctalia overwrites it with real theme colors.
+    # hypr/noctalia.lua has no template — seed an empty stub so hyprland.lua's
+    # require("noctalia") loads before Noctalia's first run overwrites it.
     seedNoctalia ${pkgs.writeText "noctalia-lua-stub" ''
-      -- Placeholder seeded by home-manager; Noctalia overwrites this with
-      -- theme colors on first run.
+      -- Seeded by home-manager; Noctalia overwrites with theme colors.
     ''} ${config.xdg.configHome}/hypr/noctalia.lua
 
-    # Noctalia v5 config dir. config.toml comes from home/noctalia/config.toml
-    # in this repo (bar layout, opacity, shortcuts) — the filter below guards
-    # against a config.toml ever reappearing in the dotfiles (the old copy
-    # was deleted from there 2026-07-14).
+    # config.toml is owned by this repo (home/noctalia/config.toml); the filter
+    # guards against a copy reappearing in the dotfiles.
     find ${inputs.dotfiles}/noctalia -type f -not -name "config.toml" -print0 \
       | while IFS= read -r -d "" src; do
           seedNoctalia "$src" "${config.xdg.configHome}/noctalia/''${src#${inputs.dotfiles}/noctalia/}"
@@ -448,10 +392,8 @@ in
   '';
 
   # ── Starship config ───────────────────────────────────────────────────────────
-  # ~/.config/starship.toml = dotfiles prompt layout + Noctalia palette block.
-  # Noctalia sed-edits this file at runtime, so it must stay a writable regular
-  # file (not a store symlink). Each rebuild re-asserts the dotfiles layout and
-  # carries over the palette block Noctalia last generated.
+  # Noctalia sed-edits starship.toml at runtime, so it stays a writable file: each
+  # rebuild re-asserts the dotfiles layout and carries over Noctalia's palette block.
   home.activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     (
     PATH=${lib.makeBinPath (with pkgs; [ coreutils gnugrep gnused gawk diffutils ])}:$PATH

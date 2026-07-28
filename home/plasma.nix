@@ -1,6 +1,5 @@
-# KDE Plasma via plasma-manager: appearance, default-panel removal
-# (Noctalia is the bar), Polonium tiling, and the 3-tier shortcut scheme
-# kept in step with the Mango/Niri/Hyprland binds.
+# KDE Plasma via plasma-manager: appearance, panel removal (Noctalia is the
+# bar), Polonium tiling, and the 3-tier shortcuts matching the other WMs.
 { config, lib, pkgs, ... }:
 
 {
@@ -8,10 +7,8 @@
     enable = true;
 
     # ── Appearance ──────────────────────────────────────────────────────────────
-    # colorScheme: Noctalia writes ~/.local/share/color-schemes/noctalia.colors
-    # at runtime via its kcolorscheme builtin template. On a fresh system it
-    # won't exist until noctalia.service has run once — Plasma falls back to
-    # Breeze gracefully and picks up the scheme on next login.
+    # Noctalia writes the "noctalia" color scheme at runtime; until its first
+    # run Plasma falls back to Breeze and picks the scheme up on next login.
     workspace = {
       colorScheme = "noctalia";
       cursor = {
@@ -24,11 +21,8 @@
     };
 
     # ── Panel removal ────────────────────────────────────────────────────────────
-    # Noctalia is the bar. programs.plasma.panels = [] is a no-op in
-    # plasma-manager (the panel desktop script only fires when panels is
-    # non-empty), so removal is driven via the Plasma JS scripting API instead.
-    # The script runs once per unique hash; plasmashell persists the "no panels"
-    # state back to plasma-org.kde.plasma.desktop-appletsrc across logins.
+    # Noctalia is the bar. panels = [] is a no-op in plasma-manager, so removal
+    # goes via the Plasma JS API; plasmashell persists the state across logins.
     startup.desktopScript."remove-default-panels" = {
       text = ''
         var allPanels = panels();
@@ -89,9 +83,8 @@
     configFile."kwinrc" = {
       Windows.PerOutputVirtualDesktops = true;
       MouseBindings.CommandAllKey   = "Meta";
-      # CommandAllWheel "Previous/Next Desktop" moves the focused window to the
-      # next desktop (window command) — not a viewport switch. Set Nothing to
-      # stop windows following the scroll. Use Meta+Ctrl+Left/Right for desktop nav.
+      # "Previous/Next Desktop" here drags the focused window along — Nothing
+      # stops windows following the scroll (Meta+Ctrl+Left/Right for desktop nav).
       MouseBindings.CommandAllWheel = "Nothing";
 
       # Focus follows mouse: hovering over a window focuses it, matching Hyprland/Niri defaults.
@@ -107,14 +100,12 @@
     };
 
     # ── VRR / G-Sync ─────────────────────────────────────────────────────────
-    # KWin VRR is stored in kscreen2 output config, not kwinrc, and plasma-manager
-    # does not expose an option for it. Enable it once manually:
-    #   System Settings → Display & Monitor → select the AW3423DW → enable VRR
-    # KWin persists the choice in ~/.local/share/kscreen/ across reboots.
+    # No plasma-manager option (lives in kscreen2, not kwinrc): enable once in
+    # System Settings → Display; KWin persists it in ~/.local/share/kscreen/.
 
     # ── KWin window opacity rules ─────────────────────────────────────────────
-    # Match niri/mango: focused=0.95 unfocused=0.85 for the same app set.
-    # Ghostty is excluded — its background-opacity=0.7 is set in ghostty/config directly.
+    # Match niri/mango: focused=0.95 unfocused=0.85. Ghostty excluded — its
+    # opacity is set in ghostty/config directly.
     configFile."kwinrulesrc" = {
       General.rules = "signal-opacity,vesktop-opacity,zen-opacity,obsidian-opacity";
 
@@ -162,10 +153,8 @@
     # ── 3-tier KWin shortcuts ────────────────────────────────────────────────────
     shortcuts.kwin = {
       # ── SUPER — focus / window state ─────────────────────────────────────────
-      # Switch Window Left/Right/Up/Down are cleared (set to "none") so that
-      # Polonium's PoloniumActivateLeft/Right/Above/Below own Meta+H/J/K/L
-      # without conflict. KWin and Polonium both registered Meta+H here, making
-      # focus navigation unreliable. Polonium is tiling-aware; KWin's is not.
+      # Switch Window * cleared so Polonium (tiling-aware) owns Meta+H/J/K/L —
+      # both registering Meta+H made focus navigation unreliable.
       "Switch Window Left"  = "none";
       "Switch Window Down"  = "none";
       "Switch Window Up"    = "none";
@@ -175,8 +164,7 @@
       "Window Minimize"     = "Meta+W";
 
       # ── SUPER+SHIFT — move window within tiling layout ───────────────────────
-      # Polonium's PlaceLeft/Right/Above/Below (Meta+Shift+H/J/K/L) handle this.
-      # Quick-tile is cleared too to avoid duplicating the same keys.
+      # Polonium's Place* own Meta+Shift+H/J/K/L; quick-tile cleared to match.
       "Window Quick Tile Left"   = "none";
       "Window Quick Tile Bottom" = "none";
       "Window Quick Tile Top"    = "none";

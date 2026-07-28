@@ -1,13 +1,7 @@
 { inputs, ... }:
 
-# Zen Browser — declarative config via the zen-browser flake's home-manager
-# module (programs.zen-browser mirrors home-manager's programs.firefox).
-# This replaces the bare package that used to live in nixos/base/packages.nix;
-# the module wraps and installs the same packages.default (zen-beta).
-#
-# Signing into the Mozilla account (Firefox Sync) stays manual — there is no
-# declarative hook for it — but the profile in ~/.zen persists across rebuilds,
-# so it's a once-per-machine step. Everything below applies on every machine.
+# Zen Browser via the zen-browser flake's HM module (mirrors programs.firefox).
+# Firefox Sync sign-in stays manual (once per machine; ~/.zen persists).
 {
   imports = [ inputs.zen-browser.homeModules.beta ];
 
@@ -40,20 +34,13 @@
         Fingerprinting = true;
       };
 
-      # All extensions come from Firefox Sync after signing in — nothing is
-      # force-installed here. On a fresh machine: install Keeper manually
-      # first (it holds the Sync password), sign into Sync, everything else
-      # follows. Keeper/Todoist were force_installed via ExtensionSettings
-      # until 2026-07-05; removed so Sync is the single source of truth and
-      # extensions aren't policy-managed.
+      # No force-installed extensions — Sync owns them. Fresh machine: install
+      # Keeper manually first (it holds the Sync password), then sign into Sync.
     };
 
     profiles.default = {
-      # Kagi is always the default search engine — declared here (not left to
-      # the Kagi extension) so it's the default from first launch on a fresh
-      # machine, before Sync has installed any extensions.
-      # force = true: home-manager owns search.json.mozlz4 and re-asserts this
-      # on every rebuild — engines added by hand in the browser won't survive.
+      # Kagi declared here so it's default before Sync installs anything. force:
+      # HM owns search.json.mozlz4 — hand-added engines won't survive rebuilds.
       search = {
         force   = true;
         default = "kagi";
@@ -69,9 +56,8 @@
             definedAliases = [ "@k" ];
           };
 
-          # The Kagi extension registers its own engine once Sync installs it;
-          # hide it so "Kagi" doesn't appear twice (extension features are
-          # unaffected — this only removes the duplicate picker entry).
+          # The Kagi extension registers its own engine; hide the duplicate
+          # picker entry (extension features unaffected).
           "search@kagi.comdefault".metaData.hidden = true;
 
           # Built-in engines we never want offered (ids from the live
@@ -84,12 +70,8 @@
         };
       };
 
-      # prefs.js defaults — changeable in the browser, re-asserted on rebuild.
-      # Zen-specific prefs are discoverable in about:config under "zen.".
-      #
-      # Privacy-focused defaults. Deliberately NOT enabled because they break
-      # daily use: privacy.resistFingerprinting (kills dark-mode detection,
-      # timezones, canvas) and disabling WebRTC (kills video calls).
+      # prefs.js defaults, re-asserted on rebuild. resistFingerprinting and
+      # WebRTC-off deliberately NOT set — they break dark mode / video calls.
       settings = {
         "zen.welcome-screen.seen" = true;  # skip onboarding on fresh machines
 

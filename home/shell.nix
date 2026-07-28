@@ -5,7 +5,17 @@
 
 {
   # pokemon-colorscripts: shown on every new shell — CachyOS parity.
-  home.packages = [ pkgs.pokemon-colorscripts ];
+  home.packages = [
+    pkgs.pokemon-colorscripts
+    # Flags when the electron-40.10.5 exception in nixos/base/core.nix is removable.
+    (pkgs.writeShellScriptBin "insecure-pin-check" ''
+      rev=$(${pkgs.jq}/bin/jq -r '.nodes.nixpkgs.locked.rev' ~/nixos-config/flake.lock)
+      if nix eval "github:nixos/nixpkgs/$rev#tidal-hifi.drvPath" >/dev/null 2>&1 \
+         && NIXPKGS_ALLOW_UNFREE=1 nix eval --impure "github:nixos/nixpkgs/$rev#obsidian.drvPath" >/dev/null 2>&1; then
+        echo "electron-40.10.5 exception no longer needed: remove permittedInsecurePackages from nixos/base/core.nix and this check"
+      fi
+    '')
+  ];
 
   # ── Fish ─────────────────────────────────────────────────────────────────────
   programs.fish = {
@@ -22,21 +32,37 @@
       cat     = "bat --style=plain";
       grep    = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
-      # update = lock refresh AND rebuild in one step. A bare `nix flake
-      # update` only rewrites flake.lock — nothing lands until the rebuild
-      # (which is how a 2026-07-13 update sat unapplied on a 07-09 system).
-      update  = "nix flake update --flake ~/nixos-config && sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
-      # dotsync = deploy dotfile edits only: refresh just the dotfiles pin
-      # and rebuild, leaving nixpkgs and every other input untouched.
+      # Refresh only the dotfiles pin, then rebuild.
       dotsync = "nix flake update dotfiles --flake ~/nixos-config && sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
-      # Ported from the Arch-era zsh config (dotfiles zsh/.zshrc). Path
-      # updated: the Zen profile on NixOS is ~/.config/zen/default, not
-      # ~/.zen/<hash>.Default Profile. CURRENTLY INERT: updater.sh is not
-      # installed, and user.js is a read-only home-manager symlink (zen.nix
-      # settings), which the arkenfox updater would need to overwrite.
-      # Before first use: decide arkenfox vs declarative zen.nix prefs —
-      # they fight over user.js and can't both own it.
+      # CURRENTLY INERT: updater.sh isn't installed, and arkenfox fights
+      # zen.nix's declarative user.js — decide which owns it before first use.
       arkenfox-update = "bash ~/.config/zen/default/updater.sh";
+    };
+    # `update` is a function, not an alias, so a bad upstream bump can revert
+    # flake.lock instead of leaving the repo stuck on a revision that won't build.
+    functions = {
+      update = ''
+        set -l flake_dir ~/nixos-config
+        set -l lock $flake_dir/flake.lock
+        set -l backup (mktemp)
+        cp $lock $backup
+
+        if not nix flake update --flake $flake_dir
+            echo "flake update failed — flake.lock left untouched"
+            rm $backup
+            return 1
+        end
+
+        if sudo nixos-rebuild switch --flake $flake_dir#desktop
+            insecure-pin-check
+            rm $backup
+        else
+            echo "rebuild failed — reverting flake.lock to the pre-update state"
+            cp $backup $lock
+            rm $backup
+            return 1
+        end
+      '';
     };
   };
 
@@ -44,19 +70,16 @@
   programs.starship = {
     enable                = true;
     enableFishIntegration = true;
-    # starship init fish | source goes into shellInitLast so nothing sourced
-    # later can shadow fish_prompt. enableInteractive = false achieves this.
+    # false puts the init in shellInitLast so nothing can shadow fish_prompt.
     enableInteractive     = false;
-    # settings left unset — ~/.config/starship.toml is written by
-    # home.activation.starshipConfig in dotfiles.nix (merges the dotfiles
-    # layout with Noctalia's runtime palette block; must stay a writable file).
+    # settings unset — starship.toml is written by home.activation.starshipConfig
+    # (dotfiles.nix) and must stay a writable file.
   };
 
   # ── fzf ──────────────────────────────────────────────────────────────────────
   programs.fzf = {
     enable = true;
-    # Fish integration disabled — it binds Ctrl+T which conflicts with
-    # Fish's built-in transpose-chars.
+    # Off — it binds Ctrl+T over fish's transpose-chars.
     enableFishIntegration = false;
   };
 
