@@ -32,15 +32,25 @@
       cat     = "bat --style=plain";
       grep    = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
-      # Refresh only the dotfiles pin, then rebuild.
-      dotsync = "nix flake update dotfiles --flake ~/nixos-config && sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
       # CURRENTLY INERT: updater.sh isn't installed, and arkenfox fights
       # zen.nix's declarative user.js — decide which owns it before first use.
       arkenfox-update = "bash ~/.config/zen/default/updater.sh";
     };
-    # `update` is a function, not an alias, so a bad upstream bump can revert
-    # flake.lock instead of leaving the repo stuck on a revision that won't build.
+    # `update`/`dotsync` are functions, not aliases, so a bad upstream bump can
+    # revert flake.lock instead of leaving the repo stuck on a revision that
+    # won't build. On a successful rebuild they also commit whatever's dirty
+    # in nixos-config (flake.lock plus any pending edits) — if it builds, it's
+    # a reasonable commit point, and this way the tree never sits dirty.
     functions = {
+      _nixos-commit-dirty = ''
+        set -l flake_dir $argv[1]
+        set -l label $argv[2]
+        if not git -C $flake_dir diff --quiet; or not git -C $flake_dir diff --cached --quiet
+            git -C $flake_dir add -A
+            git -C $flake_dir commit -m "$label: "(git -C $flake_dir diff --cached --name-only | string join ', ') >/dev/null
+        end
+      '';
+
       update = ''
         set -l flake_dir ~/nixos-config
         set -l lock $flake_dir/flake.lock
@@ -56,6 +66,31 @@
         if sudo nixos-rebuild switch --flake $flake_dir#desktop
             insecure-pin-check
             rm $backup
+            _nixos-commit-dirty $flake_dir update
+        else
+            echo "rebuild failed — reverting flake.lock to the pre-update state"
+            cp $backup $lock
+            rm $backup
+            return 1
+        end
+      '';
+
+      # Refresh only the dotfiles pin, then rebuild.
+      dotsync = ''
+        set -l flake_dir ~/nixos-config
+        set -l lock $flake_dir/flake.lock
+        set -l backup (mktemp)
+        cp $lock $backup
+
+        if not nix flake update dotfiles --flake $flake_dir
+            echo "dotfiles update failed — flake.lock left untouched"
+            rm $backup
+            return 1
+        end
+
+        if sudo nixos-rebuild switch --flake $flake_dir#desktop
+            rm $backup
+            _nixos-commit-dirty $flake_dir dotsync
         else
             echo "rebuild failed — reverting flake.lock to the pre-update state"
             cp $backup $lock
