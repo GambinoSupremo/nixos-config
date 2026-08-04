@@ -14,11 +14,10 @@
     };
   };
 
-  # Mullvad daemon; pkgs.mullvad-vpn keeps daemon + GUI versions matched (the
-  # default pkgs.mullvad lags → "inconsistent version"). First boot: mullvad account login
+  # Mullvad daemon. First boot: mullvad account login
   services.mullvad-vpn = {
-    enable  = true;
-    package = pkgs.mullvad-vpn;
+    enable     = true;
+    gui.enable = true;
   };
 
   # systemd-resolved for local DNS caching.
