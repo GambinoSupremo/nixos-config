@@ -47,6 +47,13 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   hardware-configuration.nix}: stale pre-flake leftovers, NOT removed
   (needs sudo): sudo rm /etc/nixos/configuration.nix{,.save} /etc/nixos/hardware-configuration.nix
 
+## 2026-08-03
+- niri libdisplay-info overlay removed: pin existed 2026-07-28 to
+  2026-08-03, dropped once nixpkgs shipped niri built against
+  libdisplay-info-sys >= 0.4.
+- mullvad-vpn.package unset + gui.enable = true: same nixpkgs bump split
+  the daemon out of pkgs.mullvad-vpn.
+
 ## Unsure / watch
 - keyd passthrough claim (SUPER+CTRL+V works, plain SUPER+C/V consumed) is
   reasoned from keyd semantics + observed behavior, not live-tested yet.

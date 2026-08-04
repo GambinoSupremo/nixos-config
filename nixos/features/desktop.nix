@@ -13,16 +13,6 @@
   programs.mango.enable = true;
 
   # Niri — secondary; nixpkgs module registers session + portal config.
-  # TEMP (2026-07-28): nixpkgs bumped libdisplay-info to 0.4.0 but niri 26.04's
-  # vendored libdisplay-info-sys 0.3.0 requires `< 0.4.0`, breaking the build.
-  # Pin niri back to libdisplay-info_0_2 (nixpkgs keeps it around already) until
-  # nixpkgs bumps niri to a release built against libdisplay-info-sys >= 0.4.
-  # Remove this overlay once a plain `programs.niri.enable = true;` builds again.
-  nixpkgs.overlays = [
-    (final: prev: {
-      niri = prev.niri.override { libdisplay-info = prev.libdisplay-info_0_2; };
-    })
-  ];
   programs.niri.enable = true;
 
   # Hyprland — fallback. Session env / noctalia startup driven by
