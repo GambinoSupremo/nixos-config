@@ -299,8 +299,9 @@ EOF
     cat > $out/mango/monitor.conf <<'EOF'
 # Dell AW3423DW (left). vrr:0 + rule.conf's vrr_only_fullscreen:1 = fullscreen-only
 # VRR (mango has no vrr:2; always-on VRR gamma-flickers the QD-OLED desktop).
-monitorrule=name:DP-2,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
-monitorrule=name:DP-4,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
+# hdr:1 + config.conf's hdr_depth:2 = HDR10; needs env.conf's vulkan renderer.
+monitorrule=name:DP-2,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0,hdr:1
+monitorrule=name:DP-4,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0,hdr:1
 # Philips 278E1 4K (right).
 monitorrule=name:DP-1,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
 monitorrule=name:DP-3,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
