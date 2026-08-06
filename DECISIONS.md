@@ -54,6 +54,23 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
 - mullvad-vpn.package unset + gui.enable = true: same nixpkgs bump split
   the daemon out of pkgs.mullvad-vpn.
 
+## 2026-08-05
+- Steam VPN bypass: chose Option A (wrap Steam's launcher binary to call
+  `mullvad split-tunnel add $$` + exec — same RPC mechanism gaming.nix's
+  `novpn` already uses) over per-game opt-in or desktop-entry-only wrapping.
+  Confirmed split-tunnel enforcement is PID/cgroup-based via daemon RPC, not
+  path-based — nixpkgs' mullvad-vpn is just the vendored .deb (no in-tree
+  source to grep), so this came from the existing `novpn` behavior + the
+  services.mullvad-vpn module (security.wrappers.mullvad-exclude), not
+  Mullvad source. No persistent state to manage: the daemon's exclusion set
+  is in-memory/PID-based and resets per boot, so the wrapper script IS the
+  declarative artifact — nothing store-hash-keyed to go stale.
+  Trade-off accepted: ALL Steam traffic (client + every game) now bypasses
+  Mullvad unconditionally; retires the per-game `novpn %command%` launch
+  option workaround from Rivals 2. New file: nixos/features/steam-novpn.nix,
+  imported in hosts/desktop/configuration.nix next to gaming.nix.
+  Implementation pending (see chat skeleton).
+
 ## Unsure / watch
 - keyd passthrough claim (SUPER+CTRL+V works, plain SUPER+C/V consumed) is
   reasoned from keyd semantics + observed behavior, not live-tested yet.
