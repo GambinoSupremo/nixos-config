@@ -39,8 +39,9 @@
     # `update`/`dotsync` are functions, not aliases, so a bad upstream bump can
     # revert flake.lock instead of leaving the repo stuck on a revision that
     # won't build. On a successful rebuild they also commit whatever's dirty
-    # in nixos-config (flake.lock plus any pending edits) — if it builds, it's
-    # a reasonable commit point, and this way the tree never sits dirty.
+    # in nixos-config (flake.lock plus any pending edits) and push — if it
+    # builds, it's a reasonable commit point, and this way the tree never
+    # sits dirty and origin never falls behind.
     functions = {
       _nixos-commit-dirty = ''
         set -l flake_dir $argv[1]
@@ -49,6 +50,9 @@
             git -C $flake_dir add -A
             git -C $flake_dir commit -m "$label: "(git -C $flake_dir diff --cached --name-only | string join ', ') >/dev/null
         end
+        # Push whatever's ahead of origin, including commits from earlier runs
+        # that never made it out.
+        git -C $flake_dir push
       '';
 
       update = ''
