@@ -38,9 +38,9 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # SilentSDDM — Wayland SDDM theme with multiple presets
-    silentSDDM = {
-      url   = "github:uiriansan/SilentSDDM";
+    # qylock — SDDM themes (login screen), "last-of-us" selected in desktop/configuration.nix
+    qylock = {
+      url   = "github:Darkkal44/qylock";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

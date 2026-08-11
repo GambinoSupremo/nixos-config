@@ -15,16 +15,17 @@
     ../../base/packages.nix
     ../../features/gaming.nix
     ../../features/sunshine.nix
-    inputs.silentSDDM.nixosModules.default
+    inputs.qylock.nixosModules.default
   ];
 
   # Latest mainline kernel, desktop only. The kernel was exonerated as the
   # AW3423DW scanout regressor (that was the NVIDIA driver branch, now on 610).
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  programs.silentSDDM = {
+  programs.qylock = {
     enable = true;
-    theme  = "default";
+    theme  = "last-of-us";
+    quickshell.enable = false;  # SDDM login theme only — Noctalia still owns the in-session lock
   };
 
   networking.hostName = "gavos";
