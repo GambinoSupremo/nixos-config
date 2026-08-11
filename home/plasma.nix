@@ -170,27 +170,34 @@
       "Window Quick Tile Top"    = "none";
       "Window Quick Tile Right"  = "none";
 
-      # ── SUPER+CTRL — workspace / monitor navigation ───────────────────────────
-      "Switch to Desktop 1" = "Meta+Ctrl+1";
-      "Switch to Desktop 2" = "Meta+Ctrl+2";
-      "Switch to Desktop 3" = "Meta+Ctrl+3";
-      "Switch to Desktop 4" = "Meta+Ctrl+4";
-      "Switch to Desktop 5" = "Meta+Ctrl+5";
-      "Switch to Desktop 6" = "Meta+Ctrl+6";
-      "Switch One Desktop to the Left"  = "Meta+Ctrl+Left";
-      "Switch One Desktop to the Right" = "Meta+Ctrl+Right";
+      # ── SUPER — desktop jump ─────────────────────────────────────────────────
+      # Matches niri/hyprland/mango: bare Mod+N jumps straight to desktop N.
+      "Switch to Desktop 1" = "Meta+1";
+      "Switch to Desktop 2" = "Meta+2";
+      "Switch to Desktop 3" = "Meta+3";
+      "Switch to Desktop 4" = "Meta+4";
+      "Switch to Desktop 5" = "Meta+5";
+      "Switch to Desktop 6" = "Meta+6";
+
+      # ── SUPER+CTRL — move window to desktop N / adjacent desktop / monitor nav ─
+      # Matches niri/hyprland/mango: Mod+Ctrl+N sends the window to desktop N.
+      "Window to Desktop 1" = "Meta+Ctrl+1";
+      "Window to Desktop 2" = "Meta+Ctrl+2";
+      "Window to Desktop 3" = "Meta+Ctrl+3";
+      "Window to Desktop 4" = "Meta+Ctrl+4";
+      "Window to Desktop 5" = "Meta+Ctrl+5";
+      "Window to Desktop 6" = "Meta+Ctrl+6";
+      # Desktop grid is rows=1 (flat 6-across), so "Up/Down" grid actions are
+      # meaningless — bind the Up/Down keys to the Left/Right actions instead,
+      # matching the Up/Down keystroke niri/hyprland/mango use for adjacent-cycle.
+      "Switch One Desktop to the Left"  = "Meta+Ctrl+Up";
+      "Switch One Desktop to the Right" = "Meta+Ctrl+Down";
       "Switch to Next Screen"     = "Meta+Ctrl+.";
       "Switch to Previous Screen" = "Meta+Ctrl+,";
 
-      # ── SUPER+CTRL+ALT — move windows across workspaces / monitors ────────────
-      "Window to Desktop 1" = "Meta+Ctrl+Alt+1";
-      "Window to Desktop 2" = "Meta+Ctrl+Alt+2";
-      "Window to Desktop 3" = "Meta+Ctrl+Alt+3";
-      "Window to Desktop 4" = "Meta+Ctrl+Alt+4";
-      "Window to Desktop 5" = "Meta+Ctrl+Alt+5";
-      "Window to Desktop 6" = "Meta+Ctrl+Alt+6";
-      "Window to Previous Desktop" = "Meta+Ctrl+Alt+Left";
-      "Window to Next Desktop"     = "Meta+Ctrl+Alt+Right";
+      # ── SUPER+CTRL+ALT — move window to adjacent desktop / monitor ────────────
+      "Window One Desktop to the Left"  = "Meta+Ctrl+Alt+Up";
+      "Window One Desktop to the Right" = "Meta+Ctrl+Alt+Down";
       "Window to Next Screen"      = "Meta+Ctrl+Alt+.";
       "Window to Previous Screen"  = "Meta+Ctrl+Alt+,";
     };
