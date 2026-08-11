@@ -29,6 +29,7 @@
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store   = true;
       trusted-users         = [ "root" "gav" ];
+      warn-dirty            = false;
       # Default max-jobs of 1 makes rebuilds painfully sequential on this Ryzen.
       max-jobs              = "auto";
     };

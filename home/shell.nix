@@ -55,6 +55,18 @@
         git -C $flake_dir push
       '';
 
+      # Checkpoint whatever's dirty in nixos-config as-is, no input bumps.
+      # Confirms it still builds first so a broken edit never gets pushed.
+      save = ''
+        set -l flake_dir ~/nixos-config
+        if nixos-rebuild build --flake $flake_dir#desktop
+            _nixos-commit-dirty $flake_dir save
+        else
+            echo "build failed — nothing committed"
+            return 1
+        end
+      '';
+
       update = ''
         set -l flake_dir ~/nixos-config
         set -l lock $flake_dir/flake.lock
