@@ -99,6 +99,10 @@
       "Effect-DimInactive".Strength = 40;
     };
 
+    # Mouse acceleration profile: flat = 1:1 raw input, no accel curve.
+    # Matches ~/.config/kcminputrc key already set live; declared here so it survives rebuilds.
+    configFile."kcminputrc".Mouse.X11LibInputXAccelProfileFlat = true;
+
     # ── VRR / G-Sync ─────────────────────────────────────────────────────────
     # No plasma-manager option (lives in kscreen2, not kwinrc): enable once in
     # System Settings → Display; KWin persists it in ~/.local/share/kscreen/.
