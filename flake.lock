@@ -3,8 +3,8 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1786626131,
-        "narHash": "sha256-nSTupP/yOesCYFywH4qyl2dB0ImB8AEy7ekrMCxE3Mk=",
+        "lastModified": 1786985419,
+        "narHash": "sha256-bUDiwTnWS+OR40kv0LMSXAPInlMYjkX5Ytk+hwcNQ88=",
         "path": "/home/gav/Projects/dotfiles",
         "type": "path"
       },
@@ -132,11 +132,11 @@
         "scenefx": "scenefx"
       },
       "locked": {
-        "lastModified": 1786880552,
-        "narHash": "sha256-kOH8g7pOD9tx+q6qPMAH6BFiCiuRUC6R4m4+4UCXRhM=",
+        "lastModified": 1786958759,
+        "narHash": "sha256-qekO+S6m6vfOcSoZwCMpnqVawBtclw7f2qUHLFLUpHo=",
         "owner": "mangowm",
         "repo": "mango",
-        "rev": "c5dd50494a22bde6cd59f583b1aed8daa5cbde7e",
+        "rev": "7b0b39fabb3bca04b90f75b444eafb8825454179",
         "type": "github"
       },
       "original": {
@@ -244,11 +244,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786933769,
-        "narHash": "sha256-WGcpfJDmCT+mTYW7L9g0rXVpd/CECCadg68SGlyRmJw=",
+        "lastModified": 1786984599,
+        "narHash": "sha256-I7E/WigdUVzJ5qZWkexYbHE/EWntxGPTh2N+VBUdpzo=",
         "owner": "noctalia-dev",
         "repo": "noctalia-shell",
-        "rev": "b46cdc1f2236fa2a81b36dc669bbda8a176f2148",
+        "rev": "87b203c682045d0f81a3d92d418bb37caf728a1c",
         "type": "github"
       },
       "original": {
