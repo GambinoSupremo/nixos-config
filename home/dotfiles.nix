@@ -338,9 +338,12 @@ in
   # ── Noctalia v5 ──────────────────────────────────────────────────────────────
   # Upstream HM module runs noctalia.service (WantedBy graphical-session.target);
   # settings left empty so ~/.config/noctalia/config.toml stays runtime-writable.
+  # package pinned to the flake's own build (matches the noctalia.cachix.org
+  # substituter in flake.nix) rather than nixpkgs' pkgs.noctalia default.
   programs.noctalia = {
     enable = true;
     systemd.enable = true;
+    package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
   };
 
   # ── Mango systemd session plumbing ───────────────────────────────────────────

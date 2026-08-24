@@ -5,7 +5,9 @@
 {
   imports = [
     # External home-manager modules
-    inputs.noctalia.homeModules.default       # programs.noctalia.*
+    # noctalia: home-manager now ships programs.noctalia natively (2026-08-24);
+    # the flake's own homeModules.default would duplicate that option
+    # declaration, so package is pinned explicitly in dotfiles.nix instead.
     inputs.mangowm.hmModules.mango            # wayland.windowManager.mango.*
     inputs.plasma-manager.homeModules.plasma-manager  # programs.plasma.*
     # Sub-modules — one concern per file
