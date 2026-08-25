@@ -42,7 +42,7 @@
 
   services.scx = {
     enable    = true;
-    scheduler = "scx_lavd";
+    scheduler = "scx_bpfland"; # scx_lavd RCU-stalls the whole system on kernel 7.2.0+
   };
 
   boot.kernel.sysctl."vm.max_map_count" = 2147483642;
