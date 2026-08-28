@@ -72,10 +72,9 @@
     };
 
     # Millennium — Steam client theming/plugin patcher; not in nixpkgs.
-    millennium = {
-      url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # No nixpkgs.follows: Millennium pins its own nixpkgs on purpose because
+    # its bun FOD hash breaks on any bun version change (upstream comment).
+    millennium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
   };
 
   outputs = { self, nixpkgs, home-manager, mangowm, noctalia, zen-browser, nixos-hardware, ... }@inputs:

@@ -98,6 +98,11 @@
 
         # No form-history autofill — Keeper handles filling
         "browser.formfill.enable" = false;
+
+        # Let Mullvad own DNS. Zen's built-in DoH to Cloudflare is blocked
+        # on-VPN, so lookups stall then fall back — Keeper's login hangs.
+        "network.trr.mode" = 5;
+        "doh-rollout.disable-heuristics" = true;
       };
     };
   };
