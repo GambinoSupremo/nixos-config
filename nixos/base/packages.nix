@@ -133,6 +133,7 @@
 
     # ── Peripherals ───────────────────────────────────────────────────────────
     polychromatic    # Razer lighting GUI; openrazer daemon via hardware.openrazer in services.nix
+    zmk-studio       # runtime keymap editor for the Lily58 (firmware built in ~/Projects/zmk-config)
 
     # ── Networking ────────────────────────────────────────────────────────────
     # mullvad-vpn comes from the services.mullvad-vpn module (keeps daemon + GUI
