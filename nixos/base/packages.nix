@@ -112,12 +112,6 @@
     qbittorrent
     matugen                      # material color generation from wallpaper
 
-    # lunatask                   # NOT in nixpkgs — closed-source task manager
-    # keeper-password-manager    # NOT in nixpkgs — use web vault or Flatpak
-    # fluxer-bin                 # NOT in nixpkgs
-    # dgop                       # NOT in nixpkgs (unrecognized package)
-    # shelly                     # NOT in nixpkgs
-
     # ── Media ────────────────────────────────────────────────────────────────
     spotify                      # was spotify-launcher (AUR downloader wrapper)
     sone                         # native Tidal client, hi-res FLAC (was flatpak)
