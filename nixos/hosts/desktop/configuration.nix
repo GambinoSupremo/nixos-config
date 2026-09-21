@@ -1,5 +1,22 @@
 { config, pkgs, lib, inputs, ... }:
 
+let
+  qylockThemes = inputs.qylock.legacyPackages.${pkgs.stdenv.hostPlatform.system}.mkSddmThemes { };
+  loginGifTheme = pkgs.runCommand "sddm-theme-last-of-us-gif" { } ''
+    d=$out/share/sddm/themes/last-of-us-gif
+    mkdir -p $(dirname $d)
+    cp -r ${qylockThemes}/share/sddm/themes/last-of-us $d
+    chmod -R u+w $d
+    rm -f $d/bg.mp4
+    cp ${../../assets/login-city.gif} $d/bg.gif
+    sed -i \
+      -e 's|MediaPlayer {[^}]*}|AnimatedImage { id: bgVideo; source: "bg.gif"; anchors.fill: parent; fillMode: Image.PreserveAspectCrop; z: -1000; playing: true; cache: true }|' \
+      -e '/VideoOutput {/d' \
+      $d/Main.qml
+    sed -i 's|^Name=.*|Name=last-of-us-gif|' $d/theme.conf
+    grep -q AnimatedImage $d/Main.qml
+  '';
+in
 {
   # Import order is load-bearing: list options merge in order, so reordering
   # changes the system hash even with nothing functional changed.
@@ -27,6 +44,12 @@
     theme  = "last-of-us";
     quickshell.enable = false;  # SDDM login theme only — Noctalia still owns the in-session lock
   };
+
+  # last-of-us with the h264 bg.mp4 swapped for a GIF: the greeter's VA-API decode
+  # of the video fails on NVIDIA+Wayland and the login screen froze on first boot.
+  services.displayManager.sddm.theme = lib.mkForce "last-of-us-gif";
+  services.displayManager.sddm.extraPackages = [ loginGifTheme ];
+  environment.systemPackages = [ loginGifTheme ];
 
   networking.hostName = "gavos";
 
