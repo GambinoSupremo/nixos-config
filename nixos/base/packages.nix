@@ -114,10 +114,7 @@
 
     # ── Media ────────────────────────────────────────────────────────────────
     spotify                      # was spotify-launcher (AUR downloader wrapper)
-    sone                         # native Tidal client, hi-res FLAC (was flatpak)
     tidal-hifi                   # "gray screen" = its gpuRasterization flag crashing NVIDIA+Wayland
-                                 # (not upstream #958); keep it off in config.json AND in-app settings
-    # cider                      # NOT in nixpkgs — Apple Music client
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
