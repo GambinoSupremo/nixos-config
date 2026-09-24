@@ -31,6 +31,8 @@
     PROTON_USE_NTSYNC                = "1";  # kernel NT sync primitives (needs ntsync module)
     __GL_VRR_ALLOWED                 = "1";  # enable G-Sync / VRR across all sessions
     __GL_GSYNC_ALLOWED               = "1";  # enable G-Sync-compatible path
+    # Driver trims its ~1 GB shader cache; big UE5 games then recompile every launch.
+    __GL_SHADER_DISK_CACHE_SKIP_CLEANUP = "1";
     # wlroots vars (GBM_BACKEND etc.) must NOT be global — they poison KWin;
     # they're injected per-compositor instead. WLR_DRM_DEVICES stays unset.
   };
