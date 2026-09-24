@@ -44,11 +44,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # plasma-manager — declarative KDE Plasma configuration via home-manager
-    plasma-manager = {
-      url   = "github:nix-community/plasma-manager";
+    # KineticWE — kwin-we + noctalia session. Experimental upstream flake;
+    # builds kdecoration/kglobalacceld from pinned KDE master commits.
+    kineticwe = {
+      url   = "gitlab:theblackdon/kineticwe";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
     };
 
     # For the laptop's AMD module; follows keeps a second stale nixpkgs

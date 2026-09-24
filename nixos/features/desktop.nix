@@ -1,21 +1,68 @@
-# Graphical stack: SDDM plus the three Wayland sessions (Mango primary,
-# Niri secondary, Hyprland tertiary/HDR) with portals, keyring, and fonts.
+# Graphical stack: SDDM plus the Wayland sessions (Hyprland primary, Mango
+# and Niri backups, KineticWE experimental) with portals, keyring, and fonts.
 { config, lib, pkgs, inputs, ... }:
 
 {
   imports = [
     # MangoWM NixOS module — provides programs.mango.* options
     inputs.mangowm.nixosModules.mango
+    # KineticWE (kwin-we + noctalia) — registers the session with SDDM.
+    inputs.kineticwe.nixosModules.default
   ];
 
   # ── Compositors ───────────────────────────────────────────────────────────────
-  # MangoWM — dwl-based, primary; module registers the session + its portals.
+  # KineticWE — kwin-we + noctalia. Experimental; previously removed
+  # 2026-07-01 after login failures. Retrying now that other session bugs
+  # (uwsm logout hang, hyprland-uwsm dupe) are fixed.
+  programs.kineticwe.enable = true;
+
+  # kinetic-we itself (not its startup payload) segfaults on every launch —
+  # coredumpctl shows a null deref in Qt6Gui's built-in QKdeTheme init
+  # (QStyleHintsPrivate::update). Cause: Qt's desktop-environment detection
+  # (qdesktopunixservices.cpp) checks XDG_CURRENT_DESKTOP first, and if
+  # empty, FALLS BACK to KDE_FULL_SESSION — either one alone is enough to
+  # make Qt auto-load its crashing "kde" platform theme. Commenting out
+  # this script's own `export` lines for both wasn't enough (verified by
+  # grepping the actual crashed process's environment out of its coredump:
+  # both were still "KDE"/"true") — SDDM itself injects XDG_CURRENT_DESKTOP
+  # and KDE_FULL_SESSION into the session's environment upstream, based on
+  # DesktopNames=KDE in KineticWE.desktop, before this script even runs.
+  # Not re-exporting them doesn't clear an already-inherited value, so they
+  # must be explicitly unset right before the exec. The startup payload
+  # re-exports the full KDE identity env for noctalia/portals/child apps
+  # independently (from its own heredoc, unaffected by this), so they still
+  # see KDE correctly.
+  programs.kineticwe.package =
+    let
+      orig = pkgs.kineticwe;
+    in
+    pkgs.runCommand "${orig.name}-no-qkdetheme-crash" {
+      passthru = orig.passthru;
+      meta     = orig.meta;
+    } ''
+      cp -r ${orig} $out
+      chmod -R u+w $out
+      sed -i \
+        -e '0,/^export XDG_CURRENT_DESKTOP=KDE$/{s/^export XDG_CURRENT_DESKTOP=KDE$/# &  # removed: crashes kwin-we Qt6Gui init, see kineticwe-session-debugging memory/}' \
+        -e '0,/^export KDE_FULL_SESSION=true$/{s/^export KDE_FULL_SESSION=true$/# &  # removed: Qt KDE-theme fallback trigger, same crash/}' \
+        -e '/^exec "\$KINETIC_WE" --xwayland --exit-with-session "\$STARTUP_PAYLOAD"$/i\
+unset XDG_CURRENT_DESKTOP KDE_FULL_SESSION\
+env > "$HOME/kwe-preexec-env.log" 2>/dev/null || true' \
+        "$out/bin/.start-kineticwe-wrapped"
+      # The .desktop Exec= line is baked in at the ORIGINAL derivation's own
+      # $out — cp -r doesn't rewrite file contents, so SDDM would otherwise
+      # still launch the unpatched script from the old store path.
+      substituteInPlace "$out/share/wayland-sessions/KineticWE.desktop" \
+        --replace-fail "${orig}/bin/start-kineticwe" "$out/bin/start-kineticwe"
+    '';
+
+  # MangoWM — dwl-based, backup; module registers the session + its portals.
   programs.mango.enable = true;
 
-  # Niri — secondary; nixpkgs module registers session + portal config.
+  # Niri — backup; nixpkgs module registers session + portal config.
   programs.niri.enable = true;
 
-  # Hyprland — fallback. Session env / noctalia startup driven by
+  # Hyprland — primary/daily driver. Session env / noctalia startup driven by
   # hyprSessionBootstrap in home/dotfiles.nix (the bare target raced noctalia).
   programs.hyprland = {
     enable    = true;
@@ -51,9 +98,9 @@
     settings.X11.SessionDir = "/var/empty";
   };
 
-  # Fallback preselection only (SDDM remembers last-used); keep it on the daily
-  # driver — defaulting to hyprland once landed a quick login in the wrong WM.
-  services.displayManager.defaultSession = "niri";
+  # Fallback preselection only (SDDM remembers last-used); Hyprland is the
+  # daily driver.
+  services.displayManager.defaultSession = "hyprland";
 
   # ── XDG Portals ───────────────────────────────────────────────────────────────
   # Each compositor module registers its own backends; only the shared fallback here.
@@ -62,7 +109,10 @@
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];  # file dialogs everywhere
     config = {
       KDE.default    = [ "kde" "gtk" ];  # KDE session: kde portal first, gtk fallback
-      common.default = [ "gtk" ];        # all other sessions unchanged
+      # mkForce: KineticWE's own module (DesktopNames=KDE, so it's covered by
+      # KDE.default above) also sets common.default = "kde" unconditionally —
+      # this wins the merge so Hyprland/Niri/Mango keep gtk.
+      common.default = lib.mkForce [ "gtk" ];
     };
   };
 
