@@ -346,14 +346,6 @@ in
     package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
   };
 
-  # ── Mango systemd session plumbing ───────────────────────────────────────────
-  # Only for mango-session.target; session binary + SDDM entry come from the
-  # NixOS module. settings empty → the dotfiles stay authoritative for config.conf.
-  wayland.windowManager.mango = {
-    enable = true;
-    systemd.enable = true;
-  };
-
   # ── Dotfiles deployment ───────────────────────────────────────────────────────
   # recursive keeps directories writable for runtime-generated files; force
   # overwrites leftovers from pre-declarative deployments.

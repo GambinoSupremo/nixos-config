@@ -61,9 +61,8 @@
   };
 
   # ── Signal ───────────────────────────────────────────────────────────────────
-  # Force gnome-libsecret: Electron otherwise picks a different keyring per
-  # compositor and "keyring backend changed" loses the encryption key.
-  xdg.desktopEntries.signal-desktop = {
+  # Pin gnome-libsecret (key lives there); id "signal" replaces the package entry.
+  xdg.desktopEntries.signal = {
     name       = "Signal";
     exec       = "signal-desktop --password-store=gnome-libsecret %U";
     icon       = "signal-desktop";
