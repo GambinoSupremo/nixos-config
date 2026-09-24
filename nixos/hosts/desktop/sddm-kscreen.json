@@ -1,0 +1,52 @@
+[
+    {
+        "enabled": true,
+        "id": "c5347566046540b4c17f34f8fb49993d",
+        "metadata": {
+            "fullname": "xrandr-Dell AW3423DW-#tBszGDAYBQUH",
+            "name": "DP-2"
+        },
+        "mode": {
+            "refresh": 59.972618103027344,
+            "size": {
+                "height": 1440,
+                "width": 3440
+            }
+        },
+        "overscan": 0,
+        "pos": {
+            "x": 0,
+            "y": 0
+        },
+        "priority": 1,
+        "rgbrange": 0,
+        "rotation": 1,
+        "scale": 1,
+        "vrrpolicy": 2
+    },
+    {
+        "enabled": true,
+        "id": "48b93bf567a4f472f3b0b9424bd5d605",
+        "metadata": {
+            "fullname": "xrandr-PHL 278E1-1631",
+            "name": "DP-0"
+        },
+        "mode": {
+            "refresh": 59.99662399291992,
+            "size": {
+                "height": 2160,
+                "width": 3840
+            }
+        },
+        "overscan": 0,
+        "pos": {
+            "x": 3440,
+            "y": 0
+        },
+        "priority": 2,
+        "rgbrange": 0,
+        "rotation": 1,
+        "scale": 1.5,
+        "vrrpolicy": 2
+    }
+]

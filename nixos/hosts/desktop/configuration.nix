@@ -51,40 +51,21 @@ in
   services.displayManager.sddm.extraPackages = [ loginGifTheme ];
   environment.systemPackages = [ loginGifTheme ];
 
-  networking.hostName = "gavos";
-
-  # KDE Plasma 6 — available as a session in SDDM alongside MangoWM/Niri/Hyprland.
-  services.desktopManager.plasma6.enable = true;
-  services.xserver.enable = true;
-  environment.plasma6.excludePackages = with pkgs.kdePackages; [
-    # Already-excluded bloat
-    plasma-browser-integration
-    oxygen
-    elisa
-    kmail
-    kontact
-    korganizer
-    # Apps replaced by better alternatives
-    dolphin        # file manager — use terminal or another
-    konsole        # terminal — using ghostty
-    kate           # text editor — using whatever's in dotfiles
-    gwenview       # image viewer — using mpv or cli
-    okular         # document viewer
-    ark            # archive manager
-    dragon         # video player — using mpv
-    kcalc          # calculator
-    kfind          # file search
-    # KDE-specific infrastructure we don't want
-    kwalletmanager # KWallet GUI — KWallet disabled via PAM anyway
-    plasma-welcome # first-run tour screen
-    discover       # software center — using nix
-    print-manager  # printing
+  # SDDM's Wayland greeter runs its own KWin instance as the `sddm` system
+  # user — a separate $HOME from ours, so it never saw our Hyprland/Niri
+  # monitor layout and was putting the Philips secondary at the origin as
+  # if it were primary. KWin persists output layout at
+  # ~/.local/share/kscreen/<hash>.json (hash is derived from the connected
+  # outputs' identity, not the user — same filename as our own kscreen
+  # config from the old KDE session, just with corrected pos/priority/scale
+  # matching hypr/monitor.lua and niri/outputs.kdl: AW3423DW primary at
+  # 0,0, Philips secondary at 3440,0 @ 1.5x scale).
+  systemd.tmpfiles.rules = [
+    "d /var/lib/sddm/.local/share/kscreen 0755 sddm sddm - -"
+    "C /var/lib/sddm/.local/share/kscreen/36aeefcbda87d1f6e851bd4d97887c38 0644 sddm sddm - ${./sddm-kscreen.json}"
   ];
 
-  # KWallet PAM auto-start off — GNOME Keyring handles SecretService for every
-  # session (KDE included); KWallet can still be opened manually.
-  security.pam.services.login.kwallet.enable  = lib.mkForce false;
-  security.pam.services.sddm.kwallet.enable   = lib.mkForce false;
+  networking.hostName = "gavos";
 
   # systemd-boot: plain but instant. (Tried themed GRUB 2026-07-09, reverted —
   # the menu load lag wasn't worth cosmetics on a menu that's hidden anyway.)
