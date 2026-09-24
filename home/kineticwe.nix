@@ -104,7 +104,7 @@ let
   # screen 0 = DP-1 (4K), 1 = DP-2 (Alienware). *match 3 = regex; *rule 2 = force,
   # 3 = initially. desktops/screen are forced: the screen move resets initial desktops.
   opacity = cls: { wmclass = cls; wmclassmatch = 3;
-    opacityactive = 95; opacityactiverule = 2; opacityinactive = 85; opacityinactiverule = 2; };
+    opacityactive = 98; opacityactiverule = 2; opacityinactive = 92; opacityinactiverule = 2; };
   windowRules = {
     # Steam + games → desktop 2 on the Alienware, no focus stealing.
     steam = { wmclass = "^(steam|steam_app_.*)$"; wmclassmatch = 3;
@@ -114,7 +114,7 @@ let
       desktops = "Desktop_2"; desktopsrule = 2; screen = 0; screenrule = 3; };
     ghostty-floating = { wmclass = "^com\\.ghostty\\.floating$"; wmclassmatch = 3;
       size = "900,600"; sizerule = 3; };
-    # Match niri: focused 0.95, unfocused 0.85 (ghostty sets its own).
+    # Focused 0.98, unfocused 0.92 (ghostty sets its own). KWin can't blur these.
     signal-opacity   = opacity "signal";
     vesktop-opacity  = opacity "vesktop";
     zen-opacity      = opacity "zen";
