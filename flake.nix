@@ -38,9 +38,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # KineticWE session; 2.0 branch ships Kinetic Settings in its own noctalia fork.
+    # KineticWE session (kineticwe-2.0 branch: Kinetic Settings). Pinned so `update`
+    # skips it (daily upstream churn, long source build); bump the rev deliberately.
     kineticwe = {
-      url   = "gitlab:theblackdon/kineticwe/kineticwe-2.0";
+      url   = "gitlab:theblackdon/kineticwe/c2b82884fd3a3bb717158227a66af85d1517eeb2";
       inputs.nixpkgs.follows  = "nixpkgs";
       inputs.noctalia.follows = "noctalia";  # unused by 2.0; avoids a second fetch
     };

@@ -121,8 +121,8 @@
       },
       "original": {
         "owner": "theblackdon",
-        "ref": "kineticwe-2.0",
         "repo": "kineticwe",
+        "rev": "c2b82884fd3a3bb717158227a66af85d1517eeb2",
         "type": "gitlab"
       }
     },
