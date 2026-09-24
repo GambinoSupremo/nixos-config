@@ -18,12 +18,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # MangoWM — provides nixosModules.mango and programs.mango.enable
-    mangowm = {
-      url   = "github:mangowm/mango";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Noctalia v5 — native Wayland shell; homeModules.default provides
     # programs.noctalia.* + the noctalia.service user unit.
     noctalia = {
@@ -44,11 +38,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # KineticWE — kwin-we + noctalia session. Experimental upstream flake;
-    # builds kdecoration/kglobalacceld from pinned KDE master commits.
+    # KineticWE session; 2.0 branch ships Kinetic Settings in its own noctalia fork.
     kineticwe = {
-      url   = "gitlab:theblackdon/kineticwe";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url   = "gitlab:theblackdon/kineticwe/kineticwe-2.0";
+      inputs.nixpkgs.follows  = "nixpkgs";
+      inputs.noctalia.follows = "noctalia";  # unused by 2.0; avoids a second fetch
     };
 
     # For the laptop's AMD module; follows keeps a second stale nixpkgs
@@ -77,7 +71,7 @@
     millennium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
   };
 
-  outputs = { self, nixpkgs, home-manager, mangowm, noctalia, zen-browser, nixos-hardware, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, noctalia, zen-browser, nixos-hardware, ... }@inputs:
   let
     # Shared home-manager config block applied to every host. (A commonOverlay
     # of throw-alias shims was removed 2026-07-14 — git history has it.)

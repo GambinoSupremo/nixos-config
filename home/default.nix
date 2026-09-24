@@ -4,18 +4,14 @@
 
 {
   imports = [
-    # External home-manager modules
-    # noctalia: home-manager now ships programs.noctalia natively (2026-08-24);
-    # the flake's own homeModules.default would duplicate that option
-    # declaration, so package is pinned explicitly in dotfiles.nix instead.
-    inputs.mangowm.hmModules.mango            # wayland.windowManager.mango.*
-    # Sub-modules — one concern per file
+    # One concern per file (noctalia uses HM's native module; package pinned in dotfiles.nix)
     ./dotfiles.nix   # compositor plumbing, dotfile patching, activation scripts
     ./shell.nix      # fish, starship, fzf, zoxide, bat
     ./theming.nix    # gtk, cursor
     ./programs.nix   # git, neovim, obs, signal, pywalfox
     ./services.nix   # mullvad-gui systemd user service
     ./zen.nix        # Zen Browser — declarative profile, extensions, policies
+    ./kineticwe.nix  # KineticWE binds, look and rules (seeded once at login)
   ];
 
   home.username      = "gav";
