@@ -79,6 +79,8 @@ in
   # 5s generation menu at boot — roll back without holding a key (0 = straight through).
   boot.loader.timeout = 5;
   boot.loader.systemd-boot.configurationLimit = 10;
+  # Memtest86+ entry in the boot menu (RAM stability checks after BIOS changes).
+  boot.loader.systemd-boot.memtest86.enable = true;
 
   # Plymouth theme from the adi1090x pack — swap the name in BOTH places to try
   # another. Esc during boot drops to the text log.
@@ -97,10 +99,6 @@ in
     "quiet"
     "udev.log_priority=3"
   ];
-
-  # ── Profile Sync Daemon ───────────────────────────────────────────────────────
-  # Zen profile in tmpfs: faster page loads, less SSD wear. Desktop only.
-  services.psd.enable = true;
 
   # No btrfs-assistant: it drags snapper back into the closure (removed
   # 2026-07-14) and plain `btrfs` subcommands cover what it wrapped.

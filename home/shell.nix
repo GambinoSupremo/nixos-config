@@ -114,6 +114,12 @@
             return 1
         end
       '';
+
+      # Claude Code won't persist trust for $HOME; launch from nixos-config instead.
+      claude = ''
+        test "$PWD" = "$HOME"; and cd ~/nixos-config
+        command claude $argv
+      '';
     };
   };
 

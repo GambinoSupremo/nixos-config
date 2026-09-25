@@ -131,7 +131,6 @@
 
     # ── Misc ─────────────────────────────────────────────────────────────────
     # ollama managed via services.ollama in services.nix
-    # profile-sync-daemon managed via services.psd in services.nix
     # pipewire / wireplumber managed via services.pipewire in audio.nix
     # gamemode managed via programs.gamemode in services.nix
     # keyd managed via services.keyd in services.nix

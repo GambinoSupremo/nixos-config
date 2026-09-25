@@ -18,8 +18,9 @@ let
       hyprctl output create headless SUNSHINE
       hyprctl eval "hl.monitor({ output = \"SUNSHINE\", mode = \"''${w}x''${h}@''${fps}\", position = \"0x0\", scale = 1 })"
       # Disable physical outputs only after the virtual one exists — never zero monitors.
-      hyprctl eval 'hl.monitor({ output = "DP-2", disabled = true })'
-      hyprctl eval 'hl.monitor({ output = "DP-1", disabled = true })'
+      for m in $(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.name != "SUNSHINE") | .name'); do
+        hyprctl eval "hl.monitor({ output = \"$m\", disabled = true })"
+      done
       ;;
     stop)
       # reload re-applies monitor.lua (HDR/VRR/positions) before the virtual
