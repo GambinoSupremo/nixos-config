@@ -1,32 +1,22 @@
-# Sunshine (Moonlight streaming host) with a per-stream headless virtual
-# display sized to the client. Hyprland-only; other sessions stream the
-# physical (letterboxed) desktop.
+# Sunshine (Moonlight streaming host). Each stream gets a headless virtual
+# display at the client's resolution/refresh; physical monitors stay on.
 { config, lib, pkgs, ... }:
 
 let
-  # Clients are 16:9 but the AW3423DW only has 21:9 modes, so each stream gets a
-  # headless virtual display at the client's exact size, restored on disconnect.
   streamDisplay = pkgs.writeShellScript "sunshine-stream-display" ''
-    # Hyprland-only; no-op elsewhere so other sessions still stream (letterboxed).
+    # Hyprland-only; elsewhere Sunshine falls back to streaming monitor 0.
     [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ] || exit 0
 
     case "$1" in
     start)
-      w=''${SUNSHINE_CLIENT_WIDTH:-1920}
-      h=''${SUNSHINE_CLIENT_HEIGHT:-1080}
-      fps=''${SUNSHINE_CLIENT_FPS:-60}
+      # Clear a leftover from a stream whose undo never ran.
+      hyprctl output destroy SUNSHINE >/dev/null 2>&1
       hyprctl output create headless SUNSHINE
-      hyprctl eval "hl.monitor({ output = \"SUNSHINE\", mode = \"''${w}x''${h}@''${fps}\", position = \"0x0\", scale = 1 })"
-      # Disable physical outputs only after the virtual one exists — never zero monitors.
-      for m in $(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.name != "SUNSHINE") | .name'); do
-        hyprctl eval "hl.monitor({ output = \"$m\", disabled = true })"
-      done
+      hyprctl eval "hl.monitor({ output = \"SUNSHINE\", mode = \"''${SUNSHINE_CLIENT_WIDTH:-1920}x''${SUNSHINE_CLIENT_HEIGHT:-1080}@''${SUNSHINE_CLIENT_FPS:-60}\", position = \"auto-right\", scale = 1 })"
+      # Big Picture/games open on the focused monitor.
+      hyprctl dispatch 'hl.dsp.focus({ monitor = "SUNSHINE" })'
       ;;
     stop)
-      # reload re-applies monitor.lua (HDR/VRR/positions) before the virtual
-      # display disappears and workspaces migrate home.
-      hyprctl reload
-      sleep 1
       hyprctl output destroy SUNSHINE
       ;;
     esac
@@ -43,8 +33,8 @@ in
       # Pin to wlr screencopy — otherwise Sunshine probes the portal backend
       # too, popping the screen-share picker on every login.
       capture = "wlr";
-      # Runs around every stream. Declaring `settings` makes the web UI's
-      # general settings read-only (pairing + app list still work).
+      # Matched by output name (falls back to monitor 0 when absent).
+      output_name = "SUNSHINE";
       global_prep_cmd = builtins.toJSON [
         {
           do = "${streamDisplay} start";
@@ -52,5 +42,17 @@ in
         }
       ];
     };
+    applications.apps = [
+      {
+        name = "Steam Big Picture";
+        image-path = "steam.png";
+        detached = [ "setsid steam steam://open/bigpicture" ];
+        prep-cmd = [ { do = ""; undo = "setsid steam steam://close/bigpicture"; } ];
+      }
+      {
+        name = "Desktop";
+        image-path = "desktop.png";
+      }
+    ];
   };
 }
