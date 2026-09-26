@@ -82,4 +82,14 @@
     categories = [ "Network" "InstantMessaging" "Chat" ];
     mimeType   = [ "x-scheme-handler/discord" ];
   };
+
+  # ── Sunshine ─────────────────────────────────────────────────────────────────
+  # Runs as a user service; the menu entry opens the web UI instead of a 2nd copy.
+  xdg.desktopEntries."dev.lizardbyte.app.Sunshine" = {
+    name       = "Sunshine";
+    exec       = "xdg-open https://localhost:47990";
+    icon       = "dev.lizardbyte.app.Sunshine";
+    comment    = "Sunshine web UI";
+    categories = [ "RemoteAccess" "Network" ];
+  };
 }
