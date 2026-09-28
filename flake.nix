@@ -32,7 +32,7 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # qylock — SDDM themes (login screen), "last-of-us" selected in desktop/configuration.nix
+    # qylock — SDDM themes (login screen), "pixel-dusk-city" selected in desktop/configuration.nix
     qylock = {
       url   = "github:Darkkal44/qylock";
       inputs.nixpkgs.follows = "nixpkgs";
