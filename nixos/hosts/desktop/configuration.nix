@@ -2,19 +2,19 @@
 
 let
   qylockThemes = inputs.qylock.legacyPackages.${pkgs.stdenv.hostPlatform.system}.mkSddmThemes { };
-  loginGifTheme = pkgs.runCommand "sddm-theme-last-of-us-gif" { } ''
-    d=$out/share/sddm/themes/last-of-us-gif
+  # pixel-dusk-city with bg.mp4 transcoded to animated WebP (greeter video decode freezes on NVIDIA).
+  loginTheme = pkgs.runCommand "sddm-theme-pixel-dusk-city-webp" { nativeBuildInputs = [ pkgs.ffmpeg-headless ]; } ''
+    d=$out/share/sddm/themes/pixel-dusk-city-webp
     mkdir -p $(dirname $d)
-    cp -r ${qylockThemes}/share/sddm/themes/last-of-us $d
+    cp -r ${qylockThemes}/share/sddm/themes/pixel-dusk-city $d
     chmod -R u+w $d
-    rm -f $d/bg.mp4
-    cp ${../../assets/login-city.gif} $d/bg.gif
-    sed -i \
-      -e 's|MediaPlayer {[^}]*}|AnimatedImage { id: bgVideo; source: "bg.gif"; anchors.fill: parent; fillMode: Image.PreserveAspectCrop; z: -1000; playing: true; cache: true }|' \
-      -e '/VideoOutput {/d' \
-      $d/Main.qml
-    sed -i 's|^Name=.*|Name=last-of-us-gif|' $d/theme.conf
-    grep -q AnimatedImage $d/Main.qml
+    ffmpeg -v error -i $d/bg.mp4 -an -vf fps=30 -c:v libwebp -q:v 85 -compression_level 4 -loop 0 $d/bg.webp
+    rm $d/bg.mp4
+    cat > $d/BackgroundVideo.qml <<'QML'
+  import QtQuick
+  AnimatedImage { anchors.fill: parent; source: "bg.webp"; fillMode: Image.PreserveAspectCrop; smooth: false; playing: true; cache: false }
+  QML
+    sed -i 's|^Name=.*|Name=pixel-dusk-city-webp|' $d/metadata.desktop
   '';
 in
 {
@@ -41,28 +41,20 @@ in
 
   programs.qylock = {
     enable = true;
-    theme  = "last-of-us";
+    theme  = "pixel-dusk-city";
     quickshell.enable = false;  # SDDM login theme only — Noctalia still owns the in-session lock
   };
 
-  # last-of-us with the h264 bg.mp4 swapped for a GIF: the greeter's VA-API decode
-  # of the video fails on NVIDIA+Wayland and the login screen froze on first boot.
-  services.displayManager.sddm.theme = lib.mkForce "last-of-us-gif";
-  services.displayManager.sddm.extraPackages = [ loginGifTheme ];
-  environment.systemPackages = [ loginGifTheme ];
+  services.displayManager.sddm.theme = lib.mkForce "pixel-dusk-city-webp";
+  # qtimageformats provides the WebP decoder for the animated background.
+  services.displayManager.sddm.extraPackages = [ loginTheme pkgs.qt6.qtimageformats ];
+  environment.systemPackages = [ loginTheme ];
 
-  # SDDM's Wayland greeter runs its own KWin instance as the `sddm` system
-  # user — a separate $HOME from ours, so it never saw our Hyprland/Niri
-  # monitor layout and was putting the Philips secondary at the origin as
-  # if it were primary. KWin persists output layout at
-  # ~/.local/share/kscreen/<hash>.json (hash is derived from the connected
-  # outputs' identity, not the user — same filename as our own kscreen
-  # config from the old KDE session, just with corrected pos/priority/scale
-  # matching hypr/monitor.lua and niri/outputs.kdl: AW3423DW primary at
-  # 0,0, Philips secondary at 3440,0 @ 1.5x scale).
+  # SDDM's Wayland greeter runs KWin as the `sddm` user, which never saw our
+  # layout; L+ re-links KWin 6's output config each boot (C/C+ never overwrite).
   systemd.tmpfiles.rules = [
-    "d /var/lib/sddm/.local/share/kscreen 0755 sddm sddm - -"
-    "C /var/lib/sddm/.local/share/kscreen/36aeefcbda87d1f6e851bd4d97887c38 0644 sddm sddm - ${./sddm-kscreen.json}"
+    "d /var/lib/sddm/.config 0755 sddm sddm - -"
+    "L+ /var/lib/sddm/.config/kwinoutputconfig.json - - - - ${./sddm-kwinoutputconfig.json}"
   ];
 
   networking.hostName = "gavos";
