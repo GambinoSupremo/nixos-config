@@ -110,10 +110,12 @@
     pavucontrol
     qbittorrent
     matugen                      # material color generation from wallpaper
+    firefox
 
     # ── Media ────────────────────────────────────────────────────────────────
     spotify                      # was spotify-launcher (AUR downloader wrapper)
     tidal-hifi                   # "gray screen" = its gpuRasterization flag crashing NVIDIA+Wayland
+    cider-2                      # Apple Music (cider.sh 4.x); plain `cider` is the dead 1.x fork
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
