@@ -54,10 +54,6 @@
   # Required for obsidian, vivaldi, nvidia, spotify, etc.
   nixpkgs.config.allowUnfree = true;
 
-  # electron 40 went EOL 2026-07-15; tidal-hifi/obsidian still pin it.
-  # Drop once nixpkgs bumps them.
-  nixpkgs.config.permittedInsecurePackages = [ "electron-40.10.5" ];
-
   # ── System version ────────────────────────────────────────────────────────────
   # Do NOT change after first install — controls stateful service migrations.
   system.stateVersion = "26.05";

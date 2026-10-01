@@ -15,7 +15,7 @@ nixos/
                           # (pipewire), services (keyd, bluetooth, ...),
                           # packages (systemPackages)
   features/               # opt-in per host:
-    desktop.nix           #   SDDM + Mango/Niri/Hyprland sessions + portals + fonts
+    desktop.nix           #   SDDM + Hyprland/Niri/KineticWE sessions + portals + fonts
     nvidia.nix            #   driver pin + Wayland env (desktop host)
     amd.nix               #   laptop-only GPU config
     gaming.nix            #   Steam/gamescope/gamemode/novpn
@@ -27,15 +27,16 @@ nixos/
 home/                     # home-manager for gav (shared by all hosts):
                           #   dotfiles.nix (dotfile patching/deployment — the
                           #   heart of the repo), shell, theming, programs,
-                          #   services, plasma, zen, noctalia/config.toml
+                          #   services, zen, kineticwe, noctalia/config.toml
 ```
 
 ## Sessions
 
-SDDM (SilentSDDM, X11 greeter) with four sessions. **Mango is the daily
-driver**, Niri secondary, Hyprland tertiary/HDR (and the configured
-`defaultSession`), KDE Plasma 6 for the full-DE fallback. Noctalia v5 is the
-bar/shell everywhere, run as `noctalia.service` (upstream HM module).
+SDDM (Wayland greeter on kwin, qylock theme) with three sessions.
+**Hyprland is the daily driver** (HDR, `defaultSession`), Niri the backup,
+KineticWE (kwin fork) experimental. Noctalia v5 is the bar/shell, run as
+`noctalia.service` (upstream HM module). MangoWM was dropped 2026-09-24; KDE
+Plasma is not installed.
 
 ## Rebuild
 
@@ -51,10 +52,10 @@ Dotfile edits are NOT live: the dotfiles input is lock-pinned, so it takes
 ## Biweekly update ritual
 
 1. `nix flake update --flake ~/nixos-config` (don't rebuild yet).
-2. `git diff flake.lock` — note old→new revs for mangowm, noctalia, and
+2. `git diff flake.lock` — note old→new revs for noctalia, kineticwe, and
    nixpkgs (niri + hyprland come from nixpkgs).
-3. Release-note check for config-breaking changes: mango wiki/commits,
-   niri release notes, hyprland release notes, noctalia releases.
+3. Release-note check for config-breaking changes: niri, hyprland,
+   noctalia, kineticwe.
 4. Migrate configs in the dotfiles repo if needed (respect the mustSed
    warnings in each file's header).
 5. `rebuild` (or `update` if step 1 was skipped).
@@ -62,36 +63,27 @@ Dotfile edits are NOT live: the dotfiles input is lock-pinned, so it takes
    ```bash
    niri validate                       # parses ~/.config/niri/config.kdl
    hyprctl configerrors                # inside a Hyprland session
-   mango -c ~/.config/mango/config.conf 2>&1 | head   # nested; parse errors on stderr, Ctrl+C out
    systemctl --user status noctalia.service
    ls /run/current-system/sw/share/wayland-sessions   # 3 wayland sessions present
    ```
 
 ## Known constraints (load-bearing — do not rediscover these)
 
-- **Mango 255-char parser limit**: mango's config parser truncates values at
-  255 chars (`char value[256]` in parse_config.h). home/dotfiles.nix rejects
-  long lines at build time; keep mango config lines short. This is why the
-  session bootstrap is a script, not an inline one-liner.
 - **Monitor identity vs port names**: the NVIDIA DP-N index flips with GPU
-  probe order (DP-1/DP-2 vs DP-3/DP-4 both seen). Niri uses identity strings
-  (never switch to port names); mango's generated monitor.conf lists both
-  names; mango tag/rule.conf and hypr configs match DP-2/DP-1 only and
-  degrade silently if the names flip.
-- **NVIDIA driver pin**: 610 branch (`nvidiaPackages.latest`), open modules.
-  The 595 branch intermittently scanned the AW3423DW into a corner. Move
-  back to `.stable` once stable ≥ 610 (details in nixos/features/nvidia.nix).
+  probe order (DP-1/DP-2 vs DP-3/DP-4 both seen). Niri and hypr/monitor.lua
+  match by identity/EDID desc (never switch to port names); KineticWE
+  (home/kineticwe.nix) still uses DP-2/DP-1 and degrades if the names flip.
+- **NVIDIA driver pin**: `nvidiaPackages.latest` (615 as of 2026-10), open
+  modules. The 595 branch intermittently scanned the AW3423DW into a corner.
+  Move back to `.stable` once stable ≥ 610 (details in nixos/features/nvidia.nix).
 - **NVIDIA cursor bug**: hardware cursors freeze under the HDR/10-bit
   pipeline. Hyprland: `no_hardware_cursors = true` + `min_refresh_rate = 60`
   (software cursors render no frames on an idle VRR screen otherwise).
-  Mango: `WLR_NO_HARDWARE_CURSORS=1` in env.conf.
 - **VRR / gamma flicker**: fluctuating refresh causes visible gamma flicker
   on the QD-OLED desktop. Policy everywhere is fullscreen-games-only VRR:
-  Hyprland `vrr = 2`, niri `on-demand=true` + steam_app rule, mango
-  monitorrule `vrr:0` + `vrr_only_fullscreen:1` on steam_app_ (mango has no
-  mode 2; monitor vrr is clamped to 0/1).
-- **HDR**: lives in dotfiles hypr/monitor.lua only (cm=hdr, 10-bit).
-  MangoWM master has no working HDR on the scenefx/GLES renderer.
+  Hyprland `vrr = 2`, niri `on-demand=true` + steam_app rule.
+- **HDR**: lives in dotfiles hypr/monitor.lua only (cm=hdr, 10-bit,
+  `sdr_min_luminance = 0`).
 - **keyd clipboard**: super+c/super+v are remapped to Ctrl-/Shift-Insert at
   the kernel level for ALL sessions (base/services.nix). Compositor binds on
   plain SUPER+C/V can never fire; binds with extra keys/modifiers

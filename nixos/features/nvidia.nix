@@ -9,7 +9,7 @@
   # Open modules — NVIDIA's recommended path for Ampere.
   hardware.nvidia.open                = true;
   hardware.nvidia.nvidiaSettings      = true;
-  # latest (610), NOT stable (595): 595 intermittently scans the AW3423DW into
+  # latest (>=610), NOT stable (595): 595 intermittently scans the AW3423DW into
   # a corner on Wayland (proven driver-branch bug). Back to .stable once >= 610.
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
 

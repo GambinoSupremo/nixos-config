@@ -43,9 +43,7 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   json references the store path directly and doesn't need it.
 - defaultSession = "hyprland" despite Mango being the daily driver — as
   found; deliberate choice, not cleanup material.
-- /etc/nixos/{configuration.nix,configuration.nix.save,
-  hardware-configuration.nix}: stale pre-flake leftovers, NOT removed
-  (needs sudo): sudo rm /etc/nixos/configuration.nix{,.save} /etc/nixos/hardware-configuration.nix
+- /etc/nixos pre-flake leftovers: since removed (empty as of 2026-10-01).
 
 ## 2026-08-03
 - niri libdisplay-info overlay removed: pin existed 2026-07-28 to
@@ -69,13 +67,21 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   Mullvad unconditionally; retires the per-game `novpn %command%` launch
   option workaround from Rivals 2. New file: nixos/features/steam-novpn.nix,
   imported in hosts/desktop/configuration.nix next to gaming.nix.
-  Implementation pending (see chat skeleton).
+  NEVER IMPLEMENTED (as of 2026-10-01): steam-novpn.nix doesn't exist;
+  per-game `novpn` launch options are still the live mechanism.
+
+## 2026-10-01
+- MangoWM HM plumbing removed from home/dotfiles.nix (bootstrap script,
+  mustSeds, generated monitor.conf, 255-char check, deploy + noctalia seed).
+  Session was already disabled 2026-09-24; mango edits in the dotfiles repo
+  can no longer break this build.
+- electron-40.10.5 permittedInsecurePackages + insecure-pin-check removed:
+  nothing in the closure uses electron 40. The check never fired because
+  tidal-hifi is unfree and it evaluated without allowing unfree.
 
 ## Unsure / watch
 - keyd passthrough claim (SUPER+CTRL+V works, plain SUPER+C/V consumed) is
   reasoned from keyd semantics + observed behavior, not live-tested yet.
-- mango vrr_only_fullscreen behavior verified in source/docs, not on-screen
-  — confirm no desktop flicker and working game VRR after next mango boot.
 - Hyprland fresh-boot fallback path (broken lua → hyprland.conf) untested.
 - flake.lock path-input lastModified for dotfiles looks stale even when
   content is current — narHash is what matters; don't trust the date.
