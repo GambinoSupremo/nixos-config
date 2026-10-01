@@ -102,16 +102,6 @@ window-rule {
     opacity 0.90
 }
 window-rule {
-    match app-id="zen-beta"
-    match is-focused=true
-    opacity 0.95
-}
-window-rule {
-    match app-id="zen-beta"
-    match is-focused=false
-    opacity 0.90
-}
-window-rule {
     match app-id="obsidian"
     match is-focused=true
     opacity 0.95
@@ -181,7 +171,6 @@ bind = SUPER, code:51, exec, noctalia msg panel-toggle control-center audio
 # Per-app opacity, same values as niri
 windowrule = match:class ^(signal)$, opacity 0.95 0.90
 windowrule = match:class ^(vesktop)$, opacity 0.95 0.90
-windowrule = match:class ^(zen-beta)$, opacity 0.95 0.90
 windowrule = match:class ^(obsidian)$, opacity 0.95 0.90
 EOF
 
