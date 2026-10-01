@@ -75,7 +75,7 @@
   programs.satty = {
     enable   = true;
     settings.general = {
-      fullscreen        = true;
+      fullscreen        = false;
       early-exit        = true;
       copy-command      = "wl-copy";
       corner-roundness  = 12;
