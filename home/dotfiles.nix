@@ -80,7 +80,7 @@ let
     cat >> $out/niri/config.kdl <<'EOF'
 
 // ── NixOS additions ──────────────────────────────────────────────────────────
-// Per-app opacity: focused=0.95 unfocused=0.85
+// Per-app opacity: focused=0.95 unfocused=0.90
 window-rule {
     match app-id="signal"
     match is-focused=true
@@ -89,7 +89,7 @@ window-rule {
 window-rule {
     match app-id="signal"
     match is-focused=false
-    opacity 0.85
+    opacity 0.90
 }
 window-rule {
     match app-id="vesktop"
@@ -99,7 +99,7 @@ window-rule {
 window-rule {
     match app-id="vesktop"
     match is-focused=false
-    opacity 0.85
+    opacity 0.90
 }
 window-rule {
     match app-id="zen-beta"
@@ -109,7 +109,7 @@ window-rule {
 window-rule {
     match app-id="zen-beta"
     match is-focused=false
-    opacity 0.85
+    opacity 0.90
 }
 window-rule {
     match app-id="obsidian"
@@ -119,7 +119,7 @@ window-rule {
 window-rule {
     match app-id="obsidian"
     match is-focused=false
-    opacity 0.85
+    opacity 0.90
 }
 EOF
 
@@ -179,10 +179,10 @@ bind = SUPER SHIFT, E, exit
 bind = SUPER SHIFT, D, exec, mullvad-exclude vesktop
 bind = SUPER, code:51, exec, noctalia msg panel-toggle control-center audio
 # Per-app opacity, same values as niri
-windowrule = match:class ^(signal)$, opacity 0.95 0.85
-windowrule = match:class ^(vesktop)$, opacity 0.95 0.85
-windowrule = match:class ^(zen-beta)$, opacity 0.95 0.85
-windowrule = match:class ^(obsidian)$, opacity 0.95 0.85
+windowrule = match:class ^(signal)$, opacity 0.95 0.90
+windowrule = match:class ^(vesktop)$, opacity 0.95 0.90
+windowrule = match:class ^(zen-beta)$, opacity 0.95 0.90
+windowrule = match:class ^(obsidian)$, opacity 0.95 0.90
 EOF
 
     ${lib.optionalString (!isVM) ''
