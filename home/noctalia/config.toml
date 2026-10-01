@@ -174,8 +174,18 @@ source = "wallpaper"
         "telegram",
         "yazi",
         "zathura",
-        "hyprtoolkit"
+        "hyprtoolkit",
+        "obs"
     ]
+
+    # App themes Noctalia has no community template for.
+    [theme.templates.user.tidal-hifi]
+    input_path = "~/.config/noctalia/templates/tidal-hifi.css"
+    output_path = "~/.config/tidal-hifi/themes/noctalia.css"
+
+    [theme.templates.user.cider]
+    input_path = "~/.config/noctalia/templates/cider.scss"
+    output_path = "~/.config/sh.cider.genten/themes/noctalia/noctalia.scss"
 
 [wallpaper]
 directory = "/home/gav/Pictures/backgrounds"

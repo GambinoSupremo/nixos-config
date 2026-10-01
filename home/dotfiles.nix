@@ -261,6 +261,10 @@ in
     "niri"    = { source = "${dotfiles}/niri";    recursive = true; force = true; };
     "hypr"    = { source = "${dotfiles}/hypr";    recursive = true; force = true; };
     "ghostty" = { source = "${dotfiles}/ghostty"; recursive = true; force = true; };
+    # Noctalia user templates (wired in noctalia/config.toml [theme.templates.user]).
+    "noctalia/templates/tidal-hifi.css".source = ./noctalia/templates/tidal-hifi.css;
+    "noctalia/templates/cider.scss".source     = ./noctalia/templates/cider.scss;
+    "sh.cider.genten/themes/noctalia/theme.yml".source = ./noctalia/templates/cider-theme.yml;
     # Suppress the stale XDG autostart entry so the mullvad-gui systemd user
     # service (services.nix) controls launch timing instead.
     "autostart/mullvad-vpn.desktop" = { force = true; text = "[Desktop Entry]\nHidden=true\n"; };
