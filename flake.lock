@@ -3,8 +3,8 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1790882572,
-        "narHash": "sha256-zaIkGsabXW9Sda4MMPHkaJwqZ+HShoVZOLLAfQNjVdI=",
+        "lastModified": 1790893846,
+        "narHash": "sha256-vwJ/rVsdqlirKuqG0ogpXITzsTVB544eut7FzEgMwiQ=",
         "path": "/home/gav/Projects/dotfiles",
         "type": "path"
       },
