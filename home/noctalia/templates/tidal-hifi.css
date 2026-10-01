@@ -1,22 +1,37 @@
 /* Noctalia → tidal-hifi; generated from tidal-hifi's bundled Gruvbox.css.
    Surfaces are tinted with primary so the palette reads on pure-black schemes. */
+/* Palette as variables; everything below derives from these. */
+html:root {
+  --nx-error: {{colors.error.default.hex}};
+  --nx-on-surface: {{colors.on_surface.default.hex}};
+  --nx-on-surface-variant: {{colors.on_surface_variant.default.hex}};
+  --nx-outline-variant: {{colors.outline_variant.default.hex}};
+  --nx-primary: {{colors.primary.default.hex}};
+  --nx-secondary: {{colors.secondary.default.hex}};
+  --nx-surface: {{colors.surface.default.hex}};
+  --nx-surface-container: {{colors.surface_container.default.hex}};
+  --nx-surface-container-high: {{colors.surface_container_high.default.hex}};
+  --nx-surface-container-highest: {{colors.surface_container_highest.default.hex}};
+  --nx-tertiary: {{colors.tertiary.default.hex}};
+}
+
 html {
-  --sidebar-background: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  --sidebar-hover-background: {{colors.outline_variant.default.hex}};
-  --sidebar-menu-top-text: {{colors.on_surface_variant.default.hex}};
-  --sidebar-menu-playlist-text: {{colors.on_surface_variant.default.hex}};
-  --search-background: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  --main-background: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
-  --main-navigation-control-background: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  --main-feed-button-background: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  --player-control-background: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  --player-control-active-button: {{colors.primary.default.hex}};
-  --player-progress-bar: {{colors.primary.default.hex}};
-  --indicator-hifi-background: {{colors.tertiary.default.hex}};
-  --indicator-hifi-span: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  --player-control-favorite: {{colors.error.default.hex}};
-  --search-dialog-background: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  --right-queue-background: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  --sidebar-background: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  --sidebar-hover-background: var(--nx-outline-variant);
+  --sidebar-menu-top-text: var(--nx-on-surface-variant);
+  --sidebar-menu-playlist-text: var(--nx-on-surface-variant);
+  --search-background: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  --main-background: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
+  --main-navigation-control-background: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  --main-feed-button-background: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  --player-control-background: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  --player-control-active-button: var(--nx-primary);
+  --player-progress-bar: var(--nx-primary);
+  --indicator-hifi-background: var(--nx-tertiary);
+  --indicator-hifi-span: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  --player-control-favorite: var(--nx-error);
+  --search-dialog-background: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  --right-queue-background: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
   --market-divider-fill-color: transparent;
   --market-header-divider-color: transparent;
   --market-core-divider-10-color: transparent;
@@ -28,47 +43,47 @@ html {
 }
 
 #sidebar {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [class*=_sidebarWrapper_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 #sidebar [class*=_header_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [class*=_navigationItem_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 [class*=_navigationItem_]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  background-color: var(--nx-outline-variant);
+  color: var(--nx-on-surface);
 }
 [class*=_navigationItem_][data-status=active], [class*=_navigationItem_][aria-current=page] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_contentItem_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
   transition: background-color 0.15s ease;
 }
 [class*=_contentItem_]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  background-color: var(--nx-outline-variant);
+  color: var(--nx-on-surface);
 }
 [class*=_contentItem_][data-status=active] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=_collectionWrapper_] {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=_fixedNavigation_] {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 #sidebar ::-webkit-scrollbar {
@@ -76,7 +91,7 @@ html {
 }
 
 #sidebar ::-webkit-scrollbar-thumb {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
   border-radius: 3px;
 }
 
@@ -85,227 +100,227 @@ html {
 }
 
 [class*=_actionButton_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_actionButton_]:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 
 #mainHeader {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [data-test=header] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [data-test=navigation-arrows] button {
-  color: {{colors.on_surface_variant.default.hex}};
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  color: var(--nx-on-surface-variant);
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  border-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 [data-test=navigation-arrows] button:hover {
-  background-color: {{colors.outline_variant.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  background-color: var(--nx-outline-variant);
+  color: var(--nx-on-surface);
 }
 [data-test=navigation-arrows] button:disabled {
-  color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 [class*=_logo_][href="/"] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_buttonContainer_] button {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_buttonContainer_] button:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_searchField_][class*=_searchField_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  color: var(--nx-on-surface);
   border-color: transparent;
   border-radius: 8px;
 }
 [class*=_searchField_][class*=_searchField_]::placeholder {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_searchField_][class*=_searchField_]:focus {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 input[class*=_searchField_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  color: var(--nx-on-surface);
   border-color: transparent;
   border-radius: 8px;
 }
 input[class*=_searchField_]::placeholder {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 input[class*=_searchField_]:focus {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=_searchFieldWithPopover_] [class*=_container_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
   border-color: transparent;
   border-radius: 8px;
 }
 [class*=_searchFieldWithPopover_] [class*=_container_]:focus-within {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=_searchFieldFilter_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  color: {{colors.on_surface.default.hex}};
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  color: var(--nx-on-surface);
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 #main {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=_mainContainer_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=_containerRow_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 [class*=_containerRow_]:hover {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface)) !important;
 }
 
 .mainContent {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_headerContainer_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=_dataContainer_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=_detailContainer_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=_actionContainer_] button:hover {
-  background-color: {{colors.outline_variant.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  background-color: var(--nx-outline-variant);
+  color: var(--nx-on-surface);
 }
 
 [id^=footerPlayer] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [class*=_footerPlayerWrapper_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [class*=_controlWrapper_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=_mediaControlButtons_] button {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_mediaControlButtons_] button:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_mediaControlButtons_] button[data-status=playing], [class*=_mediaControlButtons_] button[aria-pressed=true] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=_progressBar_] [class*=_progressBarFill_] {
-  background-color: {{colors.primary.default.hex}};
+  background-color: var(--nx-primary);
 }
 
 [class*=_volume_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_volume_]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_trackListWrapper_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=_tracklistHeaderContainer_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=_trackRow_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_trackRow_]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  background-color: var(--nx-outline-variant);
+  color: var(--nx-on-surface);
 }
 [class*=_trackRow_][data-status=playing] {
-  color: {{colors.primary.default.hex}};
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  color: var(--nx-primary);
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=_mediaPlayerControls_] button {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_mediaPlayerControls_] button:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_mediaPlayerControls_] button[data-status=playing] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=_favoriteButton_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_favoriteButton_]:hover {
-  color: {{colors.error.default.hex}};
+  color: var(--nx-error);
 }
 [class*=_favoriteButton_][data-favorite=true] {
-  color: {{colors.error.default.hex}};
+  color: var(--nx-error);
 }
 
 [class*=_feedModule_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 [class*=_feedModule_]:hover {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface)) !important;
 }
 
 [class*=_cardContainer_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
   transition: background-color 0.15s ease;
 }
 [class*=_cardContainer_]:hover {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=_feedTitle_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_subtitle_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=_container_][class*=_header_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=_sectionHeader_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface)) !important;
 }
 
 #main [class*=_header_] {
@@ -313,142 +328,142 @@ input[class*=_searchField_]:focus {
 }
 
 [class*=_header_] [class*=_marketText_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_headerColumn_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=_overline_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=_feedItem_],
 [class*=_feedCard_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  border-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=_textContainer_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_filter_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 a {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 ::selection {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  color: var(--nx-on-surface);
 }
 
 [class*=_queueWrapper_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=_modal_],
 [class*=_dialog_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  color: var(--nx-on-surface);
 }
 
 [class*=_contextMenuWrapper_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 [class*=_contextMenuItem_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_contextMenuItem_]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  background-color: var(--nx-outline-variant);
+  color: var(--nx-on-surface);
 }
 
 #footerPlayer,
 [data-test=footer-player] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  border-top: 1px solid color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  border-top: 1px solid color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 #footerPlayer [class*=_leftColumn_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 #footerPlayer [class*=_leftColumn_] a {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 #footerPlayer [class*=_leftColumn_] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [data-test=footer-track-title] a {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [data-test=footer-track-title] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 #footerPlayer [class*=_descriptionText_] a {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 #footerPlayer [class*=_descriptionText_] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 #playbackControlBar button,
 [data-test=play-controls] button {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
   transition: color 0.15s ease;
 }
 #playbackControlBar button:hover,
 [data-test=play-controls] button:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 #playbackControlBar button.withBackground[aria-checked=true],
 [data-test=play-controls] button.withBackground[aria-checked=true] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 #playbackControlBar button.withBackground[aria-checked=true] path,
 [data-test=play-controls] button.withBackground[aria-checked=true] path {
-  fill: {{colors.primary.default.hex}};
+  fill: var(--nx-primary);
 }
 
 [class*=_playbackButton_] button {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 #progressBar,
 [data-test=progress-bar] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=_progressBarWrapper_] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=_indicator_][class*=_fillingBlock_] {
-  background-color: {{colors.primary.default.hex}};
+  background-color: var(--nx-primary);
 }
 
 [data-test=footer-favorite-button][aria-checked=true] svg,
 [data-test=now-playing-favorite-button][aria-checked=true] svg {
-  color: {{colors.error.default.hex}};
+  color: var(--nx-error);
 }
 
 [data-test=now-playing],
 #nowPlaying,
 [class*=_nowPlayingContainer_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface)) !important;
   background-image: none !important;
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_innerContainer_] {
@@ -461,41 +476,41 @@ a:hover {
 }
 
 [class*=_playingFrom_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_playingFrom_] a {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 [class*=_playingFrom_] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=_baseButton_][data-test=close-now-playing],
 [class*=_baseButton_][data-test=request-fullscreen],
 [class*=_closeButton_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
   background-color: transparent;
 }
 [class*=_baseButton_][data-test=close-now-playing]:hover,
 [class*=_baseButton_][data-test=request-fullscreen]:hover,
 [class*=_closeButton_]:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 [class*=_baseButton_][data-test=close-now-playing] span,
 [class*=_baseButton_][data-test=request-fullscreen] span,
 [class*=_closeButton_] span {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_leftColumn_][class*=_albumMediaQueries_],
 [class*=_leftColumn_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 .overlay[class*=_albumImageOverlay_],
 [class*=_albumImageOverlay_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
   background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -504,49 +519,49 @@ a:hover {
 }
 
 [data-test=now-playing-track-title] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_artistNameColor_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_artistNameColor_]:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=_subTitleText_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_subTitleText_] a {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_subTitleText_] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=_buttonsContainer_] [data-test=now-playing-favorite-button],
 [class*=_buttonsContainer_] [data-test=now-playing-context-menu] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_buttonsContainer_] [data-test=now-playing-favorite-button]:hover,
 [class*=_buttonsContainer_] [data-test=now-playing-context-menu]:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=_tabs_][class*=_tabItems_] {
   background-color: transparent;
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 [class*=_tabItem_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
   background-color: transparent;
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 [class*=_tabItem_]:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 [class*=_tabItem_] span,
 [class*=_tabItem_] [data-wave-color] {
@@ -557,12 +572,12 @@ a:hover {
 }
 
 [class*=_tabItem_][class*=_activeTab_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_tabPanelStyles_] {
   background-color: transparent;
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_playQueueTab_] {
@@ -575,35 +590,35 @@ a:hover {
 }
 
 [class*=_stickyHeader_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
+  color: var(--nx-on-surface);
 }
 
 [class*=_groupTitle_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
   background-color: transparent;
 }
 [class*=_groupTitle_] a {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 [class*=_groupTitle_] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=_clearButton_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_clearButton_]:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 
 [data-test=playqueue-item] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
   background-color: transparent;
 }
 [data-test=playqueue-item]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=_containerPriorityHistory_] {
@@ -614,52 +629,52 @@ a:hover {
 }
 
 [class*=_titleLink_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_titleLink_]:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=_textHigh_] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=_nowPlayingIconContainer_] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=_iconHigh_] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=_artistText_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_artistText_] a {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_artistText_] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=_titleArtistGroup_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_actions_] button {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_actions_] button:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=_removeButton_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_removeButton_]:hover {
-  color: {{colors.error.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-error);
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=_nowPlayingCell_] {
@@ -667,7 +682,7 @@ a:hover {
 }
 
 [class*=_bottomGradient_] {
-  background: linear-gradient(transparent, color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}}));
+  background: linear-gradient(transparent, color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface)));
 }
 
 [class*=_dropContainer_] {
@@ -676,24 +691,24 @@ a:hover {
 
 [class*=_suggestionsTab_] {
   background-color: transparent;
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_creditsTab_] {
   background-color: transparent;
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=_creditsTab_] [class*=_divider_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high)) !important;
 }
 
 [data-test=mp-toggle-now-playing],
 [class*=_toggleButton_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [data-test=mp-toggle-now-playing]:hover,
 [class*=_toggleButton_]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=_nowPlayingVisible_] {
@@ -705,17 +720,17 @@ a:hover {
 }
 
 [class*=_nowPlayingButton_] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=_nowPlayingButton_]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [data-test=playqueue-scroll]::-webkit-scrollbar {
   width: 6px;
 }
 [data-test=playqueue-scroll]::-webkit-scrollbar-thumb {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
   border-radius: 3px;
 }
 [data-test=playqueue-scroll]::-webkit-scrollbar-track {
@@ -723,7 +738,7 @@ a:hover {
 }
 
 .os-theme-tidal .os-scrollbar-handle {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
   border-radius: 3px;
 }
 .os-theme-tidal .os-scrollbar-track {
@@ -731,51 +746,51 @@ a:hover {
 }
 
 .settings-window {
-  --black: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
-  --black-lighter: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  --black-lightest: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  --grey-darkest: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  --grey-darker: {{colors.outline_variant.default.hex}};
-  --grey: {{colors.on_surface_variant.default.hex}};
-  --white: {{colors.on_surface.default.hex}};
-  --tidal-blue: {{colors.tertiary.default.hex}};
-  --tidal-red: {{colors.error.default.hex}};
-  color: {{colors.on_surface.default.hex}};
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  --black: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
+  --black-lighter: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  --black-lightest: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  --grey-darkest: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  --grey-darker: var(--nx-outline-variant);
+  --grey: var(--nx-on-surface-variant);
+  --white: var(--nx-on-surface);
+  --tidal-blue: var(--nx-tertiary);
+  --tidal-red: var(--nx-error);
+  color: var(--nx-on-surface);
+  background: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
   overflow: hidden;
 }
 
 .settings-window__wrapper {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
-  box-shadow: inset 0 0 2px 0 color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
+  box-shadow: inset 0 0 2px 0 color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 .settings-window__close-button:hover {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 .tabs__trigger + label {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 .tabs__trigger + label:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 .tabs__trigger:checked + label {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 .tabs__separator {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 .settings input:checked + label {
-  border-bottom: 2px solid {{colors.primary.default.hex}};
-  color: {{colors.primary.default.hex}};
+  border-bottom: 2px solid var(--nx-primary);
+  color: var(--nx-primary);
 }
 
 .tabs__content::-webkit-scrollbar-thumb {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
 }
 
 .group {
@@ -783,56 +798,56 @@ a:hover {
 }
 
 .group__title {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 .group__option {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  border-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 .group__options-group {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  border-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 .group__options-group .group__option {
-  border-bottom-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  border-bottom-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 .group__content h4 {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 .group__content p,
 .group__description p {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 .group__description .text-input {
-  border-bottom: solid 1px color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  border-bottom: solid 1px color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  color: var(--nx-on-surface);
 }
 
 .group__description .text-input:focus {
-  border-color: {{colors.primary.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  border-color: var(--nx-primary);
+  color: var(--nx-on-surface);
 }
 
 .text-input {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  color: {{colors.on_surface.default.hex}};
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  color: var(--nx-on-surface);
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 .text-input::placeholder {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 .tags__tag {
-  background: {{colors.secondary.default.hex}};
-  color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background: var(--nx-secondary);
+  color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 .tags__tag:hover, .tags__tag:focus-within {
-  background: {{colors.primary.default.hex}};
+  background: var(--nx-primary);
 }
 
 .tags__tag__text {
@@ -848,42 +863,42 @@ a:hover {
 }
 
 .button {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  color: {{colors.on_surface.default.hex}};
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  color: var(--nx-on-surface);
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 .button:hover {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 .button.primary {
-  background: {{colors.primary.default.hex}};
-  color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background: var(--nx-primary);
+  color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 .button.primary:hover {
-  background: {{colors.secondary.default.hex}};
+  background: var(--nx-secondary);
 }
 
 .select-input {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  color: {{colors.on_surface.default.hex}};
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  color: var(--nx-on-surface);
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 .select-input option {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 .select-input option:disabled {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 .hotkey-binding kbd {
-  background: {{colors.primary.default.hex}};
-  color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background: var(--nx-primary);
+  color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 .hotkey-binding.editing {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 .switch {
@@ -892,11 +907,11 @@ a:hover {
 }
 
 .switch input:checked + .switch__slider {
-  background-color: {{colors.primary.default.hex}};
+  background-color: var(--nx-primary);
 }
 
 .switch input:checked + .switch__slider::before {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 .switch input:focus + .switch__slider {
@@ -904,118 +919,118 @@ a:hover {
 }
 
 .switch:has(:focus-visible) {
-  outline: 2px solid {{colors.primary.default.hex}};
+  outline: 2px solid var(--nx-primary);
   outline-offset: 2px;
   border-radius: 40px;
 }
 
 .switch__slider {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
 }
 
 .switch__slider::before {
-  background-color: {{colors.on_surface_variant.default.hex}};
+  background-color: var(--nx-on-surface-variant);
 }
 
 .textarea {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  color: {{colors.on_surface.default.hex}};
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  color: var(--nx-on-surface);
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 .footer__note {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 .footer__button {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 
 .footer__button:hover {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 
 .external-link {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 .external-link:hover {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 
 .file-msg {
-  color: {{colors.tertiary.default.hex}} !important;
+  color: var(--nx-tertiary) !important;
 }
 
 #tidal-hifi-titlebar {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}}) !important;
+  background: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container)) !important;
 }
 
 [class*=sidebarWrapper] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 #sidebar [class*=header_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [class*=_sectionHeader_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container)) !important;
 }
 
 [class*=logoWrapper] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [class*=logoButton],
 [data-test=sidebar-logo] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=versionBadge] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=submenu_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 
 [class*=submenuItem] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=submenuItem]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  background-color: var(--nx-outline-variant);
+  color: var(--nx-on-surface);
 }
 
 [class*=collapseButton],
 [data-test=sidebar-collapse],
 [data-test=sidebar-expand] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=collapseButton]:hover,
 [data-test=sidebar-collapse]:hover,
 [data-test=sidebar-expand]:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 
 [data-test=shortcut-list] [class*=shortcutItem] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [data-test=shortcut-list] [class*=shortcutItem]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
 }
 [data-test=shortcut-list] [class*=textWrapper] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [data-test=create-folder-or-playlist] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [data-test=create-folder-or-playlist]:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=_header_]::before {
@@ -1025,102 +1040,102 @@ a:hover {
 }
 
 [class*=logo_][class*=logoVisible] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [data-test=header-profile-menu-button],
 [class*=profileMenuButton] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [data-test=header-profile-menu-button]:hover,
 [class*=profileMenuButton]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=profilePicture] {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=searchField] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  color: var(--nx-on-surface);
   border-color: transparent;
   border-radius: 8px;
 }
 [class*=searchField]::placeholder {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=searchField]:focus, [class*=searchField]:focus-within {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=searchFieldWithPopover] [class*=container] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
   border-color: transparent;
   border-radius: 8px;
 }
 [class*=searchFieldWithPopover] [class*=container]:focus-within {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [data-test=search-popover-container] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 .mainContent {
-  color: {{colors.on_surface.default.hex}};
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  color: var(--nx-on-surface);
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=pageHeader] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=feed_][data-test=home-page-feed],
 [class*=feed_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [data-test=spotlight-banner] [class*=slide_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 [data-test=spotlight-banner] [class*=leftSection] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [data-test=spotlight-banner] [class*=brandingTitle] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=cardContainer],
 [class*=card_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
   transition: background-color 0.15s ease;
 }
 [class*=cardContainer]:hover,
 [class*=card_]:hover {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=textContent] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=subtitle] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=description] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=headerTitleContainer] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=headerText] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=marketText] {
@@ -1129,146 +1144,146 @@ a:hover {
 
 [data-test=view-all-link],
 [class*=viewAllButton] {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 [data-test=view-all-link]:hover,
 [class*=viewAllButton]:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=overlay] [class*=css-75d7zy] {
-  background-color: {{colors.primary.default.hex}};
-  color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: var(--nx-primary);
+  color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [class*=playButtonContainer] [class*=playButtonInner] {
-  background-color: {{colors.primary.default.hex}};
+  background-color: var(--nx-primary);
 }
 
 [class*=headerContainer] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=detailContainer] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [class*=sortButton] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=sortButton]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=trackListWrapper] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface));
 }
 
 [data-test=tracklist-row],
 [class*=trackRow_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [data-test=tracklist-row]:hover,
 [class*=trackRow_]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
-  color: {{colors.on_surface.default.hex}};
+  background-color: var(--nx-outline-variant);
+  color: var(--nx-on-surface);
 }
 [data-test=tracklist-row][data-status=playing], [data-test=tracklist-row][data-test-is-playing=true],
 [class*=trackRow_][data-status=playing],
 [class*=trackRow_][data-test-is-playing=true] {
-  color: {{colors.primary.default.hex}};
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  color: var(--nx-primary);
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=album] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=favoriteButton] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=favoriteButton]:hover {
-  color: {{colors.error.default.hex}};
+  color: var(--nx-error);
 }
 [class*=favoriteButton][aria-checked=true] {
-  color: {{colors.error.default.hex}};
+  color: var(--nx-error);
 }
 
 [data-test=explicit-badge],
 [class*=explicitBadge],
 [data-test=quality-badge-LOSSLESS],
 [class*=qualityBadgeContainer] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 #footerPlayer [class*=background_] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container)) !important;
 }
 
 [class*=playerContent] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [data-test=track-info],
 [class*=trackInfo] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=artworkContainer],
 [data-test=player-details-toggle-now-playing] {
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=trackContent] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=titleArtistStack] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=titleContainer] a {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=titleContainer] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=artist_] [class*=item_],
 [class*=artist_] [class*=link_] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [class*=artist_] [class*=item_]:hover,
 [class*=artist_] [class*=link_]:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 [class*=playingFromText] a {
-  color: {{colors.tertiary.default.hex}};
+  color: var(--nx-tertiary);
 }
 [class*=playingFromText] a:hover {
-  color: {{colors.secondary.default.hex}};
+  color: var(--nx-secondary);
 }
 
 #footerPlayer [class*=actions_] button {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 #footerPlayer [class*=actions_] button:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=blockButton] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=blockButton]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=contextMenuButton] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=contextMenuButton]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=centerSection] {
@@ -1277,98 +1292,98 @@ a:hover {
 
 #playbackControlBar button[aria-checked=true] path,
 [data-test=play-controls] button[aria-checked=true] path {
-  fill: {{colors.primary.default.hex}};
+  fill: var(--nx-primary);
 }
 #playbackControlBar button.withBackground, #playbackControlBar button[class*=activeButton],
 [data-test=play-controls] button.withBackground,
 [data-test=play-controls] button[class*=activeButton] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 
 [class*=shuffleButton][aria-checked=true],
 [data-test=shuffle][aria-checked=true] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=repeatButton][aria-checked=true],
 [data-test=repeat][aria-checked=true] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [class*=skipButton] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=skipButton]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=playbackButton],
 [data-test=play-controls] [class*=playButtonInner] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
   background-color: transparent;
 }
 
 [class*=scrubberRow] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=scrubberBar] {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=scrubberTime],
 [class*=scrubberTimeText] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=fillingBlock][class*=indicator] {
-  background-color: {{colors.primary.default.hex}};
+  background-color: var(--nx-primary);
 }
 
 [class*=fillingBlock][class*=range] {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=knob] {
-  background-color: {{colors.primary.default.hex}};
+  background-color: var(--nx-primary);
 }
 
 [class*=toolTip] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  background-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
+  color: var(--nx-on-surface);
 }
 
 [class*=rightSection] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=utilityContainer] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=utilityButtons] button {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=utilityButtons] button:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [data-test=play-queue-button] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
   background-color: transparent !important;
 }
 [data-test=play-queue-button]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [data-test=play-queue-button][aria-pressed=true] {
-  color: {{colors.primary.default.hex}};
+  color: var(--nx-primary);
 }
 
 [data-test=volume] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [data-test=volume]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=sliderContainer] {
@@ -1376,20 +1391,20 @@ a:hover {
 }
 
 [class*=newNowPlaying] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 7%, {{colors.surface.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 7%, var(--nx-surface)) !important;
   background-image: none !important;
   --market-button-focus-ring-color: transparent;
-  --market-core-focus-ring-color: {{colors.primary.default.hex}};
+  --market-core-focus-ring-color: var(--nx-primary);
 }
 
 [data-test=now-playing-similar-tracks] [class*=radioSection] [class*=card_] {
   background-color: transparent;
 }
 [data-test=now-playing-similar-tracks] [class*=radioSection] [class*=contentContainer] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 [data-test=now-playing-similar-tracks] [class*=radioSection] [class*=subtitle] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [data-test=now-playing-mixes-and-radio-header],
@@ -1405,8 +1420,8 @@ a:hover {
 }
 
 #playQueueSidebar {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}}) !important;
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container)) !important;
+  background: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container)) !important;
   border: none !important;
   border-color: transparent !important;
   border-width: 0 !important;
@@ -1414,36 +1429,36 @@ a:hover {
   outline: none !important;
 }
 #playQueueSidebar > * {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}}) !important;
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container)) !important;
   border: none !important;
   box-shadow: none !important;
 }
 
 [class*=playQueueWrapper] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 
 [data-test=playqueue-header] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 [data-test=playqueue-header] [class*=headerButton] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [data-test=playqueue-header] [class*=headerButton]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [data-test=playqueue-save-button],
 [data-test=playqueue-close-button] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [data-test=playqueue-save-button]:hover,
 [data-test=playqueue-close-button]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [data-test=playqueue-title] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=playQueueItemsContainer],
@@ -1456,71 +1471,71 @@ a:hover {
 }
 
 #playQueueSidebar [class*=stickyHeader] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
-  color: {{colors.on_surface.default.hex}};
+  background-color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
+  color: var(--nx-on-surface);
 }
 
 [data-test=playqueue-item] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
   background-color: transparent;
-  border-bottom: 1px solid color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
+  border-bottom: 1px solid color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
 }
 [data-test=playqueue-item]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
 }
 [data-test=playqueue-item] img {
   border-radius: 4px;
 }
 [data-test=playqueue-item] [class*=artist] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [data-test=playqueue-item] [class*=duration] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 
 [class*=dragHandle] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=dragHandle]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [data-test=playqueue-item] [class*=more],
 [data-test=playqueue-item] [class*=menu] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [data-test=playqueue-item] [class*=more]:hover,
 [data-test=playqueue-item] [class*=menu]:hover {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 #playQueueSidebar [class*=actions_] button {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 #playQueueSidebar [class*=actions_] button:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=removeButton],
 [data-test=remove-button] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=removeButton]:hover,
 [data-test=remove-button]:hover {
-  color: {{colors.error.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-error);
+  background-color: var(--nx-outline-variant);
 }
 
 [class*=bottomGradient] {
-  background: linear-gradient(transparent, color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}}));
+  background: linear-gradient(transparent, color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container)));
 }
 
 [data-test=playqueue-scroll]::-webkit-scrollbar {
   width: 6px;
 }
 [data-test=playqueue-scroll]::-webkit-scrollbar-thumb {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
   border-radius: 3px;
 }
 [data-test=playqueue-scroll]::-webkit-scrollbar-track {
@@ -1528,32 +1543,32 @@ a:hover {
 }
 
 [class*=notificationWrapper] {
-  color: {{colors.on_surface.default.hex}};
+  color: var(--nx-on-surface);
 }
 
 [class*=marketButton][class*=primary] {
-  background-color: {{colors.primary.default.hex}};
-  color: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}});
+  background-color: var(--nx-primary);
+  color: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container));
 }
 [class*=marketButton][class*=primary]:hover {
   opacity: 0.9;
 }
 [class*=marketButton][class*=secondary] {
-  background-color: color-mix(in srgb, {{colors.primary.default.hex}} 16%, {{colors.surface_container_high.default.hex}});
-  color: {{colors.on_surface.default.hex}};
-  border-color: color-mix(in srgb, {{colors.primary.default.hex}} 22%, {{colors.surface_container_highest.default.hex}});
+  background-color: color-mix(in srgb, var(--nx-primary) 16%, var(--nx-surface-container-high));
+  color: var(--nx-on-surface);
+  border-color: color-mix(in srgb, var(--nx-primary) 22%, var(--nx-surface-container-highest));
 }
 [class*=marketButton][class*=secondary]:hover {
-  background-color: {{colors.outline_variant.default.hex}};
+  background-color: var(--nx-outline-variant);
 }
 [class*=marketButton][class*=tertiary] {
-  color: {{colors.on_surface_variant.default.hex}};
+  color: var(--nx-on-surface-variant);
 }
 [class*=marketButton][class*=tertiary]:hover {
-  color: {{colors.on_surface.default.hex}};
-  background-color: {{colors.outline_variant.default.hex}};
+  color: var(--nx-on-surface);
+  background-color: var(--nx-outline-variant);
 }
 
 #tidal-hifi-titlebar {
-  background: color-mix(in srgb, {{colors.primary.default.hex}} 12%, {{colors.surface_container.default.hex}}) !important;
+  background: color-mix(in srgb, var(--nx-primary) 12%, var(--nx-surface-container)) !important;
 }
