@@ -63,7 +63,7 @@
       fi
     '';
 
-  # MangoWM disabled 2026-09-24; config still deployed from dotfiles/mango
+  # MangoWM disabled 2026-09-24; its HM deploy/patching removed 2026-10-01
   # (re-enable: mangowm input + its NixOS/HM modules, see git history).
 
   # Niri — backup; nixpkgs module registers session + portal config.

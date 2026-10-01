@@ -20,22 +20,6 @@ let
     meta.description = "Scrollable niri-like overview plugin for Hyprland";
   };
 
-  # Run from mango's autostart.conf. A script, not inline: mango's parser
-  # truncates exec-once at 255 chars, and env import must precede the target.
-  # graphical-session.target stays active across compositor relogins on this
-  # box, so noctalia.service's WantedBy=graphical-session.target only ever
-  # fires once at boot — mango-session.target's BindsTo doesn't re-trigger it.
-  # Same root cause hyprSessionBootstrap below already works around.
-  mangoSessionBootstrap = pkgs.writeShellScript "mango-session-bootstrap" ''
-    systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY
-    dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY
-    systemctl --user reset-failed
-    systemctl --user start mango-session.target
-    systemctl --user restart noctalia.service
-    # Sunshine needs the compositor env for wlr screen capture.
-    systemctl --user restart sunshine.service
-  '';
-
   # Hyprland has no session target without uwsm, so nothing pulls
   # graphical-session.target; restart (not start) recovers from start-limit-hit.
   hyprSessionBootstrap = pkgs.writeShellScript "hypr-session-bootstrap" ''
@@ -51,7 +35,7 @@ let
   # IPC). Files Noctalia regenerates are removed here and seeded writable below.
   dotfiles = pkgs.runCommandLocal "dotfiles-patched" { } ''
     mkdir -p $out
-    for d in mango niri hypr ghostty; do
+    for d in niri hypr ghostty; do
       cp -r ${inputs.dotfiles}/$d $out/$d
     done
     chmod -R u+w $out
@@ -65,59 +49,6 @@ let
       }
       sed -i -e "$3" "$1"
     }
-
-    # ── mango ────────────────────────────────────────────────────────────
-    # Portals are dbus-activated on NixOS (no /usr/lib path).
-    mustSed $out/mango/autostart.conf \
-      '^exec-once=/usr/lib/xdg-desktop-portal-wlr$' \
-      '\|^exec-once=/usr/lib/xdg-desktop-portal-wlr$|d'
-    # SDDM-launched mango doesn't activate the systemd user session itself; the
-    # bootstrap imports env then starts mango-session.target → noctalia.service.
-    mustSed $out/mango/autostart.conf \
-      '^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$' \
-      's|^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP$|exec-once=${mangoSessionBootstrap}|'
-    # v4 launched the shell directly; v5 comes up via mango-session.target.
-    mustSed $out/mango/autostart.conf \
-      '^exec-once=qs -c noctalia-shell$' \
-      '/^exec-once=qs -c noctalia-shell$/d'
-
-    ${lib.optionalString isVM ''
-      # VM only: no heavy chat/media autostarts (mustSed-guarded so a dotfiles
-      # wording change fails the build instead of silently re-enabling them).
-      mustSed $out/mango/autostart.conf \
-        '^exec-once=sleep 5 && mullvad-exclude vesktop$' \
-        '/^exec-once=sleep 5 && mullvad-exclude vesktop$/d'
-      mustSed $out/mango/autostart.conf \
-        '^exec-once=sleep 5 && signal-desktop$' \
-        '/^exec-once=sleep 5 && signal-desktop$/d'
-      mustSed $out/mango/autostart.conf \
-        '^exec-once=sleep 5 && tidal-hifi$' \
-        '/^exec-once=sleep 5 && tidal-hifi$/d'
-    ''}
-
-    ${lib.optionalString (!isVM) ''
-      mustSed $out/mango/autostart.conf \
-        '^exec-once=sleep 5 && signal-desktop$' \
-        's|^exec-once=sleep 5 && signal-desktop$|& --password-store=gnome-libsecret|'
-    ''}
-
-    mustSed $out/mango/bind.conf '/usr/bin/ghostty' 's|/usr/bin/ghostty|ghostty|g'
-    # v4 `qs -c noctalia-shell ipc call ...` → v5 `noctalia msg ...`
-    mustSed $out/mango/bind.conf \
-      'qs -c noctalia-shell ipc call launcher toggle' \
-      's|qs -c noctalia-shell ipc call launcher toggle|noctalia msg panel-toggle launcher|'
-    mustSed $out/mango/bind.conf \
-      'qs -c noctalia-shell ipc call launcher emoji' \
-      's|qs -c noctalia-shell ipc call launcher emoji|noctalia msg panel-open launcher /emo|'
-    mustSed $out/mango/bind.conf \
-      'qs -c noctalia-shell ipc call wallpaper toggle' \
-      's|qs -c noctalia-shell ipc call wallpaper toggle|noctalia msg panel-toggle wallpaper|'
-    mustSed $out/mango/bind.conf \
-      '^bind=SUPER+ALT,r,spawn,bash' \
-      's|^bind=SUPER+ALT,r,spawn,bash .*$|bind=SUPER+ALT,r,spawn,systemctl --user restart noctalia.service|'
-    mustSed $out/mango/bind.conf \
-      'zen-browser' \
-      's|zen-browser|zen-beta|g'
 
     # ── niri ─────────────────────────────────────────────────────────────
     # Keep the dotfiles' `spawn-at-startup "noctalia"`: under niri the session
@@ -149,7 +80,7 @@ let
     cat >> $out/niri/config.kdl <<'EOF'
 
 // ── NixOS additions ──────────────────────────────────────────────────────────
-// Match MangoWM: focused=0.95 unfocused=0.85
+// Per-app opacity: focused=0.95 unfocused=0.85
 window-rule {
     match app-id="signal"
     match is-focused=true
@@ -247,7 +178,7 @@ bind = SUPER, Q, killactive
 bind = SUPER SHIFT, E, exit
 bind = SUPER SHIFT, D, exec, mullvad-exclude vesktop
 bind = SUPER, code:51, exec, noctalia msg panel-toggle control-center audio
-# Opacity rules — match mango (global 0.95/0.85) and niri/KDE (per-app rules)
+# Per-app opacity, same values as niri
 windowrulev2 = opacity 0.95 0.85, class:^(signal)$
 windowrulev2 = opacity 0.95 0.85, class:^(vesktop)$
 windowrulev2 = opacity 0.95 0.85, class:^(zen-beta)$
@@ -298,33 +229,13 @@ EOF
     # Drop the Arch zsh command; the login shell on NixOS is fish.
     mustSed $out/ghostty/config '^command = ' '/^command = /d'
 
-    # ── monitor layout ───────────────────────────────────────────────────────
-    # Matched by EDID model, not connector name (those renumber with GPU changes).
-    cat > $out/mango/monitor.conf <<'EOF'
-# Dell AW3423DW (left). vrr:0 + rule.conf's vrr_only_fullscreen:1 = fullscreen-only
-# VRR (mango has no vrr:2; always-on VRR gamma-flickers the QD-OLED desktop).
-# HDR not viable: mango's scenefx renderer is hardcoded GLES2, ignores
-# WLR_RENDERER, and never satisfies output_supports_hdr()'s renderer check.
-monitorrule=model:Dell AW3423DW,width:3440,height:1440,refresh:174,x:0,y:0,scale:1,vrr:0
-# Philips 278E1 4K (right).
-monitorrule=model:PHL 278E1,width:3840,height:2160,refresh:60,x:3440,y:0,scale:1.5,vrr:0
-EOF
-
     # Runtime-generated by Noctalia — never deploy read-only (seeded instead)
-    rm $out/mango/noctalia.conf
     rm $out/niri/noctalia.kdl
     rm $out/ghostty/themes/noctalia
 
     # No v4-era Noctalia invocations may survive the patching above.
     if grep -rn 'qs -c\|noctalia-shell ipc' $out; then
       echo "dotfiles patch FAILED: v4 Noctalia references remain (see above)" >&2
-      exit 1
-    fi
-
-    # Mango's config parser silently truncates values at 255 chars; reject
-    # any line long enough to be eaten.
-    if grep -rn '.\{256,\}' $out/mango; then
-      echo "dotfiles patch FAILED: mango config line exceeds the 255-char parser limit" >&2
       exit 1
     fi
   '';
@@ -347,7 +258,6 @@ in
   # recursive keeps directories writable for runtime-generated files; force
   # overwrites leftovers from pre-declarative deployments.
   xdg.configFile = {
-    "mango"   = { source = "${dotfiles}/mango";   recursive = true; force = true; };
     "niri"    = { source = "${dotfiles}/niri";    recursive = true; force = true; };
     "hypr"    = { source = "${dotfiles}/hypr";    recursive = true; force = true; };
     "ghostty" = { source = "${dotfiles}/ghostty"; recursive = true; force = true; };
@@ -374,7 +284,6 @@ in
         run chmod u+w "$2"
       fi
     }
-    seedNoctalia ${inputs.dotfiles}/mango/noctalia.conf     ${config.xdg.configHome}/mango/noctalia.conf
     seedNoctalia ${inputs.dotfiles}/niri/noctalia.kdl       ${config.xdg.configHome}/niri/noctalia.kdl
     seedNoctalia ${inputs.dotfiles}/ghostty/themes/noctalia ${config.xdg.configHome}/ghostty/themes/noctalia
     # hypr/noctalia.lua has no template — seed an empty stub so hyprland.lua's

@@ -36,7 +36,7 @@ in
   ];
 
   # Latest mainline kernel, desktop only. The kernel was exonerated as the
-  # AW3423DW scanout regressor (that was the NVIDIA driver branch, now on 610).
+  # AW3423DW scanout regressor (that was the NVIDIA driver branch, now on latest).
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   programs.qylock = {

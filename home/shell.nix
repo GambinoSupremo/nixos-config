@@ -7,14 +7,6 @@
   # pokemon-colorscripts: shown on every new shell — CachyOS parity.
   home.packages = [
     pkgs.pokemon-colorscripts
-    # Flags when the electron-40.10.5 exception in nixos/base/core.nix is removable.
-    (pkgs.writeShellScriptBin "insecure-pin-check" ''
-      rev=$(${pkgs.jq}/bin/jq -r '.nodes.nixpkgs.locked.rev' ~/nixos-config/flake.lock)
-      if nix eval "github:nixos/nixpkgs/$rev#tidal-hifi.drvPath" >/dev/null 2>&1 \
-         && NIXPKGS_ALLOW_UNFREE=1 nix eval --impure "github:nixos/nixpkgs/$rev#obsidian.drvPath" >/dev/null 2>&1; then
-        echo "electron-40.10.5 exception no longer needed: remove permittedInsecurePackages from nixos/base/core.nix and this check"
-      fi
-    '')
   ];
 
   # ── Fish ─────────────────────────────────────────────────────────────────────
@@ -22,6 +14,7 @@
     enable = true;
     interactiveShellInit = ''
       set fish_greeting ""
+      fish_add_path -g ~/.local/bin  # user-installed CLIs (e.g. agy)
       command -q pokemon-colorscripts; and pokemon-colorscripts --no-title -r 2>/dev/null || true
     '';
     shellAliases = {
@@ -43,6 +36,15 @@
     # builds, it's a reasonable commit point, and this way the tree never
     # sits dirty and origin never falls behind.
     functions = {
+      # Never let Antigravity open on ~ (it'd ask to trust all of home); jump to a default project instead.
+      agy = ''
+        set -l default_dir ~/nixos-agy-test
+        if test "$PWD" = "$HOME"; or test "$PWD" = /
+            cd $default_dir; or return 1
+        end
+        command agy $argv
+      '';
+
       _nixos-commit-dirty = ''
         set -l flake_dir $argv[1]
         set -l label $argv[2]
@@ -80,7 +82,6 @@
         end
 
         if sudo nixos-rebuild switch --flake $flake_dir#desktop
-            insecure-pin-check
             rm $backup
             _nixos-commit-dirty $flake_dir update
         else
