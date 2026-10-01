@@ -31,7 +31,9 @@ let
     )
     for t in targets:
         if t.get("type") == "page" and "tidal.com" in t.get("url", ""):
-            ws = websocket.create_connection(t["webSocketDebuggerUrl"], timeout=3)
+            # No Origin header: Chromium rejects any origin not explicitly allowed.
+            ws = websocket.create_connection(t["webSocketDebuggerUrl"],
+                                             timeout=3, suppress_origin=True)
             ws.send(json.dumps({"id": 1, "method": "Runtime.evaluate",
                                 "params": {"expression": js}}))
             ws.recv()
