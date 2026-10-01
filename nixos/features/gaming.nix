@@ -61,6 +61,7 @@
     lutris
     heroic
     mangohud
+    deadlock-mod-manager
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
   ];
 }

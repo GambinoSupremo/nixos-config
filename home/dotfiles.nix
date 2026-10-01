@@ -333,12 +333,14 @@ in
   # ── Noctalia v5 ──────────────────────────────────────────────────────────────
   # Upstream HM module runs noctalia.service (WantedBy graphical-session.target);
   # settings left empty so ~/.config/noctalia/config.toml stays runtime-writable.
-  # package pinned to the flake's own build (matches the noctalia.cachix.org
-  # substituter in flake.nix) rather than nixpkgs' pkgs.noctalia default.
+  # package is the flake's own build, patched so compositor blur covers only the
+  # bar capsules (from Spike-dotfiles). Patching misses noctalia.cachix.org: local build per bump.
   programs.noctalia = {
     enable = true;
     systemd.enable = true;
-    package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./noctalia/bar-capsule-blur.patch ];
+    });
   };
 
   # ── Dotfiles deployment ───────────────────────────────────────────────────────

@@ -1,17 +1,48 @@
 [bar.default]
-background_opacity = 0.97999997809529305
-border = "secondary"
-capsule = true
-center = [ "clock", "media" ]
+# Transparent edge-docked bar; each lane is a capsule group, blurred per-capsule (bar-capsule-blur.patch).
+background_opacity = 0.0
+capsule = false
+start = [ "group:left" ]
+center = [ "group:middle" ]
+end = [ "group:right" ]
 color = "primary"
-end = [ "tray", "notifications", "clipboard", "volume", "control-center", "session" ]
 font_weight = 400
-margin_edge = 0.0
-margin_ends = 0.0
-radius = 0
+margin_edge = 0
+margin_ends = 0
 scale = 0.90000000596046448
-thickness = 32
+thickness = 26
+shadow = false
+contact_shadow = false
 
+    [[bar.default.capsule_group]]
+    id = "left"
+    members = [ "launcher", "wallpaper", "workspaces" ]
+    fill = "surface_variant"
+    border = "outline"
+    foreground = "on_surface"
+    padding = 6
+    radius = 10
+    opacity = 0.6
+
+    [[bar.default.capsule_group]]
+    id = "middle"
+    members = [ "clock", "media" ]
+    fill = "surface_variant"
+    border = "outline"
+    foreground = "on_surface"
+    padding = 6
+    radius = 10
+    opacity = 0.6
+
+    [[bar.default.capsule_group]]
+    id = "right"
+    members = [ "tray", "notifications", "clipboard", "volume", "control-center", "session" ]
+    fill = "surface_variant"
+    border = "outline"
+    foreground = "on_surface"
+    padding = 6
+    radius = 10
+    opacity = 0.6
 [config]
 
 [[control_center.shortcuts]]
@@ -84,6 +115,14 @@ telemetry_enabled = false
     open_near_click_control_center = true
     open_near_click_session = true
     open_near_click_wallpaper = true
+
+    # Region capture → Satty for annotation (satty config in home/programs.nix).
+    [shell.screenshot]
+    freeze_screen = true
+    pipe_to_command = true
+    pipe_command = "satty --filename -"
+    save_to_file = false
+    copy_to_clipboard = false
 
 [templates.vivaldi]
 input_path = "~/.config/noctalia/templates/vivaldi.css"

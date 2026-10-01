@@ -1,6 +1,6 @@
 # Per-app home-manager config: git, neovim, OBS, pywalfox, RAW mime defaults,
 # and desktop-entry overrides (Signal keyring pin, Vesktop VPN bypass).
-{ pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # ── Pywalfox native messaging host ───────────────────────────────────────────
@@ -24,7 +24,16 @@
       "image/x-canon-cr2" = [ "org.nomacs.ImageLounge.desktop" ];
       "image/x-canon-cr3" = [ "org.nomacs.ImageLounge.desktop" ];
     };
-    defaultApplications = {
+    # Text/code in Zed; mkForce beats zen's setAsDefaultBrowser claim on text/plain + json.
+    defaultApplications = lib.genAttrs [
+      "text/plain" "text/markdown" "text/x-log" "text/csv"
+      "text/x-nix" "text/x-python" "text/x-shellscript" "application/x-shellscript"
+      "text/x-csrc" "text/x-chdr" "text/x-c++src" "text/rust" "text/javascript"
+      "application/json" "application/toml" "application/x-yaml" "application/xml"
+      "text/x-ini" "application/x-zerosize"
+    ] (_: lib.mkForce [ "dev.zed.Zed.desktop" ]) // {
+      # Folders (e.g. Steam "Browse local files") — otherwise falls back to kitty-open.
+      "inode/directory"   = [ "org.gnome.Nautilus.desktop" ];
       "image/x-canon-cr2" = [ "org.nomacs.ImageLounge.desktop" ];
       "image/x-canon-cr3" = [ "org.nomacs.ImageLounge.desktop" ];
     };
@@ -58,6 +67,21 @@
       obs-vaapi
       obs-vkcapture
     ];
+  };
+
+  # ── Satty ────────────────────────────────────────────────────────────────────
+  # Noctalia pipes region screenshots here (shell.screenshot in noctalia config.toml).
+  # Enter copies + exits, Ctrl+S saves to output-filename.
+  programs.satty = {
+    enable   = true;
+    settings.general = {
+      fullscreen        = true;
+      early-exit        = true;
+      copy-command      = "wl-copy";
+      corner-roundness  = 12;
+      initial-tool      = "arrow";
+      output-filename   = "${config.home.homeDirectory}/Pictures/Screenshots/Screenshot-%Y-%m-%d_%H-%M-%S.png";
+    };
   };
 
   # ── Signal ───────────────────────────────────────────────────────────────────
