@@ -1,0 +1,1558 @@
+/* Noctalia → tidal-hifi; generated from tidal-hifi's bundled Gruvbox.css. */
+html {
+  --sidebar-background: {{colors.surface_container.default.hex}};
+  --sidebar-hover-background: {{colors.outline_variant.default.hex}};
+  --sidebar-menu-top-text: {{colors.on_surface_variant.default.hex}};
+  --sidebar-menu-playlist-text: {{colors.on_surface_variant.default.hex}};
+  --search-background: {{colors.surface_container.default.hex}};
+  --main-background: {{colors.surface.default.hex}};
+  --main-navigation-control-background: {{colors.surface_container.default.hex}};
+  --main-feed-button-background: {{colors.surface_container.default.hex}};
+  --player-control-background: {{colors.surface_container_high.default.hex}};
+  --player-control-active-button: {{colors.primary.default.hex}};
+  --player-progress-bar: {{colors.primary.default.hex}};
+  --indicator-hifi-background: {{colors.tertiary.default.hex}};
+  --indicator-hifi-span: {{colors.surface_container.default.hex}};
+  --player-control-favorite: {{colors.error.default.hex}};
+  --search-dialog-background: {{colors.surface_container_high.default.hex}};
+  --right-queue-background: {{colors.surface_container.default.hex}};
+  --market-divider-fill-color: transparent;
+  --market-header-divider-color: transparent;
+  --market-core-divider-10-color: transparent;
+  --market-core-divider-20-color: transparent;
+  --market-row-normal-state-separator-color: transparent;
+  --market-row-hover-state-separator-color: transparent;
+  --market-row-hover-state-bg-color: transparent;
+  --market-row-normal-state-bg-color: transparent;
+}
+
+#sidebar {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[class*=_sidebarWrapper_] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+#sidebar [class*=_header_] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[class*=_navigationItem_] {
+  color: {{colors.on_surface_variant.default.hex}};
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+[class*=_navigationItem_]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_navigationItem_][data-status=active], [class*=_navigationItem_][aria-current=page] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_contentItem_] {
+  color: {{colors.on_surface_variant.default.hex}};
+  transition: background-color 0.15s ease;
+}
+[class*=_contentItem_]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_contentItem_][data-status=active] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=_collectionWrapper_] {
+  border-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=_fixedNavigation_] {
+  border-color: {{colors.surface_container_high.default.hex}};
+}
+
+#sidebar ::-webkit-scrollbar {
+  width: 6px;
+}
+
+#sidebar ::-webkit-scrollbar-thumb {
+  background-color: {{colors.outline_variant.default.hex}};
+  border-radius: 3px;
+}
+
+#sidebar ::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+[class*=_actionButton_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_actionButton_]:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+#mainHeader {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[data-test=header] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[data-test=navigation-arrows] button {
+  color: {{colors.on_surface_variant.default.hex}};
+  background-color: {{colors.surface_container.default.hex}};
+  border-color: {{colors.surface_container_high.default.hex}};
+}
+[data-test=navigation-arrows] button:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+[data-test=navigation-arrows] button:disabled {
+  color: {{colors.surface_container_highest.default.hex}};
+}
+
+[class*=_logo_][href="/"] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_buttonContainer_] button {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_buttonContainer_] button:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_searchField_][class*=_searchField_] {
+  background-color: {{colors.surface_container.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: transparent;
+  border-radius: 8px;
+}
+[class*=_searchField_][class*=_searchField_]::placeholder {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_searchField_][class*=_searchField_]:focus {
+  border-color: {{colors.surface_container_highest.default.hex}};
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+input[class*=_searchField_] {
+  background-color: {{colors.surface_container.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: transparent;
+  border-radius: 8px;
+}
+input[class*=_searchField_]::placeholder {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+input[class*=_searchField_]:focus {
+  border-color: {{colors.surface_container_highest.default.hex}};
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=_searchFieldWithPopover_] [class*=_container_] {
+  background-color: {{colors.surface_container.default.hex}};
+  border-color: transparent;
+  border-radius: 8px;
+}
+[class*=_searchFieldWithPopover_] [class*=_container_]:focus-within {
+  border-color: {{colors.surface_container_highest.default.hex}};
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=_searchFieldFilter_] {
+  background-color: {{colors.surface_container_high.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+
+#main {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=_mainContainer_] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=_containerRow_] {
+  background-color: {{colors.surface.default.hex}};
+}
+[class*=_containerRow_]:hover {
+  background-color: {{colors.surface.default.hex}} !important;
+}
+
+.mainContent {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_headerContainer_] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=_dataContainer_] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=_detailContainer_] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=_actionContainer_] button:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+[id^=footerPlayer] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[class*=_footerPlayerWrapper_] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[class*=_controlWrapper_] {
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=_mediaControlButtons_] button {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_mediaControlButtons_] button:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_mediaControlButtons_] button[data-status=playing], [class*=_mediaControlButtons_] button[aria-pressed=true] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=_progressBar_] [class*=_progressBarFill_] {
+  background-color: {{colors.primary.default.hex}};
+}
+
+[class*=_volume_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_volume_]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_trackListWrapper_] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=_tracklistHeaderContainer_] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=_trackRow_] {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_trackRow_]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_trackRow_][data-status=playing] {
+  color: {{colors.primary.default.hex}};
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=_mediaPlayerControls_] button {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_mediaPlayerControls_] button:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_mediaPlayerControls_] button[data-status=playing] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=_favoriteButton_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_favoriteButton_]:hover {
+  color: {{colors.error.default.hex}};
+}
+[class*=_favoriteButton_][data-favorite=true] {
+  color: {{colors.error.default.hex}};
+}
+
+[class*=_feedModule_] {
+  background-color: {{colors.surface.default.hex}};
+}
+[class*=_feedModule_]:hover {
+  background-color: {{colors.surface.default.hex}} !important;
+}
+
+[class*=_cardContainer_] {
+  background-color: {{colors.surface.default.hex}};
+  transition: background-color 0.15s ease;
+}
+[class*=_cardContainer_]:hover {
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=_feedTitle_] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_subtitle_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=_container_][class*=_header_] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=_sectionHeader_] {
+  background-color: {{colors.surface.default.hex}} !important;
+}
+
+#main [class*=_header_] {
+  background-color: transparent;
+}
+
+[class*=_header_] [class*=_marketText_] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_headerColumn_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=_overline_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=_feedItem_],
+[class*=_feedCard_] {
+  background-color: {{colors.surface_container_high.default.hex}};
+  border-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=_textContainer_] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_filter_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+a {
+  color: {{colors.tertiary.default.hex}};
+}
+a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+::selection {
+  background-color: {{colors.surface_container_high.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_queueWrapper_] {
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=_modal_],
+[class*=_dialog_] {
+  background-color: {{colors.surface_container_high.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_contextMenuWrapper_] {
+  background-color: {{colors.surface_container_high.default.hex}};
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+
+[class*=_contextMenuItem_] {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_contextMenuItem_]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+#footerPlayer,
+[data-test=footer-player] {
+  background-color: {{colors.surface_container.default.hex}};
+  border-top: 1px solid {{colors.surface_container_high.default.hex}};
+}
+
+#footerPlayer [class*=_leftColumn_] {
+  color: {{colors.on_surface.default.hex}};
+}
+#footerPlayer [class*=_leftColumn_] a {
+  color: {{colors.on_surface.default.hex}};
+}
+#footerPlayer [class*=_leftColumn_] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[data-test=footer-track-title] a {
+  color: {{colors.on_surface.default.hex}};
+}
+[data-test=footer-track-title] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+#footerPlayer [class*=_descriptionText_] a {
+  color: {{colors.on_surface.default.hex}};
+}
+#footerPlayer [class*=_descriptionText_] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+#playbackControlBar button,
+[data-test=play-controls] button {
+  color: {{colors.on_surface_variant.default.hex}};
+  transition: color 0.15s ease;
+}
+#playbackControlBar button:hover,
+[data-test=play-controls] button:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+#playbackControlBar button.withBackground[aria-checked=true],
+[data-test=play-controls] button.withBackground[aria-checked=true] {
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+#playbackControlBar button.withBackground[aria-checked=true] path,
+[data-test=play-controls] button.withBackground[aria-checked=true] path {
+  fill: {{colors.primary.default.hex}};
+}
+
+[class*=_playbackButton_] button {
+  color: {{colors.on_surface.default.hex}};
+}
+
+#progressBar,
+[data-test=progress-bar] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=_progressBarWrapper_] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=_indicator_][class*=_fillingBlock_] {
+  background-color: {{colors.primary.default.hex}};
+}
+
+[data-test=footer-favorite-button][aria-checked=true] svg,
+[data-test=now-playing-favorite-button][aria-checked=true] svg {
+  color: {{colors.error.default.hex}};
+}
+
+[data-test=now-playing],
+#nowPlaying,
+[class*=_nowPlayingContainer_] {
+  background-color: {{colors.surface.default.hex}} !important;
+  background-image: none !important;
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_innerContainer_] {
+  background-color: transparent;
+}
+
+#nowPlayingHeader,
+[data-test=header-container] {
+  background-color: transparent;
+}
+
+[class*=_playingFrom_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_playingFrom_] a {
+  color: {{colors.tertiary.default.hex}};
+}
+[class*=_playingFrom_] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=_baseButton_][data-test=close-now-playing],
+[class*=_baseButton_][data-test=request-fullscreen],
+[class*=_closeButton_] {
+  color: {{colors.on_surface_variant.default.hex}};
+  background-color: transparent;
+}
+[class*=_baseButton_][data-test=close-now-playing]:hover,
+[class*=_baseButton_][data-test=request-fullscreen]:hover,
+[class*=_closeButton_]:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+[class*=_baseButton_][data-test=close-now-playing] span,
+[class*=_baseButton_][data-test=request-fullscreen] span,
+[class*=_closeButton_] span {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_leftColumn_][class*=_albumMediaQueries_],
+[class*=_leftColumn_] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+.overlay[class*=_albumImageOverlay_],
+[class*=_albumImageOverlay_] {
+  color: {{colors.on_surface.default.hex}};
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+[class*=_infoWrapper_] {
+  background-color: transparent;
+}
+
+[data-test=now-playing-track-title] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_artistNameColor_] {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_artistNameColor_]:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=_subTitleText_] {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_subTitleText_] a {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_subTitleText_] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=_buttonsContainer_] [data-test=now-playing-favorite-button],
+[class*=_buttonsContainer_] [data-test=now-playing-context-menu] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_buttonsContainer_] [data-test=now-playing-favorite-button]:hover,
+[class*=_buttonsContainer_] [data-test=now-playing-context-menu]:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=_tabs_][class*=_tabItems_] {
+  background-color: transparent;
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+
+[class*=_tabItem_] {
+  color: {{colors.on_surface_variant.default.hex}};
+  background-color: transparent;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+[class*=_tabItem_]:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+[class*=_tabItem_] span,
+[class*=_tabItem_] [data-wave-color] {
+  color: inherit !important;
+}
+[class*=_tabItem_] svg {
+  color: inherit;
+}
+
+[class*=_tabItem_][class*=_activeTab_] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_tabPanelStyles_] {
+  background-color: transparent;
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_playQueueTab_] {
+  background-color: transparent;
+}
+
+[class*=_playQueueItemsContainer_],
+[data-test=nowplaying-playqueue] {
+  background-color: transparent;
+}
+
+[class*=_stickyHeader_] {
+  background-color: {{colors.surface.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_groupTitle_] {
+  color: {{colors.on_surface.default.hex}};
+  background-color: transparent;
+}
+[class*=_groupTitle_] a {
+  color: {{colors.tertiary.default.hex}};
+}
+[class*=_groupTitle_] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=_clearButton_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_clearButton_]:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[data-test=playqueue-item] {
+  color: {{colors.on_surface.default.hex}};
+  background-color: transparent;
+}
+[data-test=playqueue-item]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=_containerPriorityHistory_] {
+  opacity: 0.6;
+}
+[class*=_containerPriorityHistory_]:hover {
+  opacity: 1;
+}
+
+[class*=_titleLink_] {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_titleLink_]:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=_textHigh_] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=_nowPlayingIconContainer_] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=_iconHigh_] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=_artistText_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_artistText_] a {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_artistText_] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=_titleArtistGroup_] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_actions_] button {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_actions_] button:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=_removeButton_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_removeButton_]:hover {
+  color: {{colors.error.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=_nowPlayingCell_] {
+  background-color: transparent;
+}
+
+[class*=_bottomGradient_] {
+  background: linear-gradient(transparent, {{colors.surface.default.hex}});
+}
+
+[class*=_dropContainer_] {
+  background-color: transparent;
+}
+
+[class*=_suggestionsTab_] {
+  background-color: transparent;
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_creditsTab_] {
+  background-color: transparent;
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=_creditsTab_] [class*=_divider_] {
+  background-color: {{colors.surface_container_high.default.hex}} !important;
+}
+
+[data-test=mp-toggle-now-playing],
+[class*=_toggleButton_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[data-test=mp-toggle-now-playing]:hover,
+[class*=_toggleButton_]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=_nowPlayingVisible_] {
+  background-color: inherit;
+}
+
+[class*=_toggleArrowIcon_] {
+  color: inherit;
+}
+
+[class*=_nowPlayingButton_] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=_nowPlayingButton_]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[data-test=playqueue-scroll]::-webkit-scrollbar {
+  width: 6px;
+}
+[data-test=playqueue-scroll]::-webkit-scrollbar-thumb {
+  background-color: {{colors.outline_variant.default.hex}};
+  border-radius: 3px;
+}
+[data-test=playqueue-scroll]::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.os-theme-tidal .os-scrollbar-handle {
+  background-color: {{colors.outline_variant.default.hex}};
+  border-radius: 3px;
+}
+.os-theme-tidal .os-scrollbar-track {
+  background-color: transparent;
+}
+
+.settings-window {
+  --black: {{colors.surface.default.hex}};
+  --black-lighter: {{colors.surface_container.default.hex}};
+  --black-lightest: {{colors.surface_container_high.default.hex}};
+  --grey-darkest: {{colors.surface_container_highest.default.hex}};
+  --grey-darker: {{colors.outline_variant.default.hex}};
+  --grey: {{colors.on_surface_variant.default.hex}};
+  --white: {{colors.on_surface.default.hex}};
+  --tidal-blue: {{colors.tertiary.default.hex}};
+  --tidal-red: {{colors.error.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  background: {{colors.surface.default.hex}};
+  overflow: hidden;
+}
+
+.settings-window__wrapper {
+  background: {{colors.surface.default.hex}};
+  box-shadow: inset 0 0 2px 0 {{colors.surface_container.default.hex}};
+}
+
+.settings-window__close-button:hover {
+  background: {{colors.surface_container_high.default.hex}};
+}
+
+.tabs__trigger + label {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+.tabs__trigger + label:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+.tabs__trigger:checked + label {
+  color: {{colors.primary.default.hex}};
+}
+
+.tabs__separator {
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+
+.settings input:checked + label {
+  border-bottom: 2px solid {{colors.primary.default.hex}};
+  color: {{colors.primary.default.hex}};
+}
+
+.tabs__content::-webkit-scrollbar-thumb {
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+.group {
+  border-bottom: none;
+}
+
+.group__title {
+  color: {{colors.on_surface.default.hex}};
+}
+
+.group__option {
+  background: {{colors.surface_container_high.default.hex}};
+  border-color: {{colors.surface_container_high.default.hex}};
+}
+
+.group__options-group {
+  background: {{colors.surface_container_high.default.hex}};
+  border-color: {{colors.surface_container_high.default.hex}};
+}
+.group__options-group .group__option {
+  border-bottom-color: {{colors.surface_container_highest.default.hex}};
+}
+
+.group__content h4 {
+  color: {{colors.on_surface.default.hex}};
+}
+
+.group__content p,
+.group__description p {
+  color: {{colors.on_surface.default.hex}};
+}
+
+.group__description .text-input {
+  border-bottom: solid 1px {{colors.surface_container_highest.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+.group__description .text-input:focus {
+  border-color: {{colors.primary.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+.text-input {
+  background-color: {{colors.surface_container_highest.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+.text-input::placeholder {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+.tags__tag {
+  background: {{colors.secondary.default.hex}};
+  color: {{colors.surface.default.hex}};
+}
+.tags__tag:hover, .tags__tag:focus-within {
+  background: {{colors.primary.default.hex}};
+}
+
+.tags__tag__text {
+  color: inherit;
+}
+
+.tags__tag__remove {
+  color: inherit;
+  opacity: 0.8;
+}
+.tags__tag__remove:hover {
+  opacity: 1;
+}
+
+.button {
+  background: {{colors.surface_container_high.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+.button:hover {
+  background: {{colors.surface_container_highest.default.hex}};
+}
+.button.primary {
+  background: {{colors.primary.default.hex}};
+  color: {{colors.surface.default.hex}};
+}
+.button.primary:hover {
+  background: {{colors.secondary.default.hex}};
+}
+
+.select-input {
+  background-color: {{colors.surface_container_high.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+
+.select-input option {
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+.select-input option:disabled {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+.hotkey-binding kbd {
+  background: {{colors.primary.default.hex}};
+  color: {{colors.surface.default.hex}};
+}
+
+.hotkey-binding.editing {
+  background: {{colors.surface_container_highest.default.hex}};
+}
+
+.switch {
+  border: none;
+  background-color: transparent;
+}
+
+.switch input:checked + .switch__slider {
+  background-color: {{colors.primary.default.hex}};
+}
+
+.switch input:checked + .switch__slider::before {
+  background-color: {{colors.surface.default.hex}};
+}
+
+.switch input:focus + .switch__slider {
+  box-shadow: none;
+}
+
+.switch:has(:focus-visible) {
+  outline: 2px solid {{colors.primary.default.hex}};
+  outline-offset: 2px;
+  border-radius: 40px;
+}
+
+.switch__slider {
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+.switch__slider::before {
+  background-color: {{colors.on_surface_variant.default.hex}};
+}
+
+.textarea {
+  background: {{colors.surface_container_high.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+
+.footer__note {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+.footer__button {
+  color: {{colors.tertiary.default.hex}};
+}
+
+.footer__button:hover {
+  color: {{colors.tertiary.default.hex}};
+}
+
+.external-link {
+  color: {{colors.tertiary.default.hex}};
+}
+.external-link:hover {
+  color: {{colors.tertiary.default.hex}};
+}
+
+.file-msg {
+  color: {{colors.tertiary.default.hex}} !important;
+}
+
+#tidal-hifi-titlebar {
+  background: {{colors.surface_container.default.hex}} !important;
+}
+
+[class*=sidebarWrapper] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+#sidebar [class*=header_] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[class*=_sectionHeader_] {
+  background-color: {{colors.surface_container.default.hex}} !important;
+}
+
+[class*=logoWrapper] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[class*=logoButton],
+[data-test=sidebar-logo] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=versionBadge] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=submenu_] {
+  background-color: {{colors.surface_container_high.default.hex}};
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+
+[class*=submenuItem] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=submenuItem]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=collapseButton],
+[data-test=sidebar-collapse],
+[data-test=sidebar-expand] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=collapseButton]:hover,
+[data-test=sidebar-collapse]:hover,
+[data-test=sidebar-expand]:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[data-test=shortcut-list] [class*=shortcutItem] {
+  color: {{colors.on_surface.default.hex}};
+}
+[data-test=shortcut-list] [class*=shortcutItem]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+}
+[data-test=shortcut-list] [class*=textWrapper] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[data-test=create-folder-or-playlist] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[data-test=create-folder-or-playlist]:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=_header_]::before {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: transparent !important;
+}
+
+[class*=logo_][class*=logoVisible] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[data-test=header-profile-menu-button],
+[class*=profileMenuButton] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[data-test=header-profile-menu-button]:hover,
+[class*=profileMenuButton]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=profilePicture] {
+  border-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=searchField] {
+  background-color: {{colors.surface_container.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: transparent;
+  border-radius: 8px;
+}
+[class*=searchField]::placeholder {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=searchField]:focus, [class*=searchField]:focus-within {
+  border-color: {{colors.surface_container_highest.default.hex}};
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=searchFieldWithPopover] [class*=container] {
+  background-color: {{colors.surface_container.default.hex}};
+  border-color: transparent;
+  border-radius: 8px;
+}
+[class*=searchFieldWithPopover] [class*=container]:focus-within {
+  border-color: {{colors.surface_container_highest.default.hex}};
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[data-test=search-popover-container] {
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+.mainContent {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=pageHeader] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=feed_][data-test=home-page-feed],
+[class*=feed_] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[data-test=spotlight-banner] [class*=slide_] {
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+[data-test=spotlight-banner] [class*=leftSection] {
+  color: {{colors.on_surface.default.hex}};
+}
+[data-test=spotlight-banner] [class*=brandingTitle] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=cardContainer],
+[class*=card_] {
+  background-color: {{colors.surface.default.hex}};
+  transition: background-color 0.15s ease;
+}
+[class*=cardContainer]:hover,
+[class*=card_]:hover {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=textContent] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=subtitle] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=description] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=headerTitleContainer] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=headerText] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=marketText] {
+  color: inherit;
+}
+
+[data-test=view-all-link],
+[class*=viewAllButton] {
+  color: {{colors.tertiary.default.hex}};
+}
+[data-test=view-all-link]:hover,
+[class*=viewAllButton]:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=overlay] [class*=css-75d7zy] {
+  background-color: {{colors.primary.default.hex}};
+  color: {{colors.surface_container.default.hex}};
+}
+
+[class*=playButtonContainer] [class*=playButtonInner] {
+  background-color: {{colors.primary.default.hex}};
+}
+
+[class*=headerContainer] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=detailContainer] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[class*=sortButton] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=sortButton]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=trackListWrapper] {
+  background-color: {{colors.surface.default.hex}};
+}
+
+[data-test=tracklist-row],
+[class*=trackRow_] {
+  color: {{colors.on_surface.default.hex}};
+}
+[data-test=tracklist-row]:hover,
+[class*=trackRow_]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+[data-test=tracklist-row][data-status=playing], [data-test=tracklist-row][data-test-is-playing=true],
+[class*=trackRow_][data-status=playing],
+[class*=trackRow_][data-test-is-playing=true] {
+  color: {{colors.primary.default.hex}};
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=album] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=favoriteButton] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=favoriteButton]:hover {
+  color: {{colors.error.default.hex}};
+}
+[class*=favoriteButton][aria-checked=true] {
+  color: {{colors.error.default.hex}};
+}
+
+[data-test=explicit-badge],
+[class*=explicitBadge],
+[data-test=quality-badge-LOSSLESS],
+[class*=qualityBadgeContainer] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+#footerPlayer [class*=background_] {
+  background-color: {{colors.surface_container.default.hex}} !important;
+}
+
+[class*=playerContent] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[data-test=track-info],
+[class*=trackInfo] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=artworkContainer],
+[data-test=player-details-toggle-now-playing] {
+  border-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=trackContent] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=titleArtistStack] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=titleContainer] a {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=titleContainer] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=artist_] [class*=item_],
+[class*=artist_] [class*=link_] {
+  color: {{colors.on_surface.default.hex}};
+}
+[class*=artist_] [class*=item_]:hover,
+[class*=artist_] [class*=link_]:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+[class*=playingFromText] a {
+  color: {{colors.tertiary.default.hex}};
+}
+[class*=playingFromText] a:hover {
+  color: {{colors.secondary.default.hex}};
+}
+
+#footerPlayer [class*=actions_] button {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+#footerPlayer [class*=actions_] button:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=blockButton] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=blockButton]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=contextMenuButton] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=contextMenuButton]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=centerSection] {
+  background-color: transparent;
+}
+
+#playbackControlBar button[aria-checked=true] path,
+[data-test=play-controls] button[aria-checked=true] path {
+  fill: {{colors.primary.default.hex}};
+}
+#playbackControlBar button.withBackground, #playbackControlBar button[class*=activeButton],
+[data-test=play-controls] button.withBackground,
+[data-test=play-controls] button[class*=activeButton] {
+  background-color: {{colors.surface_container_high.default.hex}};
+}
+
+[class*=shuffleButton][aria-checked=true],
+[data-test=shuffle][aria-checked=true] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=repeatButton][aria-checked=true],
+[data-test=repeat][aria-checked=true] {
+  color: {{colors.primary.default.hex}};
+}
+
+[class*=skipButton] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=skipButton]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=playbackButton],
+[data-test=play-controls] [class*=playButtonInner] {
+  color: {{colors.on_surface.default.hex}};
+  background-color: transparent;
+}
+
+[class*=scrubberRow] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=scrubberBar] {
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=scrubberTime],
+[class*=scrubberTimeText] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=fillingBlock][class*=indicator] {
+  background-color: {{colors.primary.default.hex}};
+}
+
+[class*=fillingBlock][class*=range] {
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=knob] {
+  background-color: {{colors.primary.default.hex}};
+}
+
+[class*=toolTip] {
+  background-color: {{colors.surface_container_highest.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=rightSection] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=utilityContainer] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=utilityButtons] button {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=utilityButtons] button:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[data-test=play-queue-button] {
+  color: {{colors.on_surface_variant.default.hex}};
+  background-color: transparent !important;
+}
+[data-test=play-queue-button]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+[data-test=play-queue-button][aria-pressed=true] {
+  color: {{colors.primary.default.hex}};
+}
+
+[data-test=volume] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[data-test=volume]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=sliderContainer] {
+  background-color: transparent;
+}
+
+[class*=newNowPlaying] {
+  background-color: {{colors.surface.default.hex}} !important;
+  background-image: none !important;
+  --market-button-focus-ring-color: transparent;
+  --market-core-focus-ring-color: {{colors.primary.default.hex}};
+}
+
+[data-test=now-playing-similar-tracks] [class*=radioSection] [class*=card_] {
+  background-color: transparent;
+}
+[data-test=now-playing-similar-tracks] [class*=radioSection] [class*=contentContainer] {
+  color: {{colors.on_surface.default.hex}};
+}
+[data-test=now-playing-similar-tracks] [class*=radioSection] [class*=subtitle] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[data-test=now-playing-mixes-and-radio-header],
+[data-test=now-playing-mixes-and-radio-scroll] {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-test=now-playing-mixes-and-radio-scroll] [class*=card] {
+  background-color: transparent !important;
+}
+
+#playQueueSidebar {
+  background-color: {{colors.surface_container.default.hex}} !important;
+  background: {{colors.surface_container.default.hex}} !important;
+  border: none !important;
+  border-color: transparent !important;
+  border-width: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+#playQueueSidebar > * {
+  background-color: {{colors.surface_container.default.hex}} !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[class*=playQueueWrapper] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+
+[data-test=playqueue-header] {
+  background-color: {{colors.surface_container.default.hex}};
+}
+[data-test=playqueue-header] [class*=headerButton] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[data-test=playqueue-header] [class*=headerButton]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[data-test=playqueue-save-button],
+[data-test=playqueue-close-button] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[data-test=playqueue-save-button]:hover,
+[data-test=playqueue-close-button]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[data-test=playqueue-title] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=playQueueItemsContainer],
+[data-test=playqueue] {
+  background-color: transparent;
+}
+
+[class*=playQueueItems] {
+  background-color: transparent;
+}
+
+#playQueueSidebar [class*=stickyHeader] {
+  background-color: {{colors.surface_container.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+}
+
+[data-test=playqueue-item] {
+  color: {{colors.on_surface.default.hex}};
+  background-color: transparent;
+  border-bottom: 1px solid {{colors.surface_container_high.default.hex}};
+}
+[data-test=playqueue-item]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+}
+[data-test=playqueue-item] img {
+  border-radius: 4px;
+}
+[data-test=playqueue-item] [class*=artist] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[data-test=playqueue-item] [class*=duration] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+
+[class*=dragHandle] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=dragHandle]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[data-test=playqueue-item] [class*=more],
+[data-test=playqueue-item] [class*=menu] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[data-test=playqueue-item] [class*=more]:hover,
+[data-test=playqueue-item] [class*=menu]:hover {
+  color: {{colors.on_surface.default.hex}};
+}
+
+#playQueueSidebar [class*=actions_] button {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+#playQueueSidebar [class*=actions_] button:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=removeButton],
+[data-test=remove-button] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=removeButton]:hover,
+[data-test=remove-button]:hover {
+  color: {{colors.error.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+[class*=bottomGradient] {
+  background: linear-gradient(transparent, {{colors.surface_container.default.hex}});
+}
+
+[data-test=playqueue-scroll]::-webkit-scrollbar {
+  width: 6px;
+}
+[data-test=playqueue-scroll]::-webkit-scrollbar-thumb {
+  background-color: {{colors.outline_variant.default.hex}};
+  border-radius: 3px;
+}
+[data-test=playqueue-scroll]::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+[class*=notificationWrapper] {
+  color: {{colors.on_surface.default.hex}};
+}
+
+[class*=marketButton][class*=primary] {
+  background-color: {{colors.primary.default.hex}};
+  color: {{colors.surface_container.default.hex}};
+}
+[class*=marketButton][class*=primary]:hover {
+  opacity: 0.9;
+}
+[class*=marketButton][class*=secondary] {
+  background-color: {{colors.surface_container_high.default.hex}};
+  color: {{colors.on_surface.default.hex}};
+  border-color: {{colors.surface_container_highest.default.hex}};
+}
+[class*=marketButton][class*=secondary]:hover {
+  background-color: {{colors.outline_variant.default.hex}};
+}
+[class*=marketButton][class*=tertiary] {
+  color: {{colors.on_surface_variant.default.hex}};
+}
+[class*=marketButton][class*=tertiary]:hover {
+  color: {{colors.on_surface.default.hex}};
+  background-color: {{colors.outline_variant.default.hex}};
+}
+
+#tidal-hifi-titlebar {
+  background: {{colors.surface_container.default.hex}} !important;
+}
