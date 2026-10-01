@@ -159,8 +159,8 @@ EOF
     cat >> $out/hypr/hyprland.conf <<'EOF'
 
 # ── NixOS additions ─────────────────────────────────────────────────────────
-# Minimal fallback so the session is never a dead end (the lua config needs an
-# Arch-only plugin). NVIDIA wlroots vars scoped here so they don't poison KWin.
+# Minimal fallback so the session is never a dead end if hyprland.lua fails.
+# NVIDIA wlroots vars scoped here so they don't poison KWin.
 env = GBM_BACKEND,nvidia-drm
 env = __GLX_VENDOR_LIBRARY_NAME,nvidia
 env = WLR_NO_HARDWARE_CURSORS,1
@@ -169,7 +169,7 @@ monitor = desc:Dell Inc. Dell AW3423DW #tBszGDAYBQUH, 3440x1440@174, 0x0, 1
 monitor = desc:Philips Consumer Electronics Company PHL 278E1 0x0000065F, 3840x2160@60, 3440x0, 1.5
 monitor = , preferred, auto, 1
 misc {
-    vrr = 1    # enable VRR / G-Sync globally; use 2 for fullscreen-only
+    vrr = 2    # fullscreen-only (always-on gamma-flickers the QD-OLED)
 }
 exec-once = systemctl --user start noctalia.service
 exec-once = sleep 5 && mullvad-exclude vesktop
@@ -179,10 +179,10 @@ bind = SUPER SHIFT, E, exit
 bind = SUPER SHIFT, D, exec, mullvad-exclude vesktop
 bind = SUPER, code:51, exec, noctalia msg panel-toggle control-center audio
 # Per-app opacity, same values as niri
-windowrulev2 = opacity 0.95 0.85, class:^(signal)$
-windowrulev2 = opacity 0.95 0.85, class:^(vesktop)$
-windowrulev2 = opacity 0.95 0.85, class:^(zen-beta)$
-windowrulev2 = opacity 0.95 0.85, class:^(obsidian)$
+windowrule = match:class ^(signal)$, opacity 0.95 0.85
+windowrule = match:class ^(vesktop)$, opacity 0.95 0.85
+windowrule = match:class ^(zen-beta)$, opacity 0.95 0.85
+windowrule = match:class ^(obsidian)$, opacity 0.95 0.85
 EOF
 
     ${lib.optionalString (!isVM) ''
