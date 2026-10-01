@@ -1,6 +1,6 @@
 # Spare AMD laptop — kept as a reference host; deliberately NOT wired
 # into flake.nix outputs. Wire it up (and re-check amd.nix) before use.
-{ inputs, ... }:
+{ inputs, lib, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -20,7 +20,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Battery management
+  # Battery management: tlp conflicts with power-profiles-daemon (base/services.nix).
   services.tlp.enable = true;
-  services.upower.enable = true;
+  services.power-profiles-daemon.enable = lib.mkForce false;
 }

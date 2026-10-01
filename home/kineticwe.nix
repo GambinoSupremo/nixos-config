@@ -101,17 +101,18 @@ let
     "${kwc} --file \"$kcfg/${file}\" ${lib.concatMapStringsSep " " (g: "--group ${lib.escapeShellArg g}") groups} --key ${lib.escapeShellArg key} ${lib.escapeShellArg (toString value)}";
   set = file: group: setIn file [ group ];
 
-  # screen 0 = DP-1 (4K), 1 = DP-2 (Alienware). *match 3 = regex; *rule 2 = force,
+  # screen = connector name (indices follow probe order; no EDID support in findOutput).
+  # DP-1 = 4K, DP-2 = Alienware. *match 3 = regex; *rule 2 = force,
   # 3 = initially. desktops/screen are forced: the screen move resets initial desktops.
   opacity = cls: { wmclass = cls; wmclassmatch = 3;
     opacityactive = 98; opacityactiverule = 2; opacityinactive = 92; opacityinactiverule = 2; };
   windowRules = {
     # Steam + games → desktop 2 on the Alienware, no focus stealing.
     steam = { wmclass = "^(steam|steam_app_.*)$"; wmclassmatch = 3;
-      desktops = "Desktop_2"; desktopsrule = 2; screen = 1; screenrule = 2;
+      desktops = "Desktop_2"; desktopsrule = 2; screen = "DP-2"; screenrule = 2;
       fsplevel = 4; fsplevelrule = 2; };
     comms = { wmclass = "^(vesktop|signal|Signal|tidal-hifi|TIDAL HiFi)$"; wmclassmatch = 3;
-      desktops = "Desktop_2"; desktopsrule = 2; screen = 0; screenrule = 3; };
+      desktops = "Desktop_2"; desktopsrule = 2; screen = "DP-1"; screenrule = 3; };
     ghostty-floating = { wmclass = "^com\\.ghostty\\.floating$"; wmclassmatch = 3;
       size = "900,600"; sizerule = 3; };
     # Focused 0.98, unfocused 0.92 (ghostty sets its own). KWin can't blur these.
@@ -172,6 +173,11 @@ let
     if [ -e "$marker" ] && [ ! -e "$kcfg/.migrated-steam-screen-force" ]; then
       ${set "rules.kwe" "steam" "screenrule" 2}
       touch "$kcfg/.migrated-steam-screen-force"
+    fi
+    if [ -e "$marker" ] && [ ! -e "$kcfg/.migrated-screen-names" ]; then
+      ${set "rules.kwe" "steam" "screen" "DP-2"}
+      ${set "rules.kwe" "comms" "screen" "DP-1"}
+      touch "$kcfg/.migrated-screen-names"
     fi
     [ -e "$marker" ] && exit 0
     mkdir -p "$kcfg"
