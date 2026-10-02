@@ -5,10 +5,39 @@
 let
   alienware = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH";
   watchPid = "$XDG_RUNTIME_DIR/sunshine-game-watch.pid";
+  # Put ws 2 (Steam + games) on SUNSHINE at the client mode. Fullscreen windows can block the
+  # move, so drop fullscreen first, retry until ws 2 actually lands, then re-fullscreen games.
+  lendWs2 = pkgs.writeShellScript "sunshine-lend-ws2" ''
+    jq=${pkgs.jq}/bin/jq
+    hyprctl eval "hl.monitor({ output = \"SUNSHINE\", mode = \"''${SUNSHINE_CLIENT_WIDTH:-1920}x''${SUNSHINE_CLIENT_HEIGHT:-1080}@''${SUNSHINE_CLIENT_FPS:-60}\", position = \"auto-right\", scale = 1 })"
+    hyprctl clients -j | $jq -r '.[] | select(.workspace.name == "2" and .fullscreen != 0) | .address' |
+    while read -r a; do
+      hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
+      hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
+    done
+    for _ in $(seq 25); do
+      hyprctl dispatch 'hl.dsp.workspace.move({ workspace = "2", monitor = "SUNSHINE" })'
+      hyprctl workspaces -j | $jq -e 'any(.[]; .name == "2" and .monitor == "SUNSHINE")' >/dev/null && break
+      sleep 0.2
+    done
+    hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })'
+    sleep 0.5
+    hyprctl clients -j | $jq -r '.[] | select((.class | startswith("steam_app_")) and .fullscreen == 0) | .address' |
+    while read -r a; do
+      hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
+      hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
+    done
+  '';
   # XWayland games sometimes map on the wrong workspace despite the ws-2 rule; pull them back.
   gameWatch = pkgs.writeShellScript "sunshine-game-watch" ''
     ${pkgs.socat}/bin/socat -U - UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" |
     while IFS= read -r ev; do
+      # Reloads (e.g. Noctalia's wallpaper→theme) reset SUNSHINE's mode and re-pin ws 2 to the Alienware.
+      if [ "''${ev%%>>*}" = configreloaded ]; then
+        sleep 0.5
+        ${lendWs2}
+        continue
+      fi
       case "$ev" in openwindow\>\>*|movewindowv2\>\>*) ;; *) continue ;; esac
       hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | startswith("steam_app_")) and .workspace.name != "2") | .address' |
       while read -r a; do
@@ -24,16 +53,18 @@ let
     start)
       # Clear a leftover from a stream whose undo never ran.
       hyprctl output destroy SUNSHINE >/dev/null 2>&1
+      # Noctalia rewrites noctalia.lua on wallpaper changes; no auto-reload mid-stream.
+      hyprctl eval 'hl.config({ misc = { disable_autoreload = true } })'
       hyprctl output create headless SUNSHINE
       # Output appears asynchronously; mode/workspace calls before then silently fail.
       for _ in $(seq 50); do
         hyprctl monitors -j | ${pkgs.jq}/bin/jq -e 'any(.[]; .name == "SUNSHINE")' >/dev/null && break
         sleep 0.1
       done
-      hyprctl eval "hl.monitor({ output = \"SUNSHINE\", mode = \"''${SUNSHINE_CLIENT_WIDTH:-1920}x''${SUNSHINE_CLIENT_HEIGHT:-1080}@''${SUNSHINE_CLIENT_FPS:-60}\", position = \"auto-right\", scale = 1 })"
       # Hypr rules pin Steam + games to workspace 2; lend it to the stream.
-      hyprctl dispatch 'hl.dsp.workspace.move({ workspace = "2", monitor = "SUNSHINE" })'
-      hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })'
+      ${lendWs2}
+      # XWayland games size borderless windows from the X11 primary output.
+      ${pkgs.xorg.xrandr}/bin/xrandr --output SUNSHINE --primary
       [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null
       setsid ${gameWatch} >/dev/null 2>&1 < /dev/null & echo $! > "${watchPid}"
       ;;
@@ -41,6 +72,11 @@ let
       [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null; rm -f "${watchPid}"
       hyprctl dispatch 'hl.dsp.workspace.move({ workspace = "2", monitor = "desc:${alienware}" })'
       hyprctl output destroy SUNSHINE
+      aw=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.model == "Dell AW3423DW") | .name')
+      [ -n "$aw" ] && ${pkgs.xorg.xrandr}/bin/xrandr --output "$aw" --primary
+      # Re-enable and pick up any theme changes made during the stream.
+      hyprctl eval 'hl.config({ misc = { disable_autoreload = false } })'
+      hyprctl reload
       ;;
     esac
   '';
