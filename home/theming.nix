@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 let
   # Noctalia post_hook: push the regenerated palette into the running Tidal page via
@@ -69,4 +69,21 @@ in
 
   # qt block intentionally disabled: qt.style injects QT_STYLE_OVERRIDE=kvantum,
   # which black-screens plasmashell (Kirigami QML-imports it). Re-test per Plasma bump.
+
+  # xdph share picker inherits QT_QPA_PLATFORMTHEME=kde, can't load it → stock white.
+  # Bare drop-in (not systemd.user.services) so the portal keeps the session PATH.
+  xdg.configFile."systemd/user/xdg-desktop-portal-hyprland.service.d/qt6ct.conf".text = ''
+    [Service]
+    Environment=QT_QPA_PLATFORMTHEME=qt6ct
+    Environment=QT_PLUGIN_PATH=${pkgs.qt6Packages.qt6ct}/lib/qt-6/plugins
+  '';
+
+  # Only apps launched with QT_QPA_PLATFORMTHEME=qt6ct read this (just the picker above).
+  xdg.configFile."qt6ct/qt6ct.conf".text = ''
+    [Appearance]
+    style=Fusion
+    custom_palette=true
+    color_scheme_path=${config.xdg.configHome}/qt6ct/colors/noctalia.conf
+    icon_theme=Papirus-Dark
+  '';
 }
