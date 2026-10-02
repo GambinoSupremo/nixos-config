@@ -3,9 +3,15 @@
 { pkgs, inputs, ... }:
 
 {
-  # Millennium (Steam theming/plugin patcher) isn't in nixpkgs — pulled from
-  # its own flake and wired in as the Steam package below.
-  nixpkgs.overlays = [ inputs.millennium.overlays.default ];
+  # Millennium isn't in nixpkgs. Only its own build uses the flake's pinned
+  # nixpkgs (bun FOD); the Steam FHS env is wrapped from current nixpkgs.
+  nixpkgs.overlays = [
+    (final: prev: {
+      millennium-steam = final.callPackage "${inputs.millennium}/steam.nix" {
+        inherit (inputs.millennium.packages.${final.stdenv.hostPlatform.system}) millennium;
+      };
+    })
+  ];
 
   programs.steam = {
     enable = true;

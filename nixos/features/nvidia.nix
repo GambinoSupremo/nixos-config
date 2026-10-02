@@ -9,9 +9,13 @@
   # Open modules — NVIDIA's recommended path for Ampere.
   hardware.nvidia.open                = true;
   hardware.nvidia.nvidiaSettings      = true;
-  # latest (>=610), NOT stable (595): 595 intermittently scans the AW3423DW into
-  # a corner on Wayland (proven driver-branch bug). Back to .stable once >= 610.
+  # Newest production branch (beta often lags it). Never .stable: 595 scans the
+  # AW3423DW into a corner on Wayland.
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+  # CachyOS defaults: PAT memory typing, skip zeroing sysmem allocations.
+  boot.extraModprobeConfig = ''
+    options nvidia NVreg_UsePageAttributeTable=1 NVreg_InitializeSystemMemoryAllocations=0
+  '';
 
   hardware.graphics.enable       = true;
   hardware.graphics.enable32Bit  = true;   # 32-bit libs for Steam/Proton

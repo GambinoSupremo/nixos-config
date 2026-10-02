@@ -1,0 +1,60 @@
+diff --git a/src/shell/control_center/tabs/notifications_tab.cpp b/src/shell/control_center/tabs/notifications_tab.cpp
+index 1db15fa..e956ace 100644
+--- a/src/shell/control_center/tabs/notifications_tab.cpp
++++ b/src/shell/control_center/tabs/notifications_tab.cpp
+@@ -583,6 +583,14 @@ public:
+ 
+   [[nodiscard]] std::size_t itemCount() const override { return m_owner.m_filtered.size(); }
+ 
++  [[nodiscard]] bool itemInteractive(std::size_t /*index*/) const override { return true; }
++
++  void onActivate(std::size_t index) override {
++    if (index < m_owner.m_filtered.size() && m_owner.m_filtered[index] != nullptr) {
++      m_owner.activateNotificationEntry(*m_owner.m_filtered[index]);
++    }
++  }
++
+   [[nodiscard]] std::uint64_t itemKey(std::size_t index) const override {
+     if (index >= m_owner.m_filtered.size() || m_owner.m_filtered[index] == nullptr) {
+       return static_cast<std::uint64_t>(index);
+@@ -1026,6 +1034,28 @@ void NotificationsTab::invokeNotificationAction(uint32_t id, const std::string&
+   PanelManager::instance().refresh();
+ }
+ 
++// Card click: run the live default action (opens the chat etc.), then focus the sender's window.
++void NotificationsTab::activateNotificationEntry(const NotificationHistoryEntry& entry) {
++  // Copy first: invoking the action can drop the history entry.
++  const uint32_t id = entry.notification.id;
++  const std::string idLower =
++      StringUtils::toLower(entry.notification.desktopEntry.value_or(entry.notification.appName));
++  bool hasDefault = false;
++  for (std::size_t i = 0; i + 1 < entry.notification.actions.size(); i += 2) {
++    hasDefault = hasDefault || entry.notification.actions[i] == "default";
++  }
++
++  if (hasDefault) {
++    invokeNotificationAction(id, "default");
++  }
++  if (m_platform != nullptr) {
++    if (const auto windows = m_platform->enrichedWindowsForApp(idLower, idLower); !windows.empty()) {
++      m_platform->activateToplevelInfo(windows.back());
++    }
++  }
++  PanelManager::instance().close();
++}
++
+ bool NotificationsTab::refreshDataSnapshot() {
+   const bool hasHistory = m_notifications != nullptr && !m_notifications->history().empty();
+   if (m_clearAllButton != nullptr) {
+diff --git a/src/shell/control_center/tabs/notifications_tab.h b/src/shell/control_center/tabs/notifications_tab.h
+index 33781c0..d039430 100644
+--- a/src/shell/control_center/tabs/notifications_tab.h
++++ b/src/shell/control_center/tabs/notifications_tab.h
+@@ -41,6 +41,7 @@ private:
+   void toggleDoNotDisturb();
+   void toggleNotificationExpanded(uint32_t id);
+   void invokeNotificationAction(uint32_t id, const std::string& actionKey);
++  void activateNotificationEntry(const NotificationHistoryEntry& entry);
+   bool refreshDataSnapshot();
+   void syncDndButton();
+   void updateEmptyState(bool hasHistory, bool hasFiltered);

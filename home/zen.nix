@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, config, lib, ... }:
 
 # Zen Browser via the zen-browser flake's HM module (mirrors programs.firefox).
 # Firefox Sync sign-in stays manual (once per machine; ~/.zen persists).
@@ -75,6 +75,11 @@
       settings = {
         "zen.welcome-screen.seen" = true;  # skip onboarding on fresh machines
 
+        # Load chrome/userChrome.css — Noctalia's zen-browser template @imports its colors there.
+        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        # Zen ignores extension themes by default; Pywalfox's live colors need this off.
+        "zen.theme.disable-lightweight" = false;
+
         # Each window is independent — don't mirror tabs/workspaces into new
         # windows (Zen's "window sync" duplicates the session otherwise).
         "zen.window-sync.enabled" = false;
@@ -104,6 +109,37 @@
         "network.trr.mode" = 5;
         "doh-rollout.disable-heuristics" = true;
       };
+    };
+  };
+
+  # Live Noctalia colors: zen-live.css maps Noctalia's Zen CSS onto Pywalfox's theme vars.
+  # Noctalia's apply.sh rewrites userChrome.css but keeps extra lines, so append the import once.
+  home.file.".config/zen/default/chrome/zen-live.css".source = ./noctalia/zen-live.css;
+  home.activation.zenLiveImport = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    chrome="${config.home.homeDirectory}/.config/zen/default/chrome/userChrome.css"
+    if ! grep -qs 'zen-live.css' "$chrome"; then
+      run mkdir -p "$(dirname "$chrome")"
+      run sh -c "echo '@import \"zen-live.css\";' >> '$chrome'"
+    fi
+  '';
+
+  # Same id as the package's entry (~/.local/share wins), minus the "(Beta)" name.
+  xdg.desktopEntries.zen-beta = {
+    name        = "Zen Browser";
+    genericName = "Web Browser";
+    exec        = "zen-beta --name zen-beta %U";
+    icon        = "zen-browser";
+    categories  = [ "Network" "WebBrowser" ];
+    mimeType    = [
+      "text/html" "text/xml" "application/xhtml+xml" "application/vnd.mozilla.xul+xml"
+      "x-scheme-handler/http" "x-scheme-handler/https"
+    ];
+    startupNotify = true;
+    settings.StartupWMClass = "zen-beta";
+    actions = {
+      new-window         = { name = "New Window";         exec = "zen-beta --new-window %U"; };
+      new-private-window = { name = "New Private Window"; exec = "zen-beta --private-window %U"; };
+      profile-manager-window = { name = "Profile Manager"; exec = "zen-beta --ProfileManager"; };
     };
   };
 }

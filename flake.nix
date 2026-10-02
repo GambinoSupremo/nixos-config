@@ -1,11 +1,13 @@
 {
   description = "gav's nixos configuration";
 
-  # Noctalia binary cache — prebuilt noctalia packages when available.
+  # Binary caches: noctalia + CachyOS kernel (also in core.nix nix.settings so
+  # root's daemon trusts them; listed here so the first rebuild already hits).
   nixConfig = {
-    extra-substituters      = [ "https://noctalia.cachix.org" ];
+    extra-substituters      = [ "https://noctalia.cachix.org" "https://attic.xuyh0120.win/lantian" ];
     extra-trusted-public-keys = [
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+      "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
     ];
   };
 
@@ -38,13 +40,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # KineticWE session (kineticwe-2.0 branch: Kinetic Settings). Pinned so `update`
-    # skips it (daily upstream churn, long source build); bump the rev deliberately.
+    # KineticWE session (kineticwe-2.0 branch: Kinetic Settings). Tracks the branch;
+    # expect a long source build on `update` when upstream moved.
     kineticwe = {
-      url   = "gitlab:theblackdon/kineticwe/c2b82884fd3a3bb717158227a66af85d1517eeb2";
+      url   = "gitlab:theblackdon/kineticwe/kineticwe-2.0";
       inputs.nixpkgs.follows  = "nixpkgs";
       inputs.noctalia.follows = "noctalia";  # unused by 2.0; avoids a second fetch
     };
+
+    # CachyOS kernels (desktop host). `release` = built + cached by upstream CI.
+    # No nixpkgs.follows: its pinned overlay must match the cached builds.
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     # For the laptop's AMD module; follows keeps a second stale nixpkgs
     # copy out of the lock file.

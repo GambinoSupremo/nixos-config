@@ -239,7 +239,10 @@ in
     enable = true;
     systemd.enable = true;
     package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [ ./noctalia/bar-capsule-blur.patch ];
+      patches = (old.patches or [ ]) ++ [
+        ./noctalia/bar-capsule-blur.patch
+        ./noctalia/history-click-focus.patch  # history card click → open/focus sender app
+      ];
     });
   };
 
