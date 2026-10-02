@@ -26,7 +26,8 @@
     description = "Reconnect Mullvad when Keeper blocks the relay";
     after    = [ "mullvad-daemon.service" ];
     bindsTo  = [ "mullvad-daemon.service" ];
-    wantedBy = [ "mullvad-daemon.service" ];
+    # multi-user.target too, so a rebuild starts it while the daemon is already running.
+    wantedBy = [ "multi-user.target" "mullvad-daemon.service" ];
     path = [ config.services.mullvad-vpn.package pkgs.curl pkgs.coreutils ];
     script = ''
       tries=0
