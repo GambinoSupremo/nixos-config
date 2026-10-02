@@ -9,7 +9,7 @@
     ./shell.nix      # fish, starship, fzf, zoxide, bat
     ./theming.nix    # gtk, cursor
     ./programs.nix   # git, neovim, obs, signal, pywalfox
-    ./services.nix   # mullvad-gui systemd user service
+    ./services.nix   # mullvad-gui + noctalia-game-toasts user services
     ./zen.nix        # Zen Browser — declarative profile, extensions, policies
     ./kineticwe.nix  # KineticWE binds, look and rules (seeded once at login)
   ];
