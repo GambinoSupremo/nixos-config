@@ -45,9 +45,6 @@
     python3
     python3Packages.defusedxml
     python3Packages.packaging
-    # cli11           # header-only C++ CLI library — add if writing C++ apps
-    # gemini-cli      # check nixpkgs — may be `google-gemini-cli` or absent
-    # opencode-bin    # NOT in nixpkgs
 
     # ── System utilities ──────────────────────────────────────────────────────
     btop
@@ -60,8 +57,6 @@
     sg3_utils
     usbutils
     hwinfo
-    # pkgfile / rebuild-detector / reflector — Arch-specific, not needed
-    # cachy-update / chwd / cachyos-* — CachyOS-specific, not needed
 
     # ── Wayland tooling ───────────────────────────────────────────────────────
     # niri registered via programs.niri in desktop.nix
@@ -80,7 +75,6 @@
     uwsm                # Wayland session manager (also used by niri session)
     # noctalia — v5, managed by the upstream HM module (programs.noctalia)
     #            in home/default.nix; runs as noctalia.service
-    # scenefx        — wlroots-effects; likely bundled in MangoWM's flake output
 
     # ── Themes / Appearance ───────────────────────────────────────────────────
     nwg-look
@@ -90,7 +84,7 @@
     nordzy-icon-theme            # in nixpkgs (pkgs/by-name) despite old AUR-only note
     adw-gtk3                     # was adw-gtk-theme
     qt6Packages.qt6ct            # top-level qt6ct became a throw alias 2025-10-27
-    libsForQt5.qt5ct             # was qt5ct-kde (AUR; verify nixpkgs name)
+    libsForQt5.qt5ct
     kdePackages.breeze           # was breeze
     # kvantum intentionally NOT system-wide: Plasma's Kirigami QML-imports it and
     # black-screens plasmashell. Want it elsewhere? Per-user + QT_STYLE_OVERRIDE.
@@ -128,7 +122,6 @@
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
     protonplus
     # millennium: via its own flake, wired as the Steam package in features/gaming.nix
-    # moondeckbuddy              # NOT in nixpkgs — MoonDeck companion app
 
     # ── Peripherals ───────────────────────────────────────────────────────────
     polychromatic    # Razer lighting GUI; openrazer daemon via hardware.openrazer in services.nix

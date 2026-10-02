@@ -25,9 +25,6 @@
       cat     = "bat --style=plain";
       grep    = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
-      # CURRENTLY INERT: updater.sh isn't installed, and arkenfox fights
-      # zen.nix's declarative user.js — decide which owns it before first use.
-      arkenfox-update = "bash ~/.config/zen/default/updater.sh";
     };
     # `update`/`dotsync` are functions, not aliases, so a bad upstream bump can
     # revert flake.lock instead of leaving the repo stuck on a revision that

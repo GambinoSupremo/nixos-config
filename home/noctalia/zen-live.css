@@ -1,0 +1,26 @@
+/* Repoints Noctalia's zen-userChrome.css palette at the theme vars Pywalfox sets live.
+   Sources are vars Noctalia's CSS never overrides (avoids var() cycles); fallbacks = pywalfox off. */
+:root {
+  --nl-bg:      var(--lwt-accent-color, #000000);                      /* Background */
+  --nl-bg-lt:   var(--sidebar-background-color, #121212);              /* BackgroundLight */
+  --nl-bg-ex:   var(--toolbarbutton-background-color-active, #262626); /* BackgroundExtra */
+  --nl-text:    var(--toolbar-field-text-color, #e2e2e2);              /* Text */
+  --nl-accent:  var(--tab-loading-fill, #a5c8ff);                      /* AccentPrimary */
+  --nl-accent2: var(--toolbarbutton-icon-fill-attention, #b7c7e4);     /* AccentSecondary */
+}
+
+* {
+  --base:      var(--nl-bg) !important;
+  --surface:   var(--nl-bg-lt) !important;
+  --overlay:   color-mix(in srgb, var(--nl-bg-lt) 70%, var(--nl-bg-ex)) !important;
+  --hl_low:    color-mix(in srgb, var(--nl-bg-lt) 40%, var(--nl-bg-ex)) !important;
+  --hl_med:    var(--nl-bg-ex) !important;
+  --hl_high:   color-mix(in srgb, var(--nl-bg-ex) 90%, var(--nl-text)) !important;
+  --outline:   color-mix(in srgb, var(--nl-text) 30%, var(--nl-bg)) !important;
+  --muted:     color-mix(in srgb, var(--nl-text) 55%, var(--nl-bg)) !important;
+  --subtle:    color-mix(in srgb, var(--nl-text) 80%, var(--nl-bg)) !important;
+  --text:      var(--nl-text) !important;
+  --primary:   var(--nl-accent) !important;
+  --secondary: var(--nl-accent2) !important;
+  --tertiary:  var(--nl-accent2) !important;
+}

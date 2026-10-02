@@ -32,12 +32,15 @@ in
     ../../base/packages.nix
     ../../features/gaming.nix
     ../../features/sunshine.nix
+    ../../features/cachyos.nix
     inputs.qylock.nixosModules.default
   ];
 
-  # Latest mainline kernel, desktop only. The kernel was exonerated as the
-  # AW3423DW scanout regressor (that was the NVIDIA driver branch, now on latest).
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # CachyOS kernel (BORE + CachyOS patches), Zen 4 build for the 7800X3D.
+  # Pinned overlay = upstream's nixpkgs rev, so it hits their binary cache.
+  # Fallback: pkgs.linuxPackages_latest (mainline).
+  nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-zen4;
 
   programs.qylock = {
     enable = true;

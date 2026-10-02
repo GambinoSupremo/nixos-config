@@ -29,10 +29,9 @@
   services.spice-vdagentd.enable = true;
 
   # virtio-gpu / llvmpipe is enough for the wlroots compositors; no GPU config here.
-  # When moving to the physical desktop, import nixos/features/nvidia.nix instead.
   hardware.graphics.enable = true;
 
-  # Let wlroots compositors (Mango) fall back to software rendering when the
+  # Let wlroots compositors fall back to software rendering when the
   # VM exposes no usable GPU acceleration.
   environment.sessionVariables.WLR_RENDERER_ALLOW_SOFTWARE = "1";
 
