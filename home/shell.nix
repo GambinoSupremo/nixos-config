@@ -14,7 +14,7 @@
     enable = true;
     interactiveShellInit = ''
       set fish_greeting ""
-      fish_add_path -g ~/.local/bin  # user-installed CLIs (e.g. agy)
+      fish_add_path -g ~/.local/bin  # user-installed CLIs
       command -q pokemon-colorscripts; and pokemon-colorscripts --no-title -r 2>/dev/null || true
     '';
     shellAliases = {
@@ -33,15 +33,6 @@
     # builds, it's a reasonable commit point, and this way the tree never
     # sits dirty and origin never falls behind.
     functions = {
-      # Never let Antigravity open on ~ (it'd ask to trust all of home); jump to a default project instead.
-      agy = ''
-        set -l default_dir ~/nixos-agy-test
-        if test "$PWD" = "$HOME"; or test "$PWD" = /
-            cd $default_dir; or return 1
-        end
-        command agy $argv
-      '';
-
       _nixos-commit-dirty = ''
         set -l flake_dir $argv[1]
         set -l label $argv[2]
@@ -81,12 +72,28 @@
         if sudo nixos-rebuild switch --flake $flake_dir#desktop
             rm $backup
             _nixos-commit-dirty $flake_dir update
-        else
-            echo "rebuild failed — reverting flake.lock to the pre-update state"
-            cp $backup $lock
-            rm $backup
-            return 1
+            return
         end
+
+        # Millennium's bun hash often goes stale upstream; retry with it held back.
+        set -l mill_rev '.nodes.millennium.locked.rev'
+        if test (jq -r $mill_rev $lock) != (jq -r $mill_rev $backup)
+            echo "rebuild failed — retrying with Millennium held at its previous rev"
+            cp $backup $lock
+            set -l others (jq -r '.nodes.root.inputs | keys[] | select(. != "millennium")' $lock)
+            if nix flake update $others --flake $flake_dir
+                and sudo nixos-rebuild switch --flake $flake_dir#desktop
+                rm $backup
+                _nixos-commit-dirty $flake_dir update
+                echo "note: Millennium held back (new upstream rev failed to build)"
+                return
+            end
+        end
+
+        echo "rebuild failed — reverting flake.lock to the pre-update state"
+        cp $backup $lock
+        rm $backup
+        return 1
       '';
 
       # Refresh only the dotfiles pin, then rebuild.

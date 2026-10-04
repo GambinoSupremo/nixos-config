@@ -9,6 +9,8 @@
     (final: prev: {
       millennium-steam = final.callPackage "${inputs.millennium}/steam.nix" {
         inherit (inputs.millennium.packages.${final.stdenv.hostPlatform.system}) millennium;
+        # Steam guesses UI scale from the X11 primary at launch; Sunshine's 0mm virtual output made it huge.
+        extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1";
       };
     })
   ];
