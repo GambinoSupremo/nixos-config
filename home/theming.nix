@@ -54,6 +54,15 @@ in
       name    = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
     };
+    # Nautilus sidebar pins; file is a read-only symlink, so add pins here, not via Ctrl+D.
+    gtk3.bookmarks = [
+      "smb://gavin@10.0.0.117/plexmedia NAS"
+      "file://${config.home.homeDirectory}/Downloads"
+      "file://${config.home.homeDirectory}/Documents"
+      "file://${config.home.homeDirectory}/Pictures"
+      "file://${config.home.homeDirectory}/Games"
+      "file://${config.home.homeDirectory}/Projects"
+    ];
   };
 
   # ── Cursor ───────────────────────────────────────────────────────────────────
@@ -78,7 +87,7 @@ in
     Environment=QT_PLUGIN_PATH=${pkgs.qt6Packages.qt6ct}/lib/qt-6/plugins
   '';
 
-  # Only apps launched with QT_QPA_PLATFORMTHEME=qt6ct read this (just the picker above).
+  # Only apps launched with QT_QPA_PLATFORMTHEME=qt6ct read this (picker above + qbittorrent).
   xdg.configFile."qt6ct/qt6ct.conf".text = ''
     [Appearance]
     style=Fusion

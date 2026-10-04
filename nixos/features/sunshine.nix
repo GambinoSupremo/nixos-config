@@ -43,6 +43,14 @@ let
       while read -r a; do
         hyprctl dispatch "hl.dsp.window.move({ workspace = \"2\", window = \"address:$a\", follow = true })"
       done
+      # Games launched mid-stream open windowed under fullscreen Big Picture; bring them over it.
+      case "$ev" in openwindow\>\>*) ;; *) continue ;; esac
+      sleep 1
+      hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | startswith("steam_app_")) and .fullscreen == 0 and (.floating | not)) | .address' |
+      while read -r a; do
+        hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
+        hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
+      done
     done
   '';
   streamDisplay = pkgs.writeShellScript "sunshine-stream-display" ''

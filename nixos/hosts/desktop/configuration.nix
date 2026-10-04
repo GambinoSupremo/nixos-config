@@ -73,7 +73,7 @@ in
   # ── Quiet, pretty boot ────────────────────────────────────────────────────────
   # 5s generation menu at boot — roll back without holding a key (0 = straight through).
   boot.loader.timeout = 5;
-  boot.loader.systemd-boot.configurationLimit = 10;
+  boot.loader.systemd-boot.configurationLimit = 20;
   # Memtest86+ entry in the boot menu (RAM stability checks after BIOS changes).
   boot.loader.systemd-boot.memtest86.enable = true;
 
