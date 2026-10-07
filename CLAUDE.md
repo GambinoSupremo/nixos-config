@@ -20,7 +20,8 @@ from the separate dotfiles repo; see README.md for the repo map.
   (hand-curated, never regenerate).
 - Monitors are matched by identity string (EDID description/model), never by
   port name. The NVIDIA DP-N numbering flips between boots.
-- HDR is deliberately off (SDR, `cm = "dcip3"`) until desktop HDR works with
+- The AW3423DW is in its own Creator/sRGB mode, so the compositors send plain
+  sRGB (`cm = "srgb"`). HDR is deliberately off until desktop HDR works with
   Moonlight/Sunshine streaming. Don't turn it back on.
 
 ## Checking a change
