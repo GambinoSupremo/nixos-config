@@ -59,10 +59,6 @@
   # ── Power profiles daemon ─────────────────────────────────────────────────────
   services.power-profiles-daemon.enable = true;
 
-  # ── NTP ───────────────────────────────────────────────────────────────────────
-  # systemd-timesyncd is lighter than ntpd and sufficient for a desktop.
-  services.timesyncd.enable = true;
-
   # ── gvfs (SMB / network browsing) ────────────────────────────────────────────
   # Needed for Nautilus to browse SMB shares (replaces gvfs-smb).
   services.gvfs.enable = true;
