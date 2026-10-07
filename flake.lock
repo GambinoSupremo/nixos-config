@@ -3,14 +3,17 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1790982600,
-        "narHash": "sha256-rLkJpli7T7D4TeL+mVXLjyYG0eAv/pQpLdlIQSuqsE8=",
-        "path": "/home/gav/Projects/dotfiles",
-        "type": "path"
+        "lastModified": 1791405210,
+        "narHash": "sha256-afFx5as13PkxsOupaNvch+I5MMmincLcYXu02h/46nk=",
+        "owner": "GambinoSupremo",
+        "repo": "dotfiles",
+        "rev": "349bc16eaac62e8d8a17f7d6e653bc3a2f9e20dc",
+        "type": "github"
       },
       "original": {
-        "path": "/home/gav/Projects/dotfiles",
-        "type": "path"
+        "owner": "GambinoSupremo",
+        "repo": "dotfiles",
+        "type": "github"
       }
     },
     "flake-compat": {

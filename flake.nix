@@ -71,7 +71,7 @@
 
     # Dotfiles deployed declaratively via home-manager (see home/default.nix)
     dotfiles = {
-      url = "path:/home/gav/Projects/dotfiles";
+      url = "github:GambinoSupremo/dotfiles";
       flake = false;
     };
 
