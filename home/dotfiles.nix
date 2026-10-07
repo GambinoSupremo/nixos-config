@@ -292,7 +292,7 @@ in
 
   # ── Wallpapers ───────────────────────────────────────────────────────────────
   # Noctalia's settings.json points at ~/Pictures/backgrounds; read-only is fine.
-  home.file."Pictures/backgrounds".source = "${inputs.dotfiles}/backgrounds";
+  home.file."Pictures/backgrounds".source = "${inputs.wallpapers}";
 
   # ── Noctalia runtime seed ─────────────────────────────────────────────────────
   # Seed Noctalia's runtime templates once as writable copies; rebuilds skip

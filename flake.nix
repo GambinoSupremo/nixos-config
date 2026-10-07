@@ -75,6 +75,11 @@
       flake = false;
     };
 
+    wallpapers = {
+      url = "github:GambinoSupremo/wallpapers";
+      flake = false;
+    };
+
     # Millennium — Steam client theming/plugin patcher; not in nixpkgs.
     # No nixpkgs.follows: Millennium pins its own nixpkgs on purpose because
     # its bun FOD hash breaks on any bun version change (upstream comment).
