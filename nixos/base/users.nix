@@ -4,16 +4,16 @@
 {
   users.users.gav = {
     isNormalUser = true;
-    description  = "Gavin";
-    shell        = pkgs.fish;
-    extraGroups  = [
-      "wheel"           # sudo
-      "networkmanager"  # manage NetworkManager without sudo
-      "video"           # brightness control, video devices
-      "audio"           # audio devices (belt-and-suspenders with pipewire)
-      "input"           # keyd and input-remapper access
-      "plugdev"         # USB HID / openrazer
-      "dialout"         # /dev/ttyACM* — ZMK Studio serial, flashing
+    description = "Gavin";
+    shell = pkgs.fish;
+    extraGroups = [
+      "wheel" # sudo
+      "networkmanager" # manage NetworkManager without sudo
+      "video" # brightness control, video devices
+      "audio" # audio devices (belt-and-suspenders with pipewire)
+      "input" # keyd and input-remapper access
+      "plugdev" # USB HID / openrazer
+      "dialout" # /dev/ttyACM* — ZMK Studio serial, flashing
     ];
     # openrazer adds "openrazer" group automatically via hardware.openrazer
   };

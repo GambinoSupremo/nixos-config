@@ -1,7 +1,6 @@
 # AMD graphics — used only by the laptop host (which is kept as a spare
 # and is not wired into flake.nix outputs).
-_:
-{
+_: {
   # Vulkan via RADV, which Mesa ships by default — no extraPackages needed.
   hardware.graphics = {
     enable = true;

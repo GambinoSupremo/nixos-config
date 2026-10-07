@@ -16,14 +16,14 @@ _:
 
   # Mullvad daemon. First boot: mullvad account login
   services.mullvad-vpn = {
-    enable     = true;
+    enable = true;
     gui.enable = true;
   };
 
   # systemd-resolved for local DNS caching.
   # DNSSEC must be false — it breaks Mullvad's DNS.
   services.resolved = {
-    enable  = true;
+    enable = true;
     settings.Resolve.DNSSEC = "false";
     # Don't set domains = [ "~." ] here — let Mullvad manage the split-tunnel DNS
   };

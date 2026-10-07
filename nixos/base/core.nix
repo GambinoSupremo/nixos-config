@@ -9,18 +9,18 @@
   # rebuilds of the base system and its overlay drops allowUnfree (breaks NVIDIA).
 
   # ── Locale / Time ─────────────────────────────────────────────────────────────
-  time.timeZone      = "America/Los_Angeles";
+  time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
-    LC_ADDRESS        = "en_US.UTF-8";
+    LC_ADDRESS = "en_US.UTF-8";
     LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT    = "en_US.UTF-8";
-    LC_MONETARY       = "en_US.UTF-8";
-    LC_NAME           = "en_US.UTF-8";
-    LC_NUMERIC        = "en_US.UTF-8";
-    LC_PAPER          = "en_US.UTF-8";
-    LC_TELEPHONE      = "en_US.UTF-8";
-    LC_TIME           = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
   };
 
   # ── Nix ───────────────────────────────────────────────────────────────────────
@@ -29,19 +29,25 @@
     package = pkgs.nixVersions.latest;
     settings = {
       # CachyOS kernel cache (nix-cachyos-kernel); noctalia's comes via flake nixConfig.
-      extra-substituters        = [ "https://attic.xuyh0120.win/lantian" ];
+      extra-substituters = [ "https://attic.xuyh0120.win/lantian" ];
       extra-trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
-      experimental-features = [ "nix-command" "flakes" ];
-      auto-optimise-store   = true;
-      trusted-users         = [ "root" "gav" ];
-      warn-dirty            = false;
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      auto-optimise-store = true;
+      trusted-users = [
+        "root"
+        "gav"
+      ];
+      warn-dirty = false;
       # Default max-jobs of 1 makes rebuilds painfully sequential on this Ryzen.
-      max-jobs              = "auto";
+      max-jobs = "auto";
     };
     gc = {
       automatic = true;
-      dates     = "weekly";
-      options   = "--delete-older-than 7d";
+      dates = "weekly";
+      options = "--delete-older-than 7d";
     };
   };
 

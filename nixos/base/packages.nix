@@ -11,7 +11,7 @@
     ghostty
     kitty
     tmux
-    eza          # stays: only aliased (no programs.eza) in home/shell.nix
+    eza # stays: only aliased (no programs.eza) in home/shell.nix
     ripgrep
     fd
     tree
@@ -38,8 +38,8 @@
     git
     github-cli
     claude-code
-    nil            # Nix language server — Zed's Nix extension shells out to it
-    jq             # JSON CLI; required by niri
+    nil # Nix language server — Zed's Nix extension shells out to it
+    jq # JSON CLI; required by niri
     cmake
     ninja
     python3
@@ -69,36 +69,36 @@
     wev
     playerctl
     fuzzel
-    xwayland-satellite  # rootless Xwayland for pure-Wayland compositors
+    xwayland-satellite # rootless Xwayland for pure-Wayland compositors
     xrandr
     wayland-protocols
-    uwsm                # Wayland session manager (also used by niri session)
+    uwsm # Wayland session manager (also used by niri session)
     # noctalia — v5, managed by the upstream HM module (programs.noctalia)
     #            in home/default.nix; runs as noctalia.service
 
     # ── Themes / Appearance ───────────────────────────────────────────────────
     nwg-look
-    bibata-cursors               # was bibata-cursor-theme-bin (AUR)
+    bibata-cursors # was bibata-cursor-theme-bin (AUR)
     papirus-icon-theme
     tela-icon-theme
-    nordzy-icon-theme            # in nixpkgs (pkgs/by-name) despite old AUR-only note
-    adw-gtk3                     # was adw-gtk-theme
-    qt6Packages.qt6ct            # top-level qt6ct became a throw alias 2025-10-27
+    nordzy-icon-theme # in nixpkgs (pkgs/by-name) despite old AUR-only note
+    adw-gtk3 # was adw-gtk-theme
+    qt6Packages.qt6ct # top-level qt6ct became a throw alias 2025-10-27
     libsForQt5.qt5ct
-    kdePackages.breeze           # was breeze
+    kdePackages.breeze # was breeze
     # kvantum intentionally NOT system-wide: Plasma's Kirigami QML-imports it and
     # black-screens plasmashell. Want it elsewhere? Per-user + QT_STYLE_OVERRIDE.
 
     # ── Applications ─────────────────────────────────────────────────────────
     obsidian
     signal-desktop
-    vesktop                      # Discord
+    vesktop # Discord
     element-desktop
     # zen-browser moved to home-manager (home/zen.nix, programs.zen-browser)
     mpv
-    vlc                          # was vlc-plugins-all (plugins included)
-    loupe                        # GNOME image viewer
-    nomacs                       # RAW-capable viewer; default for CR2/CR3 (home/programs.nix)
+    vlc # was vlc-plugins-all (plugins included)
+    loupe # GNOME image viewer
+    nomacs # RAW-capable viewer; default for CR2/CR3 (home/programs.nix)
     nautilus
     gnome-disk-utility
     pavucontrol
@@ -113,11 +113,11 @@
           --prefix QT_PLUGIN_PATH : ${qt6Packages.qt6ct}/lib/qt-6/plugins
       '';
     })
-    matugen                      # material color generation from wallpaper
+    matugen # material color generation from wallpaper
     firefox
 
     # ── Media ────────────────────────────────────────────────────────────────
-    spotify                      # was spotify-launcher (AUR downloader wrapper)
+    spotify # was spotify-launcher (AUR downloader wrapper)
     # "gray screen" = its gpuRasterization flag crashing NVIDIA+Wayland.
     # Localhost DevTools port lets tidal-live-theme (home/theming.nix) recolor it live.
     (symlinkJoin {
@@ -126,7 +126,7 @@
       nativeBuildInputs = [ makeWrapper ];
       postBuild = "wrapProgram $out/bin/tidal-hifi --add-flags '--remote-debugging-port=9233 --remote-debugging-address=127.0.0.1'";
     })
-    cider-2                      # Apple Music (cider.sh 4.x); plain `cider` is the dead 1.x fork
+    cider-2 # Apple Music (cider.sh 4.x); plain `cider` is the dead 1.x fork
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
@@ -134,8 +134,8 @@
     # millennium: via its own flake, wired as the Steam package in features/gaming.nix
 
     # ── Peripherals ───────────────────────────────────────────────────────────
-    polychromatic    # Razer lighting GUI; openrazer daemon via hardware.openrazer in services.nix
-    zmk-studio       # runtime keymap editor for the Lily58 (firmware built in ~/Projects/zmk-config)
+    polychromatic # Razer lighting GUI; openrazer daemon via hardware.openrazer in services.nix
+    zmk-studio # runtime keymap editor for the Lily58 (firmware built in ~/Projects/zmk-config)
 
     # ── Networking ────────────────────────────────────────────────────────────
     # mullvad-vpn comes from the services.mullvad-vpn module (keeps daemon + GUI
@@ -147,6 +147,6 @@
     # gamemode managed via programs.gamemode in services.nix
     # keyd managed via services.keyd in services.nix
 
-    pywalfox-native              # native messaging host for the Pywalfox browser extension
+    pywalfox-native # native messaging host for the Pywalfox browser extension
   ];
 }
