@@ -82,9 +82,10 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
 - **VRR / gamma flicker**: fluctuating refresh causes visible gamma flicker
   on the QD-OLED desktop. Policy everywhere is fullscreen-games-only VRR:
   Hyprland `vrr = 2`, niri `on-demand=true` + steam_app rule.
-- **HDR**: deliberately off. The AW3423DW runs SDR with `cm = "dcip3"`
-  (dotfiles hypr/monitor.lua) until desktop HDR works with Moonlight/Sunshine
-  streaming.
+- **Colour / HDR**: the AW3423DW runs in its own Creator mode with the sRGB
+  colour space (gamma 2.2), so it clamps to sRGB itself and the compositors
+  send plain sRGB (`cm = "srgb"` in dotfiles hypr/monitor.lua). HDR is
+  deliberately off until desktop HDR works with Moonlight/Sunshine streaming.
 - **keyd clipboard**: super+c/super+v are remapped to Ctrl-/Shift-Insert at
   the kernel level for ALL sessions (base/services.nix). Compositor binds on
   plain SUPER+C/V can never fire; binds with extra keys/modifiers
