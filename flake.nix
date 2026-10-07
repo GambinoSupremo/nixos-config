@@ -43,14 +43,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # KineticWE session (kineticwe-2.0 branch: Kinetic Settings). Tracks the branch;
-    # expect a long source build on `update` when upstream moved.
-    kineticwe = {
-      url = "gitlab:theblackdon/kineticwe/kineticwe-2.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.noctalia.follows = "noctalia"; # unused by 2.0; avoids a second fetch
-    };
-
     # CachyOS kernels (desktop host). `release` = built + cached by upstream CI.
     # No nixpkgs.follows: its pinned overlay must match the cached builds.
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
