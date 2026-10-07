@@ -33,7 +33,7 @@ home/                     # home-manager for gav (shared by all hosts):
 ## Sessions
 
 SDDM (Wayland greeter on kwin, qylock theme) with two sessions.
-**Hyprland is the daily driver** (HDR, `defaultSession`), Niri the backup.
+**Hyprland is the daily driver** (`defaultSession`), Niri the backup.
 Noctalia v5 is the bar/shell, run as
 `noctalia.service` (upstream HM module). MangoWM was dropped 2026-09-24; KDE
 Plasma is not installed.
@@ -82,8 +82,9 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
 - **VRR / gamma flicker**: fluctuating refresh causes visible gamma flicker
   on the QD-OLED desktop. Policy everywhere is fullscreen-games-only VRR:
   Hyprland `vrr = 2`, niri `on-demand=true` + steam_app rule.
-- **HDR**: lives in dotfiles hypr/monitor.lua only (cm=hdr, 10-bit,
-  `sdr_min_luminance = 0`).
+- **HDR**: deliberately off. The AW3423DW runs SDR with `cm = "dcip3"`
+  (dotfiles hypr/monitor.lua) until desktop HDR works with Moonlight/Sunshine
+  streaming.
 - **keyd clipboard**: super+c/super+v are remapped to Ctrl-/Shift-Insert at
   the kernel level for ALL sessions (base/services.nix). Compositor binds on
   plain SUPER+C/V can never fire; binds with extra keys/modifiers
