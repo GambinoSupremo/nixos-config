@@ -85,3 +85,4 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
 - Hyprland fresh-boot fallback path (broken lua → hyprland.conf) untested.
 - flake.lock path-input lastModified for dotfiles looks stale even when
   content is current — narHash is what matters; don't trust the date.
+  MOOT since 2026-10-07: dotfiles is a github: input (locked by rev).

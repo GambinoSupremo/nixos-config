@@ -2,7 +2,7 @@
 
 NixOS flake for **gavos** (physical desktop) and a Proxmox **vm** testbed,
 tracking nixos-unstable. Dotfiles come from the separate
-[dotfiles](https://github.com/GambinoSupremo/dotfiles) repo as a path flake
+[dotfiles](https://github.com/GambinoSupremo/dotfiles) repo as a GitHub flake
 input, patched for NixOS at build time.
 
 ## Repo map
@@ -15,7 +15,7 @@ nixos/
                           # (pipewire), services (keyd, bluetooth, ...),
                           # packages (systemPackages)
   features/               # opt-in per host:
-    desktop.nix           #   SDDM + Hyprland/Niri/KineticWE sessions + portals + fonts
+    desktop.nix           #   SDDM + Hyprland/Niri sessions + portals + fonts
     nvidia.nix            #   driver pin + Wayland env (desktop host)
     amd.nix               #   laptop-only GPU config
     gaming.nix            #   Steam/gamescope/gamemode/novpn
@@ -27,35 +27,36 @@ nixos/
 home/                     # home-manager for gav (shared by all hosts):
                           #   dotfiles.nix (dotfile patching/deployment — the
                           #   heart of the repo), shell, theming, programs,
-                          #   services, zen, kineticwe, noctalia/config.toml
+                          #   services, zen, noctalia/config.toml
 ```
 
 ## Sessions
 
-SDDM (Wayland greeter on kwin, qylock theme) with three sessions.
-**Hyprland is the daily driver** (HDR, `defaultSession`), Niri the backup,
-KineticWE (kwin fork) experimental. Noctalia v5 is the bar/shell, run as
+SDDM (Wayland greeter on kwin, qylock theme) with two sessions.
+**Hyprland is the daily driver** (HDR, `defaultSession`), Niri the backup.
+Noctalia v5 is the bar/shell, run as
 `noctalia.service` (upstream HM module). MangoWM was dropped 2026-09-24; KDE
 Plasma is not installed.
 
 ## Rebuild
 
 ```bash
-rebuild   # alias: sudo nixos-rebuild switch --flake ~/nixos-config#desktop
+rebuild   # alias: sudo nixos-rebuild switch --flake ~/nixos-config#<host> (desktop or vm, set per host)
 update    # alias: nix flake update + rebuild — a bare `nix flake update`
           # only rewrites the lock; nothing lands until the rebuild
 ```
 
-Dotfile edits are NOT live: the dotfiles input is lock-pinned, so it takes
-`nix flake update dotfiles` (or `update`) plus a rebuild to deploy them.
+Dotfile edits are NOT live: the dotfiles input is lock-pinned to GitHub, so it
+takes a push, then `nix flake update dotfiles` (or `update`) plus a rebuild to
+deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/dotfiles`.
 
 ## Biweekly update ritual
 
 1. `nix flake update --flake ~/nixos-config` (don't rebuild yet).
-2. `git diff flake.lock` — note old→new revs for noctalia, kineticwe, and
+2. `git diff flake.lock` — note old→new revs for noctalia and
    nixpkgs (niri + hyprland come from nixpkgs).
 3. Release-note check for config-breaking changes: niri, hyprland,
-   noctalia, kineticwe.
+   noctalia.
 4. Migrate configs in the dotfiles repo if needed (respect the mustSed
    warnings in each file's header).
 5. `rebuild` (or `update` if step 1 was skipped).
@@ -64,15 +65,14 @@ Dotfile edits are NOT live: the dotfiles input is lock-pinned, so it takes
    niri validate                       # parses ~/.config/niri/config.kdl
    hyprctl configerrors                # inside a Hyprland session
    systemctl --user status noctalia.service
-   ls /run/current-system/sw/share/wayland-sessions   # 3 wayland sessions present
+   ls /run/current-system/sw/share/wayland-sessions   # 2 wayland sessions present
    ```
 
 ## Known constraints (load-bearing — do not rediscover these)
 
 - **Monitor identity vs port names**: the NVIDIA DP-N index flips with GPU
   probe order (DP-1/DP-2 vs DP-3/DP-4 both seen). Niri and hypr/monitor.lua
-  match by identity/EDID desc (never switch to port names); KineticWE
-  (home/kineticwe.nix) still uses DP-2/DP-1 and degrades if the names flip.
+  match by identity/EDID desc (never switch to port names).
 - **NVIDIA driver pin**: `nvidiaPackages.latest` (615 as of 2026-10), open
   modules. The 595 branch intermittently scanned the AW3423DW into a corner.
   Move back to `.stable` once stable ≥ 610 (details in nixos/features/nvidia.nix).
