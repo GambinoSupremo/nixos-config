@@ -43,8 +43,6 @@
     cmake
     ninja
     python3
-    python3Packages.defusedxml
-    python3Packages.packaging
 
     # ── System utilities ──────────────────────────────────────────────────────
     btop
