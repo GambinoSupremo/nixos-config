@@ -4,7 +4,10 @@
   # Binary caches: noctalia + CachyOS kernel (also in core.nix nix.settings so
   # root's daemon trusts them; listed here so the first rebuild already hits).
   nixConfig = {
-    extra-substituters      = [ "https://noctalia.cachix.org" "https://attic.xuyh0120.win/lantian" ];
+    extra-substituters = [
+      "https://noctalia.cachix.org"
+      "https://attic.xuyh0120.win/lantian"
+    ];
     extra-trusted-public-keys = [
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
       "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
@@ -16,36 +19,36 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     home-manager = {
-      url   = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Noctalia v5 — native Wayland shell; homeModules.default provides
     # programs.noctalia.* + the noctalia.service user unit.
     noctalia = {
-      url   = "github:noctalia-dev/noctalia-shell";
+      url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Not in nixpkgs; homeModules.beta provides programs.zen-browser.
     zen-browser = {
-      url   = "github:0xc000022070/zen-browser-flake";
-      inputs.nixpkgs.follows      = "nixpkgs";
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
 
     # qylock — SDDM themes (login screen), "pixel-dusk-city" selected in desktop/configuration.nix
     qylock = {
-      url   = "github:Darkkal44/qylock";
+      url = "github:Darkkal44/qylock";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # KineticWE session (kineticwe-2.0 branch: Kinetic Settings). Tracks the branch;
     # expect a long source build on `update` when upstream moved.
     kineticwe = {
-      url   = "gitlab:theblackdon/kineticwe/kineticwe-2.0";
-      inputs.nixpkgs.follows  = "nixpkgs";
-      inputs.noctalia.follows = "noctalia";  # unused by 2.0; avoids a second fetch
+      url = "gitlab:theblackdon/kineticwe/kineticwe-2.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.noctalia.follows = "noctalia"; # unused by 2.0; avoids a second fetch
     };
 
     # CachyOS kernels (desktop host). `release` = built + cached by upstream CI.
@@ -62,13 +65,13 @@
     # Consumed as a plain source tree and built against the system Hyprland so
     # the plugin ABI matches (the repo's own flake targets Hyprland master).
     hyprland-scroll-overview = {
-      url   = "github:yayuuu/hyprland-scroll-overview";
+      url = "github:yayuuu/hyprland-scroll-overview";
       flake = false;
     };
 
     # Dotfiles deployed declaratively via home-manager (see home/default.nix)
     dotfiles = {
-      url   = "path:/home/gav/Projects/dotfiles";
+      url = "path:/home/gav/Projects/dotfiles";
       flake = false;
     };
 
@@ -78,46 +81,47 @@
     millennium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
   };
 
-  outputs = { nixpkgs, home-manager, ... }@inputs:
-  let
-    # Shared home-manager config block applied to every host. (A commonOverlay
-    # of throw-alias shims was removed 2026-07-14 — git history has it.)
-    hmModule = {
-      home-manager = {
-        useGlobalPkgs    = true;
-        useUserPackages  = true;
-        extraSpecialArgs = { inherit inputs; };
-        users.gav        = import ./home/default.nix;
-        # Pre-existing files that home-manager would clobber are moved aside
-        # as *.hm-bak instead of aborting the activation.
-        backupFileExtension = "hm-bak";
+  outputs =
+    { nixpkgs, home-manager, ... }@inputs:
+    let
+      # Shared home-manager config block applied to every host. (A commonOverlay
+      # of throw-alias shims was removed 2026-07-14 — git history has it.)
+      hmModule = {
+        home-manager = {
+          useGlobalPkgs = true;
+          useUserPackages = true;
+          extraSpecialArgs = { inherit inputs; };
+          users.gav = import ./home/default.nix;
+          # Pre-existing files that home-manager would clobber are moved aside
+          # as *.hm-bak instead of aborting the activation.
+          backupFileExtension = "hm-bak";
+        };
+      };
+    in
+    {
+      nixosConfigurations = {
+
+        # Proxmox VM — primary target for now
+        vm = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            ./nixos/hosts/vm/configuration.nix
+            home-manager.nixosModules.home-manager
+            hmModule
+          ];
+        };
+
+        # Physical desktop — gavos
+        desktop = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            ./nixos/hosts/desktop/configuration.nix
+            home-manager.nixosModules.home-manager
+            hmModule
+          ];
+        };
       };
     };
-  in
-  {
-    nixosConfigurations = {
-
-      # Proxmox VM — primary target for now
-      vm = nixpkgs.lib.nixosSystem {
-        system      = "x86_64-linux";
-        specialArgs = { inherit inputs; };
-        modules = [
-          ./nixos/hosts/vm/configuration.nix
-          home-manager.nixosModules.home-manager
-          hmModule
-        ];
-      };
-
-      # Physical desktop — gavos
-      desktop = nixpkgs.lib.nixosSystem {
-        system      = "x86_64-linux";
-        specialArgs = { inherit inputs; };
-        modules = [
-          ./nixos/hosts/desktop/configuration.nix
-          home-manager.nixosModules.home-manager
-          hmModule
-        ];
-      };
-    };
-  };
 }

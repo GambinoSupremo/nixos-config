@@ -18,12 +18,12 @@
       command -q pokemon-colorscripts; and pokemon-colorscripts --no-title -r 2>/dev/null || true
     '';
     shellAliases = {
-      ls      = "eza --icons --group-directories-first";
-      la      = "eza -la --icons --group-directories-first";
-      ll      = "eza -l --icons --group-directories-first";
-      tree    = "eza --tree --icons --group-directories-first";
-      cat     = "bat --style=plain";
-      grep    = "rg";
+      ls = "eza --icons --group-directories-first";
+      la = "eza -la --icons --group-directories-first";
+      ll = "eza -l --icons --group-directories-first";
+      tree = "eza --tree --icons --group-directories-first";
+      cat = "bat --style=plain";
+      grep = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
     };
     # `update`/`dotsync` are functions, not aliases, so a bad upstream bump can
@@ -125,10 +125,10 @@
 
   # ── Starship ─────────────────────────────────────────────────────────────────
   programs.starship = {
-    enable                = true;
+    enable = true;
     enableFishIntegration = true;
     # false puts the init in shellInitLast so nothing can shadow fish_prompt.
-    enableInteractive     = false;
+    enableInteractive = false;
     # settings unset — starship.toml is written by home.activation.starshipConfig
     # (dotfiles.nix) and must stay a writable file.
   };
@@ -142,7 +142,7 @@
 
   # ── zoxide ───────────────────────────────────────────────────────────────────
   programs.zoxide = {
-    enable                = true;
+    enable = true;
     enableFishIntegration = true;
   };
 

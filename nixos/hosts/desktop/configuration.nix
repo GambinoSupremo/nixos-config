@@ -1,21 +1,28 @@
-{ pkgs, lib, inputs, ... }:
+{
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 
 let
   qylockThemes = inputs.qylock.legacyPackages.${pkgs.stdenv.hostPlatform.system}.mkSddmThemes { };
   # pixel-dusk-city with bg.mp4 transcoded to animated WebP (greeter video decode freezes on NVIDIA).
-  loginTheme = pkgs.runCommand "sddm-theme-pixel-dusk-city-webp" { nativeBuildInputs = [ pkgs.ffmpeg-headless ]; } ''
-    d=$out/share/sddm/themes/pixel-dusk-city-webp
-    mkdir -p $(dirname $d)
-    cp -r ${qylockThemes}/share/sddm/themes/pixel-dusk-city $d
-    chmod -R u+w $d
-    ffmpeg -v error -i $d/bg.mp4 -an -vf fps=30 -c:v libwebp -q:v 85 -compression_level 4 -loop 0 $d/bg.webp
-    rm $d/bg.mp4
-    cat > $d/BackgroundVideo.qml <<'QML'
-  import QtQuick
-  AnimatedImage { anchors.fill: parent; source: "bg.webp"; fillMode: Image.PreserveAspectCrop; smooth: false; playing: true; cache: false }
-  QML
-    sed -i 's|^Name=.*|Name=pixel-dusk-city-webp|' $d/metadata.desktop
-  '';
+  loginTheme =
+    pkgs.runCommand "sddm-theme-pixel-dusk-city-webp" { nativeBuildInputs = [ pkgs.ffmpeg-headless ]; }
+      ''
+          d=$out/share/sddm/themes/pixel-dusk-city-webp
+          mkdir -p $(dirname $d)
+          cp -r ${qylockThemes}/share/sddm/themes/pixel-dusk-city $d
+          chmod -R u+w $d
+          ffmpeg -v error -i $d/bg.mp4 -an -vf fps=30 -c:v libwebp -q:v 85 -compression_level 4 -loop 0 $d/bg.webp
+          rm $d/bg.mp4
+          cat > $d/BackgroundVideo.qml <<'QML'
+        import QtQuick
+        AnimatedImage { anchors.fill: parent; source: "bg.webp"; fillMode: Image.PreserveAspectCrop; smooth: false; playing: true; cache: false }
+        QML
+          sed -i 's|^Name=.*|Name=pixel-dusk-city-webp|' $d/metadata.desktop
+      '';
 in
 {
   # Import order is load-bearing: list options merge in order, so reordering
@@ -44,13 +51,16 @@ in
 
   programs.qylock = {
     enable = true;
-    theme  = "pixel-dusk-city";
-    quickshell.enable = false;  # SDDM login theme only — Noctalia still owns the in-session lock
+    theme = "pixel-dusk-city";
+    quickshell.enable = false; # SDDM login theme only — Noctalia still owns the in-session lock
   };
 
   services.displayManager.sddm.theme = lib.mkForce "pixel-dusk-city-webp";
   # qtimageformats provides the WebP decoder for the animated background.
-  services.displayManager.sddm.extraPackages = [ loginTheme pkgs.qt6.qtimageformats ];
+  services.displayManager.sddm.extraPackages = [
+    loginTheme
+    pkgs.qt6.qtimageformats
+  ];
   environment.systemPackages = [ loginTheme ];
 
   # SDDM's Wayland greeter runs KWin as the `sddm` user, which never saw our
@@ -64,7 +74,7 @@ in
 
   # systemd-boot: plain but instant. (Tried themed GRUB 2026-07-09, reverted —
   # the menu load lag wasn't worth cosmetics on a menu that's hidden anyway.)
-  boot.loader.systemd-boot.enable      = true;
+  boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   # systemd initrd: faster boot, cleaner Plymouth, better error reporting.
@@ -81,7 +91,7 @@ in
   # another. Esc during boot drops to the text log.
   boot.plymouth = {
     enable = true;
-    theme  = "rings";
+    theme = "rings";
     themePackages = [
       (pkgs.adi1090x-plymouth-themes.override { selected_themes = [ "rings" ]; })
     ];
@@ -89,7 +99,7 @@ in
 
   # Silence the console text Plymouth would otherwise paint over.
   boot.consoleLogLevel = 3;
-  boot.initrd.verbose  = false;
+  boot.initrd.verbose = false;
   boot.kernelParams = [
     "quiet"
     "udev.log_priority=3"

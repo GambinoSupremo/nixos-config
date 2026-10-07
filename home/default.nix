@@ -5,17 +5,17 @@
 {
   imports = [
     # One concern per file (noctalia uses HM's native module; package patched in dotfiles.nix)
-    ./dotfiles.nix   # compositor plumbing, dotfile patching, activation scripts
-    ./shell.nix      # fish, starship, fzf, zoxide, bat
-    ./theming.nix    # gtk, cursor
-    ./programs.nix   # git, neovim, obs, signal, pywalfox
-    ./services.nix   # mullvad-gui + noctalia-game-toasts user services
-    ./zen.nix        # Zen Browser — declarative profile, extensions, policies
-    ./kineticwe.nix  # KineticWE binds, look and rules (seeded once at login)
+    ./dotfiles.nix # compositor plumbing, dotfile patching, activation scripts
+    ./shell.nix # fish, starship, fzf, zoxide, bat
+    ./theming.nix # gtk, cursor
+    ./programs.nix # git, neovim, obs, signal, pywalfox
+    ./services.nix # mullvad-gui + noctalia-game-toasts user services
+    ./zen.nix # Zen Browser — declarative profile, extensions, policies
+    ./kineticwe.nix # KineticWE binds, look and rules (seeded once at login)
   ];
 
-  home.username      = "gav";
+  home.username = "gav";
   home.homeDirectory = "/home/gav";
-  home.stateVersion  = "26.05";
+  home.stateVersion = "26.05";
   programs.home-manager.enable = true;
 }

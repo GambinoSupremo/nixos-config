@@ -1,6 +1,11 @@
 # Systemd user services owned by home-manager: the Mullvad GUI launcher (daemon is a
 # system service in nixos/base/networking.nix) and the Noctalia game-toast watcher.
-{ pkgs, lib, osConfig ? {}, ... }:
+{
+  pkgs,
+  lib,
+  osConfig ? { },
+  ...
+}:
 
 let
   isVM = osConfig.services.qemuGuest.enable or false;
@@ -20,18 +25,19 @@ in
         done
         exit 0
       '';
-    in {
+    in
+    {
       Unit = {
         Description = "Mullvad VPN GUI";
-        After       = [ "graphical-session.target" ];
-        PartOf      = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
       };
       Service = {
-        Type         = "simple";
+        Type = "simple";
         ExecStartPre = toString waitDaemon;
-        ExecStart    = "${pkgs.mullvad-vpn}/bin/mullvad-vpn";
-        Restart      = "on-failure";
-        RestartSec   = "5s";
+        ExecStart = "${pkgs.mullvad-vpn}/bin/mullvad-vpn";
+        Restart = "on-failure";
+        RestartSec = "5s";
       };
       Install.WantedBy = [ "graphical-session.target" ];
     }
@@ -86,15 +92,16 @@ in
           sleep 5
         done
       '';
-    in {
+    in
+    {
       Unit = {
         Description = "Keep Noctalia toasts off the Alienware during fullscreen games";
-        After       = [ "graphical-session.target" ];
-        PartOf      = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
       };
       Service = {
-        ExecStart  = toString watcher;
-        Restart    = "on-failure";
+        ExecStart = toString watcher;
+        Restart = "on-failure";
         RestartSec = "5s";
       };
       Install.WantedBy = [ "graphical-session.target" ];

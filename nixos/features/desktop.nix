@@ -1,6 +1,11 @@
 # Graphical stack: SDDM plus Hyprland (primary), Niri (backup) and KineticWE,
 # with portals, keyring, and fonts.
-{ lib, pkgs, inputs, ... }:
+{
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [ inputs.kineticwe.nixosModules.default ];
@@ -11,15 +16,18 @@
 
   # 2.0 lacks master's dontWrapQtApps fix for kdecoration-git; drop once merged.
   nixpkgs.overlays = lib.mkAfter [
-    (final: _prev:
+    (
+      final: _prev:
       let
         kwe = inputs.kineticwe.packages.${final.stdenv.hostPlatform.system};
         kdecoration = kwe.kdecoration.overrideAttrs { dontWrapQtApps = true; };
-        kinetic-we  = kwe.kinetic-we.override { kdecorationGit = kdecoration; };
-      in {
+        kinetic-we = kwe.kinetic-we.override { kdecorationGit = kdecoration; };
+      in
+      {
         inherit kdecoration kinetic-we;
         kineticwe = kwe.session.override { kineticWe = kinetic-we; };
-      })
+      }
+    )
   ];
 
   # Patched session launcher: see the notes on each substitution below.
@@ -36,31 +44,33 @@
         exec ${pkgs.systemd}/bin/loginctl "$@"
       '';
     in
-    pkgs.runCommand "${orig.name}-qkdetheme-fix" {
-      inherit (orig) passthru meta;
-    } ''
-      cp -r ${orig} $out
-      chmod -R u+w $out
-      # Exec= and the wrapper shim hardcode the original store path; repoint them.
-      substituteInPlace "$out/share/wayland-sessions/KineticWE.desktop" \
-        --replace-fail "${orig}/bin/start-kineticwe" "$out/bin/start-kineticwe"
-      substituteInPlace "$out/bin/start-kineticwe" \
-        --replace-fail "${orig}/bin/.start-kineticwe-wrapped" "$out/bin/.start-kineticwe-wrapped"
-      # Run the per-user config hook; unset KDE_SESSION_VERSION for kwin only
-      # (with KDE_FULL_SESSION it segfaults in Qt's QKdeTheme).
-      substituteInPlace "$out/bin/.start-kineticwe-wrapped" \
-        --replace-fail 'exec env XDG_CONFIG_HOME=' '[ -x "$HOME/.config/kineticwe/pre-start" ] && KWE_CONFIG_HOME="$KWE_CONFIG_HOME" "$HOME/.config/kineticwe/pre-start" >"$SESSION_LOG_DIR/pre-start.log" 2>&1 || true
-      unset KDE_SESSION_VERSION
-      exec env XDG_CONFIG_HOME='
-      # Logout shim on the payload's PATH (children: noctalia).
-      substituteInPlace "$out/bin/.start-kineticwe-wrapped" \
-        --replace-fail 'export XDG_CONFIG_HOME="''${KWE_REAL_CONFIG_HOME:-$HOME/.config}"' 'export XDG_CONFIG_HOME="''${KWE_REAL_CONFIG_HOME:-$HOME/.config}"
-      export KWE_PAYLOAD_PID=$$
-      export PATH="${loginctlShim}/bin:$PATH"'
-      if grep -rqF "${orig}" "$out"; then
-        echo "kineticwe patch: $out still references ${orig}" >&2; exit 1
-      fi
-    '';
+    pkgs.runCommand "${orig.name}-qkdetheme-fix"
+      {
+        inherit (orig) passthru meta;
+      }
+      ''
+        cp -r ${orig} $out
+        chmod -R u+w $out
+        # Exec= and the wrapper shim hardcode the original store path; repoint them.
+        substituteInPlace "$out/share/wayland-sessions/KineticWE.desktop" \
+          --replace-fail "${orig}/bin/start-kineticwe" "$out/bin/start-kineticwe"
+        substituteInPlace "$out/bin/start-kineticwe" \
+          --replace-fail "${orig}/bin/.start-kineticwe-wrapped" "$out/bin/.start-kineticwe-wrapped"
+        # Run the per-user config hook; unset KDE_SESSION_VERSION for kwin only
+        # (with KDE_FULL_SESSION it segfaults in Qt's QKdeTheme).
+        substituteInPlace "$out/bin/.start-kineticwe-wrapped" \
+          --replace-fail 'exec env XDG_CONFIG_HOME=' '[ -x "$HOME/.config/kineticwe/pre-start" ] && KWE_CONFIG_HOME="$KWE_CONFIG_HOME" "$HOME/.config/kineticwe/pre-start" >"$SESSION_LOG_DIR/pre-start.log" 2>&1 || true
+        unset KDE_SESSION_VERSION
+        exec env XDG_CONFIG_HOME='
+        # Logout shim on the payload's PATH (children: noctalia).
+        substituteInPlace "$out/bin/.start-kineticwe-wrapped" \
+          --replace-fail 'export XDG_CONFIG_HOME="''${KWE_REAL_CONFIG_HOME:-$HOME/.config}"' 'export XDG_CONFIG_HOME="''${KWE_REAL_CONFIG_HOME:-$HOME/.config}"
+        export KWE_PAYLOAD_PID=$$
+        export PATH="${loginctlShim}/bin:$PATH"'
+        if grep -rqF "${orig}" "$out"; then
+          echo "kineticwe patch: $out still references ${orig}" >&2; exit 1
+        fi
+      '';
 
   # MangoWM disabled 2026-09-24; its HM deploy/patching removed 2026-10-01
   # (re-enable: mangowm input + its NixOS/HM modules, see git history).
@@ -71,26 +81,29 @@
   # Hyprland — primary/daily driver. Session env / noctalia startup driven by
   # hyprSessionBootstrap in home/dotfiles.nix (the bare target raced noctalia).
   programs.hyprland = {
-    enable    = true;
+    enable = true;
     # false alone doesn't drop the duplicate SDDM entry — the package ships
     # hyprland-uwsm.desktop itself; the symlinkJoin strips that one file.
-    withUWSM  = false;
+    withUWSM = false;
     # The module calls .override on the package, so the wrapper re-exposes it
     # (re-stripping after any override) plus the attrs the module reads.
-    package   =
+    package =
       let
-        stripUwsmSession = hl: pkgs.symlinkJoin {
-          name = "hyprland-single-session";
-          paths = [ hl ];
-          postBuild = "rm $out/share/wayland-sessions/hyprland-uwsm.desktop";
-          inherit (hl) version meta;
-          passthru = hl.passthru or {} // {
-            inherit (hl) man;
-            providedSessions = [ "hyprland" ];
-            override = args: stripUwsmSession (hl.override args);
+        stripUwsmSession =
+          hl:
+          pkgs.symlinkJoin {
+            name = "hyprland-single-session";
+            paths = [ hl ];
+            postBuild = "rm $out/share/wayland-sessions/hyprland-uwsm.desktop";
+            inherit (hl) version meta;
+            passthru = hl.passthru or { } // {
+              inherit (hl) man;
+              providedSessions = [ "hyprland" ];
+              override = args: stripUwsmSession (hl.override args);
+            };
           };
-        };
-      in stripUwsmSession pkgs.hyprland;
+      in
+      stripUwsmSession pkgs.hyprland;
   };
 
   # ── Display Manager ───────────────────────────────────────────────────────────
@@ -111,10 +124,13 @@
   # ── XDG Portals ───────────────────────────────────────────────────────────────
   # Each compositor module registers its own backends; only the shared fallback here.
   xdg.portal = {
-    enable       = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];  # file dialogs everywhere
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ]; # file dialogs everywhere
     config = {
-      KDE.default    = [ "kde" "gtk" ];  # KDE session: kde portal first, gtk fallback
+      KDE.default = [
+        "kde"
+        "gtk"
+      ]; # KDE session: kde portal first, gtk fallback
       # mkForce over KineticWE's module (it's covered by KDE.default above).
       common.default = lib.mkForce [ "gtk" ];
     };
@@ -136,20 +152,20 @@
     enableDefaultPackages = true;
     packages = with pkgs; [
       noto-fonts
-      noto-fonts-cjk-sans       # was noto-fonts-cjk
-      noto-fonts-color-emoji    # top-level noto-fonts-emoji became a throw alias 2025-10-27
-      dejavu_fonts              # was ttf-dejavu
-      liberation_ttf            # was ttf-liberation
-      open-sans                 # was ttf-opensans
-      ttf_bitstream_vera        # was ttf-bitstream-vera
-      nerd-fonts.meslo-lg       # was ttf-meslo-nerd; kept as fallback
+      noto-fonts-cjk-sans # was noto-fonts-cjk
+      noto-fonts-color-emoji # top-level noto-fonts-emoji became a throw alias 2025-10-27
+      dejavu_fonts # was ttf-dejavu
+      liberation_ttf # was ttf-liberation
+      open-sans # was ttf-opensans
+      ttf_bitstream_vera # was ttf-bitstream-vera
+      nerd-fonts.meslo-lg # was ttf-meslo-nerd; kept as fallback
       nerd-fonts.jetbrains-mono
     ];
     fontconfig.defaultFonts = {
-      serif     = [ "Noto Serif" ];
+      serif = [ "Noto Serif" ];
       sansSerif = [ "Noto Sans" ];
       monospace = [ "JetBrainsMono Nerd Font Mono" ];
-      emoji     = [ "Noto Color Emoji" ];
+      emoji = [ "Noto Color Emoji" ];
     };
   };
 }

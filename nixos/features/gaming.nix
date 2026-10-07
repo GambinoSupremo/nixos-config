@@ -30,15 +30,15 @@
   # HDR + VRR scaler; use --hdr-enabled for the AW3423DW
   programs.gamescope = {
     enable = true;
-    capSysNice = true;   # lets gamescope keep its compositor thread scheduled under load
+    capSysNice = true; # lets gamescope keep its compositor thread scheduled under load
   };
 
   # enable lives in services.nix; this is what gamemode does when a game starts.
   programs.gamemode.settings = {
     general = {
-      desiredgov          = "performance";   # switch CPU governor while gaming
-      softrealtime        = "auto";          # real-time scheduling if available
-      reaper_freq         = 5;               # poll interval (seconds)
+      desiredgov = "performance"; # switch CPU governor while gaming
+      softrealtime = "auto"; # real-time scheduling if available
+      reaper_freq = 5; # poll interval (seconds)
       inhibit_screensaver = 1;
     };
   };
@@ -49,7 +49,7 @@
   '';
 
   services.scx = {
-    enable    = true;
+    enable = true;
     scheduler = "scx_bpfland"; # scx_lavd RCU-stalls the whole system on kernel 7.2.0+
   };
 

@@ -6,10 +6,10 @@
   # ── Bluetooth ─────────────────────────────────────────────────────────────────
   # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
   hardware.bluetooth = {
-    enable      = true;
+    enable = true;
     powerOnBoot = true;
   };
-  services.blueman.enable = true;   # system tray + pairing GUI
+  services.blueman.enable = true; # system tray + pairing GUI
 
   # ── Key remapping ─────────────────────────────────────────────────────────────
   # keyd — kernel-level remapping. Super+C/V → Ctrl+Insert / Shift+Insert
@@ -17,7 +17,7 @@
   services.keyd = {
     enable = true;
     keyboards.default = {
-      ids      = [ "*" ];
+      ids = [ "*" ];
       settings = {
         # Modifier combos must live in a layer named after the modifier —
         # [main] can't bind "super+c". Unlisted keys fall through with Super held.
@@ -33,7 +33,7 @@
   # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
   hardware.openrazer = {
     enable = true;
-    users  = [ "gav" ];
+    users = [ "gav" ];
   };
 
   # ── GameMode ──────────────────────────────────────────────────────────────────
@@ -42,17 +42,17 @@
 
   # ── SSH ───────────────────────────────────────────────────────────────────────
   services.openssh = {
-    enable   = true;
+    enable = true;
     settings = {
       PasswordAuthentication = false;
-      PermitRootLogin        = "no";
+      PermitRootLogin = "no";
     };
   };
 
   # ── locate / plocate ──────────────────────────────────────────────────────────
   services.locate = {
-    enable   = true;
-    package  = pkgs.plocate;
+    enable = true;
+    package = pkgs.plocate;
     interval = "hourly";
   };
 

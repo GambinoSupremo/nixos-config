@@ -37,8 +37,8 @@
 
   # Desktop-hardware services that make no sense in a VM.
   # mkForce because nixos/base/services.nix enables them for the physical machine.
-  hardware.openrazer.enable = lib.mkForce false;  # no Razer hardware in VM
-  hardware.bluetooth.enable = lib.mkForce false;  # no BT in VM
-  services.blueman.enable   = lib.mkForce false;
-  programs.gamemode.enable  = lib.mkForce false;  # pointless without a GPU
+  hardware.openrazer.enable = lib.mkForce false; # no Razer hardware in VM
+  hardware.bluetooth.enable = lib.mkForce false; # no BT in VM
+  services.blueman.enable = lib.mkForce false;
+  programs.gamemode.enable = lib.mkForce false; # pointless without a GPU
 }
