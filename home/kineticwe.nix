@@ -322,21 +322,7 @@ let
     # 2.0 compositor config lives in ~/.config/kineticwe.
     kcfg="''${KWE_CONFIG_HOME:-$cfg/kineticwe}"
     marker="$kcfg/.seeded-v${seedVersion}"
-    # One-time fixes for configs seeded before 2026-09-24 (each has a marker file).
-    # 2.0 renamed the shortcut component kwin → kineticwe; comms → desktop 2.
-    mig="$kcfg/.migrated-kwe2-component"
-    if [ -e "$marker" ] && [ ! -e "$mig" ]; then
-      ${lib.concatStringsSep "\n      " (
-        lib.mapAttrsToList (a: k: shortcutLine [ "kineticwe" ] a k) kwinShortcuts
-      )}
-      ${set "rules.kwe" "comms" "desktops" "Desktop_2"}
-      touch "$mig"
-    fi
-    if [ -e "$marker" ] && [ ! -e "$kcfg/.migrated-force-desktops" ]; then
-      ${set "rules.kwe" "steam" "desktopsrule" 2}
-      ${set "rules.kwe" "comms" "desktopsrule" 2}
-      touch "$kcfg/.migrated-force-desktops"
-    fi
+    # Post-seed fixes, each run once (marker file).
     # 2.0 generated random desktop ids; "Desktop_2" matched nothing (→ all desktops).
     if [ -e "$marker" ] && [ ! -e "$kcfg/.migrated-desktop-ids" ]; then
       d2=$(${pkgs.kdePackages.kconfig}/bin/kreadconfig6 --file "$kcfg/kineticwe.kwe" --group Desktops --key Id_2)
@@ -345,11 +331,6 @@ let
         ${kwc} --file "$kcfg/rules.kwe" --group comms --key desktops "$d2"
       fi
       touch "$kcfg/.migrated-desktop-ids"
-    fi
-    # Game launcher windows skipped the initial screen rule.
-    if [ -e "$marker" ] && [ ! -e "$kcfg/.migrated-steam-screen-force" ]; then
-      ${set "rules.kwe" "steam" "screenrule" 2}
-      touch "$kcfg/.migrated-steam-screen-force"
     fi
     if [ -e "$marker" ] && [ ! -e "$kcfg/.migrated-screen-names" ]; then
       ${set "rules.kwe" "steam" "screen" "DP-2"}
