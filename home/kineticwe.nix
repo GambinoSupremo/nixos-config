@@ -382,7 +382,7 @@ let
     if [ -n "$surf" ]; then
       ${set "kineticwe.kwe" "Tiling" "TilingBorderColorSourceInactive" "Custom"}
       ${kwc} --file "$kcfg/kineticwe.kwe" --group Tiling --key TilingBorderColorInactive \
-        "$(printf '%d,%d,%d' 0x''${surf:0:2} 0x''${surf:2:2} 0x''${surf:4:2})"
+        "$(printf '%d,%d,%d' 0x"''${surf:0:2}" 0x"''${surf:2:2}" 0x"''${surf:4:2}")"
     else
       ${set "kineticwe.kwe" "Tiling" "TilingBorderColorSourceInactive" "SystemAccentFaded"}
     fi
