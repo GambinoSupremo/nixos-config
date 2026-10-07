@@ -38,156 +38,123 @@ let
     systemctl --user restart sunshine.service
   '';
 
+  # Hyprland's .conf fallback, written whole (hyprland.lua normally wins): the
+  # Noctalia colours source line, a minimal usable session, and on the desktop
+  # the scroll-overview plugin. Nix strips a leading blank line, hence the "\n".
+  hyprFallbackConf = pkgs.writeText "hyprland.conf" (
+    "\n"
+    + ''
+      source = optional:/home/gav/.config/hypr/noctalia/noctalia-colors.conf
+
+      # ── NixOS additions ─────────────────────────────────────────────────────────
+      # Minimal fallback so the session is never a dead end if hyprland.lua fails.
+      # NVIDIA wlroots vars scoped here so they don't poison KWin.
+      env = GBM_BACKEND,nvidia-drm
+      env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+      env = WLR_NO_HARDWARE_CURSORS,1
+      # Matched by EDID description (connector names renumber); wildcard catch-all.
+      monitor = desc:Dell Inc. Dell AW3423DW #tBszGDAYBQUH, 3440x1440@174, 0x0, 1
+      monitor = desc:Philips Consumer Electronics Company PHL 278E1 0x0000065F, 3840x2160@60, 3440x0, 1.5
+      monitor = , preferred, auto, 1
+      misc {
+          vrr = 2    # fullscreen-only (always-on gamma-flickers the QD-OLED)
+      }
+      exec-once = systemctl --user start noctalia.service
+      exec-once = sleep 5 && mullvad-exclude vesktop
+      bind = SUPER, Return, exec, ghostty
+      bind = SUPER, Q, killactive
+      bind = SUPER SHIFT, E, exit
+      bind = SUPER SHIFT, D, exec, mullvad-exclude vesktop
+      bind = SUPER, code:51, exec, noctalia msg panel-toggle control-center audio
+      # Per-app opacity, same values as niri
+      windowrule = match:class ^(signal)$, opacity 0.95 0.90
+      windowrule = match:class ^(vesktop)$, opacity 0.95 0.90
+      windowrule = match:class ^(obsidian)$, opacity 0.95 0.90
+    ''
+    + lib.optionalString (!isVM) (
+      "\n"
+      + ''
+        # ── scroll-overview plugin ───────────────────────────────────────────────────
+        plugin = ${scrollOverview}/lib/libscrolloverview.so
+        plugin {
+            scrolloverview {
+                scale = 0.5
+                workspace_gap = 100
+                layout = vertical
+            }
+        }
+        bind = SUPER, Tab, scrolloverview:overview, toggle
+      ''
+    )
+  );
+
+  # Desktop only; the dotfiles' hyprland.lua loads it with pcall(require, "nixos").
+  hyprNixosLua = pkgs.writeText "nixos.lua" ''
+    -- ── scroll-overview plugin (NixOS addition) ─────────────────────────────────
+    hl.on("hyprland.start", function()
+        hl.exec_cmd("hyprctl plugin load ${scrollOverview}/lib/libscrolloverview.so")
+    end)
+    hl.config({
+        plugin = {
+            scrolloverview = {
+                scale = 0.5,
+                workspace_gap = 100,
+                layout = "vertical",
+            },
+        },
+    })
+    -- Callback form defers the hl.plugin lookup to keypress time, after the
+    -- plugin has loaded.
+    hl.bind("SUPER + Tab", function()
+        hl.plugin.scrolloverview.overview("toggle")
+    end)
+  '';
+
   # Dotfiles copied for NixOS: Hyprland session bootstrap patch plus NixOS-only
   # additions. Files Noctalia regenerates are removed here and seeded writable below.
   dotfiles = pkgs.runCommandLocal "dotfiles-patched" { } ''
-        mkdir -p $out
-        for d in niri hypr ghostty; do
-          cp -r ${inputs.dotfiles}/$d $out/$d
-        done
-        chmod -R u+w $out
+    mkdir -p $out
+    for d in niri hypr ghostty; do
+      cp -r ${inputs.dotfiles}/$d $out/$d
+    done
+    chmod -R u+w $out
 
-        # Guarded sed: fail the build if the dotfiles no longer contain the line
-        # a patch targets, instead of silently deploying an unpatched config.
-        mustSed() { # mustSed <file> <grep-pattern> <sed-expression>
-          grep -q -e "$2" "$1" || {
-            echo "dotfiles patch FAILED: pattern not found in $1: $2" >&2
-            exit 1
-          }
-          sed -i -e "$3" "$1"
-        }
-
-        # ── niri ─────────────────────────────────────────────────────────────
-        # Keep the dotfiles' `spawn-at-startup "noctalia"`: under niri the session
-        # doesn't reliably reach graphical-session.target, so the service alone
-        # left niri with no shell.
-        # Append NixOS window-rule additions to niri config.
-        cat >> $out/niri/config.kdl <<'EOF'
-
-    // ── NixOS additions ──────────────────────────────────────────────────────────
-    // Per-app opacity: focused=0.95 unfocused=0.90
-    window-rule {
-        match app-id="signal"
-        match is-focused=true
-        opacity 0.95
+    # Guarded sed: fail the build if the dotfiles no longer contain the line
+    # a patch targets, instead of silently deploying an unpatched config.
+    mustSed() { # mustSed <file> <grep-pattern> <sed-expression>
+      grep -q -e "$2" "$1" || {
+        echo "dotfiles patch FAILED: pattern not found in $1: $2" >&2
+        exit 1
+      }
+      sed -i -e "$3" "$1"
     }
-    window-rule {
-        match app-id="signal"
-        match is-focused=false
-        opacity 0.90
-    }
-    window-rule {
-        match app-id="vesktop"
-        match is-focused=true
-        opacity 0.95
-    }
-    window-rule {
-        match app-id="vesktop"
-        match is-focused=false
-        opacity 0.90
-    }
-    window-rule {
-        match app-id="obsidian"
-        match is-focused=true
-        opacity 0.95
-    }
-    window-rule {
-        match app-id="obsidian"
-        match is-focused=false
-        opacity 0.90
-    }
-    EOF
 
-        # ── hypr ─────────────────────────────────────────────────────────────
-        # Hyprland prefers hyprland.lua over hyprland.conf, so the lua tree is the
-        # effective config; the hyprland.conf additions are only a fallback.
-        # Replace the async env-import exec_cmds with the sequential bootstrap.
-        mustSed $out/hypr/autostart.lua \
-          'hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")' \
-          's|hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")|hl.exec_cmd("${hyprSessionBootstrap}")|'
-        mustSed $out/hypr/autostart.lua \
-          'hl.exec_cmd("systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")' \
-          '/hl.exec_cmd("systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")/d'
+    # ── niri ─────────────────────────────────────────────────────────────
+    # Keep the dotfiles' `spawn-at-startup "noctalia"`: under niri the session
+    # doesn't reliably reach graphical-session.target, so the service alone
+    # left niri with no shell.
+    # ── hypr ─────────────────────────────────────────────────────────────
+    # hyprland.lua is the effective config; hyprland.conf is only a fallback.
+    cp ${hyprFallbackConf} $out/hypr/hyprland.conf
+    ${lib.optionalString (!isVM) "cp ${hyprNixosLua} $out/hypr/nixos.lua"}
+    # Replace the async env-import exec_cmds with the sequential bootstrap.
+    mustSed $out/hypr/autostart.lua \
+      'hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")' \
+      's|hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")|hl.exec_cmd("${hyprSessionBootstrap}")|'
+    mustSed $out/hypr/autostart.lua \
+      'hl.exec_cmd("systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")' \
+      '/hl.exec_cmd("systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")/d'
 
-        # Append a minimal usable fallback so the session is never a dead end.
-        cat >> $out/hypr/hyprland.conf <<'EOF'
+    # ── ghostty ──────────────────────────────────────────────────────────
+    # Runtime-generated by Noctalia — never deploy read-only (seeded instead)
+    rm $out/niri/noctalia.kdl
+    rm $out/ghostty/themes/noctalia
 
-    # ── NixOS additions ─────────────────────────────────────────────────────────
-    # Minimal fallback so the session is never a dead end if hyprland.lua fails.
-    # NVIDIA wlroots vars scoped here so they don't poison KWin.
-    env = GBM_BACKEND,nvidia-drm
-    env = __GLX_VENDOR_LIBRARY_NAME,nvidia
-    env = WLR_NO_HARDWARE_CURSORS,1
-    # Matched by EDID description (connector names renumber); wildcard catch-all.
-    monitor = desc:Dell Inc. Dell AW3423DW #tBszGDAYBQUH, 3440x1440@174, 0x0, 1
-    monitor = desc:Philips Consumer Electronics Company PHL 278E1 0x0000065F, 3840x2160@60, 3440x0, 1.5
-    monitor = , preferred, auto, 1
-    misc {
-        vrr = 2    # fullscreen-only (always-on gamma-flickers the QD-OLED)
-    }
-    exec-once = systemctl --user start noctalia.service
-    exec-once = sleep 5 && mullvad-exclude vesktop
-    bind = SUPER, Return, exec, ghostty
-    bind = SUPER, Q, killactive
-    bind = SUPER SHIFT, E, exit
-    bind = SUPER SHIFT, D, exec, mullvad-exclude vesktop
-    bind = SUPER, code:51, exec, noctalia msg panel-toggle control-center audio
-    # Per-app opacity, same values as niri
-    windowrule = match:class ^(signal)$, opacity 0.95 0.90
-    windowrule = match:class ^(vesktop)$, opacity 0.95 0.90
-    windowrule = match:class ^(obsidian)$, opacity 0.95 0.90
-    EOF
-
-        ${lib.optionalString (!isVM) ''
-                # scroll-overview — desktop only, wired into hyprland.lua + conf fallback.
-                # Unquoted heredocs: ''${scrollOverview} must interpolate.
-                cat >> $out/hypr/hyprland.lua <<EOF
-
-          -- ── scroll-overview plugin (NixOS addition) ─────────────────────────────────
-          hl.on("hyprland.start", function()
-              hl.exec_cmd("hyprctl plugin load ${scrollOverview}/lib/libscrolloverview.so")
-          end)
-          hl.config({
-              plugin = {
-                  scrolloverview = {
-                      scale = 0.5,
-                      workspace_gap = 100,
-                      layout = "vertical",
-                  },
-              },
-          })
-          -- Callback form defers the hl.plugin lookup to keypress time, after the
-          -- plugin has loaded.
-          hl.bind("SUPER + Tab", function()
-              hl.plugin.scrolloverview.overview("toggle")
-          end)
-          EOF
-
-                cat >> $out/hypr/hyprland.conf <<EOF
-
-          # ── scroll-overview plugin ───────────────────────────────────────────────────
-          plugin = ${scrollOverview}/lib/libscrolloverview.so
-          plugin {
-              scrolloverview {
-                  scale = 0.5
-                  workspace_gap = 100
-                  layout = vertical
-              }
-          }
-          bind = SUPER, Tab, scrolloverview:overview, toggle
-          EOF
-        ''}
-
-        # ── ghostty ──────────────────────────────────────────────────────────
-        # Runtime-generated by Noctalia — never deploy read-only (seeded instead)
-        rm $out/niri/noctalia.kdl
-        rm $out/ghostty/themes/noctalia
-
-        # No v4-era Noctalia invocations may reach the deployed dotfiles.
-        if grep -rn 'qs -c\|noctalia-shell ipc' $out; then
-          echo "dotfiles patch FAILED: v4 Noctalia references remain (see above)" >&2
-          exit 1
-        fi
+    # No v4-era Noctalia invocations may reach the deployed dotfiles.
+    if grep -rn 'qs -c\|noctalia-shell ipc' $out; then
+      echo "dotfiles patch FAILED: v4 Noctalia references remain (see above)" >&2
+      exit 1
+    fi
   '';
 in
 {
