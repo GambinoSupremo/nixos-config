@@ -22,9 +22,6 @@
   # QEMU guest agent — graceful shutdown, snapshot integration with Proxmox
   services.qemuGuest.enable = true;
 
-  # Wayland greeter — no reason for X11 in the VM.
-  services.displayManager.sddm.wayland.enable = true;
-
   # SPICE agent — clipboard passthrough + dynamic resolution in Proxmox console
   services.spice-vdagentd.enable = true;
 
