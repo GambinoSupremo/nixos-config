@@ -1,6 +1,6 @@
 # System-wide packages; anything owned by a NixOS module or HM programs.* is
 # deliberately absent. git + neovim duplicated on purpose for root/TTY recovery.
-{ config, pkgs, inputs, lib, ... }:
+{ pkgs, ... }:
 
 {
   environment.systemPackages = with pkgs; [

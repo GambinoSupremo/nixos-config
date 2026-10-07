@@ -78,7 +78,7 @@
     millennium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
   };
 
-  outputs = { self, nixpkgs, home-manager, noctalia, zen-browser, nixos-hardware, ... }@inputs:
+  outputs = { nixpkgs, home-manager, ... }@inputs:
   let
     # Shared home-manager config block applied to every host. (A commonOverlay
     # of throw-alias shims was removed 2026-07-14 — git history has it.)

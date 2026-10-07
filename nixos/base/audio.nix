@@ -1,5 +1,5 @@
 # PipeWire audio stack: ALSA + PulseAudio shims, WirePlumber, rtkit.
-{ config, pkgs, ... }:
+{ ... }:
 
 {
   # rtkit lets PipeWire claim real-time scheduling priority safely

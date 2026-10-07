@@ -6,7 +6,7 @@
   # Millennium isn't in nixpkgs. Only its own build uses the flake's pinned
   # nixpkgs (bun FOD); the Steam FHS env is wrapped from current nixpkgs.
   nixpkgs.overlays = [
-    (final: prev: {
+    (final: _prev: {
       millennium-steam = final.callPackage "${inputs.millennium}/steam.nix" {
         inherit (inputs.millennium.packages.${final.stdenv.hostPlatform.system}) millennium;
         # Steam guesses UI scale from the X11 primary at launch; Sunshine's 0mm virtual output made it huge.
