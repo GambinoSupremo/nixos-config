@@ -72,7 +72,6 @@
     xwayland-satellite # rootless Xwayland for pure-Wayland compositors
     xrandr
     wayland-protocols
-    uwsm # Wayland session manager (also used by niri session)
     # noctalia — v5, managed by the upstream HM module (programs.noctalia)
     #            in home/default.nix; runs as noctalia.service
 
