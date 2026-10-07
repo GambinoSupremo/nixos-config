@@ -124,10 +124,6 @@ telemetry_enabled = false
     save_to_file = false
     copy_to_clipboard = false
 
-[templates.vivaldi]
-input_path = "~/.config/noctalia/templates/vivaldi.css"
-output_path = "~/.cache/noctalia/vivaldi/vivaldi.css"
-
 [theme]
 builtin = "Gruvbox"
 community_palette = "Tokyo Night Moon"
