@@ -203,6 +203,20 @@ in
       force = true;
       text = "[Desktop Entry]\nHidden=true\n";
     };
+    # niri runs XDG autostart too; these duplicated its spawn-at-startup lines,
+    # and two Signals racing at login locked its database.
+    "autostart/signal.desktop" = {
+      force = true;
+      text = "[Desktop Entry]\nHidden=true\n";
+    };
+    "autostart/vesktop.desktop" = {
+      force = true;
+      text = "[Desktop Entry]\nHidden=true\n";
+    };
+    "autostart/tidal-hifi.desktop" = {
+      force = true;
+      text = "[Desktop Entry]\nHidden=true\n";
+    };
     # Ad-hoc nix-shell/nix-env read this instead of the system config
     # (nixpkgs.config.allowUnfree in nixos/base/core.nix).
     "nixpkgs/config.nix" = {
