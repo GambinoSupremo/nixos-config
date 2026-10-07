@@ -4,6 +4,12 @@
 
 let
   alienware = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH";
+  # Steam Controller puck (28de:1304): a controller paired to it grabs player 1 over Moonlight's pad.
+  puck = state: ''
+    for d in /sys/bus/usb/devices/*; do
+      [ "$(cat "$d/idVendor" 2>/dev/null):$(cat "$d/idProduct" 2>/dev/null)" = 28de:1304 ] && echo ${state} > "$d/authorized"
+    done
+  '';
   watchPid = "$XDG_RUNTIME_DIR/sunshine-game-watch.pid";
   # Put ws 2 (Steam + games) on SUNSHINE at the client mode. Fullscreen windows can block the
   # move, so drop fullscreen first, retry until ws 2 actually lands, then re-fullscreen games.
@@ -63,6 +69,7 @@ let
       hyprctl output destroy SUNSHINE >/dev/null 2>&1
       # Noctalia rewrites noctalia.lua on wallpaper changes; no auto-reload mid-stream.
       hyprctl eval 'hl.config({ misc = { disable_autoreload = true } })'
+      ${puck "0"}
       hyprctl output create headless SUNSHINE
       # Output appears asynchronously; mode/workspace calls before then silently fail.
       for _ in $(seq 50); do
@@ -84,12 +91,18 @@ let
       [ -n "$aw" ] && ${pkgs.xorg.xrandr}/bin/xrandr --output "$aw" --primary
       # Re-enable and pick up any theme changes made during the stream.
       hyprctl eval 'hl.config({ misc = { disable_autoreload = false } })'
+      ${puck "1"}
       hyprctl reload
       ;;
     esac
   '';
 in
 {
+  # Let the stream script (user) disconnect/reconnect the puck via sysfs.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="28de", ATTR{idProduct}=="1304", RUN+="${pkgs.coreutils}/bin/chgrp users /sys%p/authorized", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys%p/authorized"
+  '';
+
   services.sunshine = {
     enable = true;
     # CUDA build → NVENC encoding (default build falls back to CPU x264).
