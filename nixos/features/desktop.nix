@@ -37,8 +37,7 @@
       '';
     in
     pkgs.runCommand "${orig.name}-qkdetheme-fix" {
-      passthru = orig.passthru;
-      meta     = orig.meta;
+      inherit (orig) passthru meta;
     } ''
       cp -r ${orig} $out
       chmod -R u+w $out

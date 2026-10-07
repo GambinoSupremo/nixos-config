@@ -6,7 +6,7 @@
 # Then commit the result. The placeholders below will cause a build failure
 # intentionally so this isn't accidentally deployed without real hardware data.
 
-{ ... }:
+_:
 
 builtins.throw ''
   hosts/laptop/hardware-configuration.nix has not been generated yet.
