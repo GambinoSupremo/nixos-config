@@ -371,6 +371,7 @@
         "nixpkgs": "nixpkgs_3",
         "noctalia": "noctalia",
         "qylock": "qylock",
+        "wallpapers": "wallpapers",
         "zen-browser": "zen-browser"
       }
     },
@@ -401,6 +402,22 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "wallpapers": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791396483,
+        "narHash": "sha256-h0ZRPYHAbKji6xr+Dr6GITYNR2BA4n5VtB4Y21gerns=",
+        "owner": "GambinoSupremo",
+        "repo": "wallpapers",
+        "rev": "48c532415dc5ab91e5968c2091c9339f1514997d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "GambinoSupremo",
+        "repo": "wallpapers",
         "type": "github"
       }
     },
