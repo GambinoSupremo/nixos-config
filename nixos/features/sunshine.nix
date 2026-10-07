@@ -1,6 +1,6 @@
 # Sunshine (Moonlight streaming host). Each stream gets a headless virtual
 # display at the client's resolution/refresh; physical monitors stay on.
-{ config, lib, pkgs, ... }:
+{ pkgs, ... }:
 
 let
   alienware = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH";
@@ -79,7 +79,7 @@ let
       # Hypr rules pin Steam + games to workspace 2; lend it to the stream.
       ${lendWs2}
       # XWayland games size borderless windows from the X11 primary output.
-      ${pkgs.xorg.xrandr}/bin/xrandr --output SUNSHINE --primary
+      ${pkgs.xrandr}/bin/xrandr --output SUNSHINE --primary
       [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null
       setsid ${gameWatch} >/dev/null 2>&1 < /dev/null & echo $! > "${watchPid}"
       ;;
@@ -88,7 +88,7 @@ let
       hyprctl dispatch 'hl.dsp.workspace.move({ workspace = "2", monitor = "desc:${alienware}" })'
       hyprctl output destroy SUNSHINE
       aw=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.model == "Dell AW3423DW") | .name')
-      [ -n "$aw" ] && ${pkgs.xorg.xrandr}/bin/xrandr --output "$aw" --primary
+      [ -n "$aw" ] && ${pkgs.xrandr}/bin/xrandr --output "$aw" --primary
       # Re-enable and pick up any theme changes made during the stream.
       hyprctl eval 'hl.config({ misc = { disable_autoreload = false } })'
       ${puck "1"}
