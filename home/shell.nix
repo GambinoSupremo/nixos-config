@@ -28,25 +28,20 @@
     };
     # `update`/`dotsync` are functions, not aliases, so a bad upstream bump can
     # revert flake.lock instead of leaving the repo stuck on a revision that
-    # won't build. On a successful rebuild they also commit whatever's dirty
-    # in nixos-config (flake.lock plus any pending edits) and push — if it
-    # builds, it's a reasonable commit point, and this way the tree never
-    # sits dirty and origin never falls behind.
+    # won't build. On a successful rebuild they commit tracked changes in
+    # nixos-config (never untracked files; repo is public). Push is manual.
     functions = {
       _nixos-commit-dirty = ''
         set -l flake_dir $argv[1]
         set -l label $argv[2]
         if not git -C $flake_dir diff --quiet; or not git -C $flake_dir diff --cached --quiet
-            git -C $flake_dir add -A
+            git -C $flake_dir add -u
             git -C $flake_dir commit -m "$label: "(git -C $flake_dir diff --cached --name-only | string join ', ') >/dev/null
         end
-        # Push whatever's ahead of origin, including commits from earlier runs
-        # that never made it out.
-        git -C $flake_dir push
       '';
 
       # Checkpoint whatever's dirty in nixos-config as-is, no input bumps.
-      # Confirms it still builds first so a broken edit never gets pushed.
+      # Confirms it still builds first so a broken edit never gets committed.
       save = ''
         set -l flake_dir ~/nixos-config
         if nixos-rebuild build --flake $flake_dir#desktop
