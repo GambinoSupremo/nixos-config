@@ -3,12 +3,12 @@
 {
   pkgs,
   lib,
-  osConfig ? { },
+  host,
   ...
 }:
 
 let
-  isVM = osConfig.services.qemuGuest.enable or false;
+  inherit (host) isVM;
 in
 {
   # ── Mullvad VPN GUI ───────────────────────────────────────────────────────────
