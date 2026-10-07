@@ -291,7 +291,7 @@ in
   };
 
   # ── Wallpapers ───────────────────────────────────────────────────────────────
-  # Noctalia's settings.json points at ~/Pictures/backgrounds; read-only is fine.
+  # Noctalia reads this path from [wallpaper] directory in config.toml; read-only is fine.
   home.file."Pictures/backgrounds".source = "${inputs.wallpapers}";
 
   # ── Noctalia runtime seed ─────────────────────────────────────────────────────
@@ -313,12 +313,6 @@ in
       -- Seeded by home-manager; Noctalia overwrites with theme colors.
     ''} ${config.xdg.configHome}/hypr/noctalia.lua
 
-    # config.toml is owned by this repo (home/noctalia/config.toml); the filter
-    # guards against a copy reappearing in the dotfiles.
-    find ${inputs.dotfiles}/noctalia -type f -not -name "config.toml" -print0 \
-      | while IFS= read -r -d "" src; do
-          seedNoctalia "$src" "${config.xdg.configHome}/noctalia/''${src#${inputs.dotfiles}/noctalia/}"
-        done
     seedNoctalia ${./noctalia/config.toml} ${config.xdg.configHome}/noctalia/config.toml
   '';
 
