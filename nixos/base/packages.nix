@@ -83,7 +83,6 @@
     nordzy-icon-theme # in nixpkgs (pkgs/by-name) despite old AUR-only note
     adw-gtk3 # was adw-gtk-theme
     qt6Packages.qt6ct # top-level qt6ct became a throw alias 2025-10-27
-    libsForQt5.qt5ct
     kdePackages.breeze # was breeze
     # kvantum intentionally NOT system-wide: Plasma's Kirigami QML-imports it and
     # black-screens plasmashell. Want it elsewhere? Per-user + QT_STYLE_OVERRIDE.
