@@ -129,7 +129,12 @@ in
         name = "Steam Big Picture";
         image-path = "steam.png";
         detached = [ "setsid steam steam://open/bigpicture" ];
-        prep-cmd = [ { do = ""; undo = "setsid steam steam://close/bigpicture"; } ];
+        prep-cmd = [
+          {
+            do = "";
+            undo = "setsid steam steam://close/bigpicture";
+          }
+        ];
       }
       {
         name = "Desktop";
