@@ -1,6 +1,6 @@
 # Sunshine (Moonlight streaming host). Each stream gets a headless virtual
 # display at the client's resolution/refresh; physical monitors stay on.
-{ pkgs, ... }:
+{ pkgs, host, ... }:
 
 let
   alienware = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH";
@@ -109,7 +109,7 @@ in
     package = pkgs.sunshine.override { cudaSupport = true; };
     openFirewall = true;
     settings = {
-      sunshine_name = "gavos";
+      sunshine_name = host.hostName;
       # Pin to wlr screencopy — otherwise Sunshine probes the portal backend
       # too, popping the screen-share picker on every login.
       capture = "wlr";

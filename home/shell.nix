@@ -1,7 +1,7 @@
 # Shell stack: fish (aliases, greeting), starship, fzf, zoxide, bat.
 # The standalone fish config in the dotfiles repo is NOT deployed on NixOS;
 # this file is the single owner of interactive-shell behavior here.
-{ pkgs, ... }:
+{ pkgs, host, ... }:
 
 {
   # pokemon-colorscripts: shown on every new shell — CachyOS parity.
@@ -24,7 +24,7 @@
       tree = "eza --tree --icons --group-directories-first";
       cat = "bat --style=plain";
       grep = "rg";
-      rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#desktop";
+      rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${host.name}";
     };
     # `update`/`dotsync` are functions, not aliases, so a bad upstream bump can
     # revert flake.lock instead of leaving the repo stuck on a revision that
@@ -44,7 +44,7 @@
       # Confirms it still builds first so a broken edit never gets committed.
       save = ''
         set -l flake_dir ~/nixos-config
-        if nixos-rebuild build --flake $flake_dir#desktop
+        if nixos-rebuild build --flake $flake_dir#${host.name}
             _nixos-commit-dirty $flake_dir save
         else
             echo "build failed — nothing committed"
@@ -64,7 +64,7 @@
             return 1
         end
 
-        if sudo nixos-rebuild switch --flake $flake_dir#desktop
+        if sudo nixos-rebuild switch --flake $flake_dir#${host.name}
             rm $backup
             _nixos-commit-dirty $flake_dir update
             return
@@ -77,7 +77,7 @@
             cp $backup $lock
             set -l others (jq -r '.nodes.root.inputs | keys[] | select(. != "millennium")' $lock)
             if nix flake update $others --flake $flake_dir
-                and sudo nixos-rebuild switch --flake $flake_dir#desktop
+                and sudo nixos-rebuild switch --flake $flake_dir#${host.name}
                 rm $backup
                 _nixos-commit-dirty $flake_dir update
                 echo "note: Millennium held back (new upstream rev failed to build)"
@@ -104,7 +104,7 @@
             return 1
         end
 
-        if sudo nixos-rebuild switch --flake $flake_dir#desktop
+        if sudo nixos-rebuild switch --flake $flake_dir#${host.name}
             rm $backup
             _nixos-commit-dirty $flake_dir dotsync
         else

@@ -5,12 +5,12 @@
   pkgs,
   lib,
   inputs,
-  osConfig ? { },
+  host,
   ...
 }:
 
 let
-  isVM = osConfig.services.qemuGuest.enable or false;
+  inherit (host) isVM;
 
   # niri-style scrollable overview for Hyprland, built against pkgs.hyprland so
   # the plugin ABI matches (the upstream flake pins Hyprland master).

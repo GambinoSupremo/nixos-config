@@ -83,41 +83,52 @@
     let
       # Shared home-manager config block applied to every host. (A commonOverlay
       # of throw-alias shims was removed 2026-07-14 — git history has it.)
-      hmModule = {
-        home-manager = {
-          useGlobalPkgs = true;
-          useUserPackages = true;
-          extraSpecialArgs = { inherit inputs; };
-          users.gav = import ./home/default.nix;
-          # Pre-existing files that home-manager would clobber are moved aside
-          # as *.hm-bak instead of aborting the activation.
-          backupFileExtension = "hm-bak";
+      hmModule =
+        { host, ... }:
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            extraSpecialArgs = { inherit inputs host; };
+            users.gav = import ./home/default.nix;
+            # Pre-existing files that home-manager would clobber are moved aside
+            # as *.hm-bak instead of aborting the activation.
+            backupFileExtension = "hm-bak";
+          };
         };
-      };
+
+      # Per-host facts live only here; NixOS and home-manager get them as `host`
+      # (host.name is the flake output, which differs from hostName).
+      mkHost =
+        name:
+        { hostName, isVM }:
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            inherit inputs;
+            host = { inherit name hostName isVM; };
+          };
+          modules = [
+            ./nixos/hosts/${name}/configuration.nix
+            { networking.hostName = hostName; }
+            home-manager.nixosModules.home-manager
+            hmModule
+          ];
+        };
     in
     {
       nixosConfigurations = {
 
         # Proxmox VM — primary target for now
-        vm = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./nixos/hosts/vm/configuration.nix
-            home-manager.nixosModules.home-manager
-            hmModule
-          ];
+        vm = mkHost "vm" {
+          hostName = "nix-vm";
+          isVM = true;
         };
 
-        # Physical desktop — gavos
-        desktop = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./nixos/hosts/desktop/configuration.nix
-            home-manager.nixosModules.home-manager
-            hmModule
-          ];
+        # Physical desktop
+        desktop = mkHost "desktop" {
+          hostName = "gavos";
+          isVM = false;
         };
       };
     };
