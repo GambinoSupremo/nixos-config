@@ -1,5 +1,5 @@
 # Shell stack: fish (aliases, greeting), starship, fzf, zoxide, bat.
-# The standalone fish config in the dotfiles repo is NOT deployed on NixOS;
+# There is no fish config in the dotfiles repo;
 # this file is the single owner of interactive-shell behavior here.
 { pkgs, host, ... }:
 
