@@ -1,6 +1,6 @@
 # NVIDIA RTX 3090 Ti (desktop only): driver-branch pin, open kernel modules,
 # Wayland/gaming session env.
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
 {
   services.xserver.videoDrivers = [ "nvidia" ];

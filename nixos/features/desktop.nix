@@ -1,6 +1,6 @@
 # Graphical stack: SDDM plus Hyprland (primary), Niri (backup) and KineticWE,
 # with portals, keyring, and fonts.
-{ config, lib, pkgs, inputs, ... }:
+{ lib, pkgs, inputs, ... }:
 
 {
   imports = [ inputs.kineticwe.nixosModules.default ];
@@ -11,7 +11,7 @@
 
   # 2.0 lacks master's dontWrapQtApps fix for kdecoration-git; drop once merged.
   nixpkgs.overlays = lib.mkAfter [
-    (final: prev:
+    (final: _prev:
       let
         kwe = inputs.kineticwe.packages.${final.stdenv.hostPlatform.system};
         kdecoration = kwe.kdecoration.overrideAttrs { dontWrapQtApps = true; };

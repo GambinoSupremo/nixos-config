@@ -1,5 +1,5 @@
 # User account, groups, and login-shell registration.
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   users.users.gav = {

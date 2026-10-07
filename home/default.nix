@@ -1,6 +1,6 @@
 # Home-manager entry point for gav — external HM modules plus one
 # submodule per concern. Applied to every host via hmModule in flake.nix.
-{ inputs, ... }:
+{ ... }:
 
 {
   imports = [

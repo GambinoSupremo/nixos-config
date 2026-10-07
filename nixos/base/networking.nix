@@ -1,5 +1,5 @@
 # NetworkManager, nftables firewall, Mullvad daemon, systemd-resolved.
-{ config, pkgs, ... }:
+{ ... }:
 
 {
   networking = {
