@@ -88,7 +88,7 @@
       dejavu_fonts # was ttf-dejavu
       liberation_ttf # was ttf-liberation
       open-sans # was ttf-opensans
-      ttf_bitstream_vera # was ttf-bitstream-vera
+      ttf-bitstream-vera
       nerd-fonts.meslo-lg # was ttf-meslo-nerd; kept as fallback
       nerd-fonts.jetbrains-mono
     ];
