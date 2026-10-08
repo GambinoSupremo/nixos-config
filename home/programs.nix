@@ -76,7 +76,12 @@
   xdg.configFile."nvim".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Projects/dotfiles/nvim";
   home.sessionVariables.EDITOR = "nvim";
-  home.packages = [ (pkgs.writeShellScriptBin "vim" ''exec nvim "$@"'') ];
+  home.packages = [
+    (pkgs.writeShellScriptBin "vim" ''exec nvim "$@"'')
+    # nvim-treesitter (main branch) compiles parsers with these.
+    pkgs.gcc
+    pkgs.tree-sitter
+  ];
 
   # ── OBS Studio ───────────────────────────────────────────────────────────────
   # obs-vaapi → VA-API (NVDEC) encoding; obs-vkcapture → GPU-side game capture.
