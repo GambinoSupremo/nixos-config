@@ -64,13 +64,20 @@ let
       after_switch() {
         if [[ "$(readlink -f /run/booted-system/kernel)" != "$(readlink -f /run/current-system/kernel)" ]] ||
           [[ "$(readlink -f /run/booted-system/kernel-modules)" != "$(readlink -f /run/current-system/kernel-modules)" ]]; then
-          echo "Reboot needed: the kernel or kernel modules changed."
+          echo "Reboot needed (kernel or modules changed)"
+        else
+          echo "No reboot needed"
         fi
-        local failed
-        failed=$(systemctl --failed --no-legend --plain || true)
-        [[ -z "$failed" ]] || printf 'Failed system units:\n%s\n' "$failed"
-        failed=$(systemctl --user --failed --no-legend --plain || true)
-        [[ -z "$failed" ]] || printf 'Failed user units:\n%s\n' "$failed"
+        local sys usr
+        sys=$(systemctl --failed --no-legend --plain || true)
+        usr=$(systemctl --user --failed --no-legend --plain || true)
+        if [[ -z "$sys$usr" ]]; then
+          echo "No failed units"
+        else
+          echo "Failed units:"
+          [[ -z "$sys" ]] || printf '  system: %s\n' "''${sys//$'\n'/$'\n'  system: }"
+          [[ -z "$usr" ]] || printf '  user: %s\n' "''${usr//$'\n'/$'\n'  user: }"
+        fi
       }
 
       cmd_update() {
@@ -96,7 +103,11 @@ let
         fi
 
         if commit_lock "$msg"; then
-          git push -q || echo "Push failed. The commit is local; run git push yourself."
+          if git push -q; then
+            echo "Pushed to origin/main"
+          else
+            echo "Push failed (commit is local; run git push)"
+          fi
         fi
         after_switch
       }
