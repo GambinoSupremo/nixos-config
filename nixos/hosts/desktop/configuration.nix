@@ -43,11 +43,9 @@ in
     inputs.qylock.nixosModules.default
   ];
 
-  # CachyOS kernel (BORE + CachyOS patches), Zen 4 build for the 7800X3D.
-  # Pinned overlay = upstream's nixpkgs rev, so it hits their binary cache.
-  # Fallback: pkgs.linuxPackages_latest (mainline).
-  nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
-  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-zen4;
+  # Zen kernel from nixpkgs (desktop-tuned, on cache.nixos.org). CachyOS tuning
+  # stays in features/cachyos.nix; see DECISIONS.md for why the kernel changed.
+  boot.kernelPackages = pkgs.linuxPackages_zen;
 
   programs.qylock = {
     enable = true;

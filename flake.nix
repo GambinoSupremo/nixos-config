@@ -1,16 +1,11 @@
 {
   description = "gav's nixos configuration";
 
-  # Binary caches: noctalia + CachyOS kernel. Only the CachyOS one is also in
-  # core.nix nix.settings (daemon-wide); noctalia's applies only via this nixConfig.
+  # Noctalia's binary cache (applies via this nixConfig only).
   nixConfig = {
-    extra-substituters = [
-      "https://noctalia.cachix.org"
-      "https://attic.xuyh0120.win/lantian"
-    ];
+    extra-substituters = [ "https://noctalia.cachix.org" ];
     extra-trusted-public-keys = [
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
-      "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
     ];
   };
 
@@ -42,10 +37,6 @@
       url = "github:Darkkal44/qylock";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # CachyOS kernels (desktop host). `release` = built + cached by upstream CI.
-    # No nixpkgs.follows: its pinned overlay must match the cached builds.
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     # For the laptop's AMD module; follows keeps a second stale nixpkgs
     # copy out of the lock file.
