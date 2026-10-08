@@ -86,10 +86,12 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
   colour space (gamma 2.2), so it clamps to sRGB itself and the compositors
   send plain sRGB (`cm = "srgb"` in dotfiles hypr/monitor.lua). HDR is
   deliberately off until desktop HDR works with Moonlight/Sunshine streaming.
-- **keyd clipboard**: super+c/super+v are remapped to Ctrl-/Shift-Insert at
-  the kernel level for ALL sessions (base/services.nix). Compositor binds on
-  plain SUPER+C/V can never fire; binds with extra keys/modifiers
-  (SUPER+X, SUPER+CTRL+V) pass through keyd untouched.
+- **keyd edit keys**: Super+Z/X/C/V become Ctrl+Z / Shift+Delete /
+  Ctrl+Insert / Shift+Insert (undo, cut, copy, paste) at the kernel level for
+  ALL sessions (base/services.nix). keyd keeps any other held modifier, so
+  Super+Shift+Z arrives as Ctrl+Shift+Z (redo) and no compositor bind on Super
+  plus Z, X, C or V can ever fire. Ghostty maps Shift+Insert to clipboard paste
+  and Shift+Delete to copy (dotfiles ghostty/config).
 - **wlroots NVIDIA env vars** (`GBM_BACKEND`, `__GLX_VENDOR_LIBRARY_NAME`,
   `WLR_NO_HARDWARE_CURSORS`) are scoped per-compositor and must NEVER go
   into global sessionVariables — they black-screen KWin.
