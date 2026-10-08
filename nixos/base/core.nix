@@ -20,6 +20,8 @@
       # CachyOS kernel cache (nix-cachyos-kernel); noctalia's comes via flake nixConfig.
       extra-substituters = [ "https://attic.xuyh0120.win/lantian" ];
       extra-trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+      # That cache is IPv6-only, unreachable through Mullvad (IPv6 off); give up fast.
+      download-attempts = 2;
       experimental-features = [
         "nix-command"
         "flakes"
