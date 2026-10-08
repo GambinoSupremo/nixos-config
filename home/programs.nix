@@ -1,4 +1,4 @@
-# Per-app home-manager config: git, neovim, OBS, pywalfox, RAW mime defaults,
+# Per-app home-manager config: git, neovim (LazyVim link), OBS, pywalfox, RAW mime defaults,
 # and desktop-entry overrides (Signal keyring pin, Vesktop VPN bypass).
 {
   config,
@@ -71,13 +71,12 @@
   };
 
   # ── Neovim ───────────────────────────────────────────────────────────────────
-  # nvim dotfiles NOT deployed declaratively — lazy.nvim writes lazy-lock.json
-  # at runtime; clone/stow them manually.
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    vimAlias = true;
-  };
+  # LazyVim config linked live from the dotfiles checkout (not the pinned input)
+  # so lazy.nvim can write lazy-lock.json. neovim itself is in systemPackages.
+  xdg.configFile."nvim".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Projects/dotfiles/nvim";
+  home.sessionVariables.EDITOR = "nvim";
+  home.packages = [ (pkgs.writeShellScriptBin "vim" ''exec nvim "$@"'') ];
 
   # ── OBS Studio ───────────────────────────────────────────────────────────────
   # obs-vaapi → VA-API (NVDEC) encoding; obs-vkcapture → GPU-side game capture.
