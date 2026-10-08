@@ -12,8 +12,9 @@
   services.blueman.enable = true; # system tray + pairing GUI
 
   # ── Key remapping ─────────────────────────────────────────────────────────────
-  # keyd — kernel-level remapping. Super+C/V → Ctrl+Insert / Shift+Insert
-  # so universal clipboard shortcuts work across all apps including terminals.
+  # keyd — Mac-style edit keys in every app and terminal: Super+Z/X/C/V →
+  # undo, cut, copy, paste. Applies with Shift/Ctrl/Alt held too, so compositors
+  # must never bind Super with these letters.
   services.keyd = {
     enable = true;
     keyboards.default = {
@@ -22,6 +23,8 @@
         # Modifier combos must live in a layer named after the modifier —
         # [main] can't bind "super+c". Unlisted keys fall through with Super held.
         meta = {
+          z = "C-z";
+          x = "S-delete";
           c = "C-insert";
           v = "S-insert";
         };
