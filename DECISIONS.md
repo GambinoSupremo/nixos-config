@@ -79,6 +79,13 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   nothing in the closure uses electron 40. The check never fired because
   tidal-hifi is unfree and it evaluated without allowing unfree.
 
+## 2026-10-08
+- Kernel: CachyOS (nix-cachyos-kernel) → nixpkgs linuxPackages_zen. Its only
+  binary cache (attic.xuyh0120.win, the author's personal server) is IPv6-only,
+  and Mullvad runs with IPv6 off, so every build stalled on lookups and kernel
+  bumps would have compiled locally. The CachyOS tuning (zram, ananicy rules,
+  sysctls in features/cachyos.nix) doesn't need that input and stays.
+
 ## Unsure / watch
 - keyd passthrough claim (SUPER+CTRL+V works, plain SUPER+C/V consumed) is
   reasoned from keyd semantics + observed behavior, not live-tested yet.

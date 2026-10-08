@@ -17,9 +17,6 @@
     # Newest Nix release rather than nixpkgs' default.
     package = pkgs.nixVersions.latest;
     settings = {
-      # CachyOS kernel cache (nix-cachyos-kernel); noctalia's comes via flake nixConfig.
-      extra-substituters = [ "https://attic.xuyh0120.win/lantian" ];
-      extra-trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
       experimental-features = [
         "nix-command"
         "flakes"
