@@ -57,10 +57,7 @@ in
 
   services.displayManager.sddm.theme = lib.mkForce "pixel-dusk-city-webp";
   # qtimageformats provides the WebP decoder for the animated background.
-  services.displayManager.sddm.extraPackages = [
-    loginTheme
-    pkgs.qt6.qtimageformats
-  ];
+  services.displayManager.sddm.extraPackages = [ pkgs.qt6.qtimageformats ];
   environment.systemPackages = [ loginTheme ];
 
   # SDDM's Wayland greeter runs KWin as the `sddm` user, which never saw our

@@ -1,8 +1,8 @@
 {
   description = "gav's nixos configuration";
 
-  # Binary caches: noctalia + CachyOS kernel (also in core.nix nix.settings so
-  # root's daemon trusts them; listed here so the first rebuild already hits).
+  # Binary caches: noctalia + CachyOS kernel. Only the CachyOS one is also in
+  # core.nix nix.settings (daemon-wide); noctalia's applies only via this nixConfig.
   nixConfig = {
     extra-substituters = [
       "https://noctalia.cachix.org"

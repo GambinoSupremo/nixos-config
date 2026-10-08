@@ -40,8 +40,6 @@
     claude-code
     nil # Nix language server — Zed's Nix extension shells out to it
     jq # JSON CLI; required by niri
-    cmake
-    ninja
     python3
 
     # ── System utilities ──────────────────────────────────────────────────────
@@ -69,7 +67,6 @@
     fuzzel
     xwayland-satellite # rootless Xwayland for pure-Wayland compositors
     xrandr
-    wayland-protocols
     # noctalia — v5, managed by the upstream HM module (programs.noctalia)
     #            in home/default.nix; runs as noctalia.service
 

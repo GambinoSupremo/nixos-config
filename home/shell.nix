@@ -22,7 +22,7 @@
       la = "eza -la --icons --group-directories-first";
       ll = "eza -l --icons --group-directories-first";
       tree = "eza --tree --icons --group-directories-first";
-      cat = "bat --style=plain";
+      cat = "bat";
       grep = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${host.name}";
     };
