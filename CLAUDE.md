@@ -9,10 +9,12 @@ from the separate dotfiles repo; see README.md for the repo map.
   Co-Authored-By or any AI attribution.
 - Work on a branch (`cleanup/<topic>`), one commit per logical change.
   Gavin merges with `--ff-only`.
-- Never push this repo. Gavin pushes.
+- Never push this repo. Gavin pushes (his `update` helper pushes its own
+  flake.lock commit).
 - Never switch or test: no `nixos-rebuild switch/test`, no `sudo`, and don't
-  run the fish helpers `rebuild`, `update` or `dotsync` (they switch).
-  Gavin does that.
+  run the fish helpers `rebuild`, `update`, `dotsync` or `save` (they switch,
+  commit or push). Gavin does that. Their logic is the `nixos-sync` script in
+  home/shell.nix.
 - Do a read-only inventory first for anything big. Ask before anything
   irreversible (deleting files outside the repo, rewriting history, force).
 - Use `rg`. In fish `grep` is aliased to `rg`; use `command grep` for GNU grep.
