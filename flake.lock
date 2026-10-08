@@ -191,26 +191,6 @@
         "type": "github"
       }
     },
-    "noctalia": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1791491204,
-        "narHash": "sha256-BGYvicXIIoRdhe/jfQi9ha3xXyBq+YBZ6OHeSjen4eg=",
-        "owner": "noctalia-dev",
-        "repo": "noctalia-shell",
-        "rev": "bc35c455099c361814c040013985ff94935a2ab0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "noctalia-dev",
-        "repo": "noctalia-shell",
-        "type": "github"
-      }
-    },
     "qylock": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -241,7 +221,6 @@
         "millennium": "millennium",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_2",
-        "noctalia": "noctalia",
         "qylock": "qylock",
         "wallpapers": "wallpapers",
         "zen-browser": "zen-browser"

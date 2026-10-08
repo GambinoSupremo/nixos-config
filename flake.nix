@@ -1,27 +1,12 @@
 {
   description = "gav's nixos configuration";
 
-  # Noctalia's binary cache (applies via this nixConfig only).
-  nixConfig = {
-    extra-substituters = [ "https://noctalia.cachix.org" ];
-    extra-trusted-public-keys = [
-      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
-    ];
-  };
-
   inputs = {
     # Rolling unstable; NVIDIA driver branch selected in nixos/features/nvidia.nix.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # Noctalia v5 — native Wayland shell; homeModules.default provides
-    # programs.noctalia.* + the noctalia.service user unit.
-    noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

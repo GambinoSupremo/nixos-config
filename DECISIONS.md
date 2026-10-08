@@ -87,6 +87,11 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   sysctls in features/cachyos.nix) doesn't need that input and stays.
 - Mac-style edit keys: keyd [meta] now also maps z = C-z and x = S-delete.
   Compositor binds on Super+Z/X/C/V moved or removed in the dotfiles.
+- noctalia: dropped the noctalia flake input, its cachix cache and our two
+  patches (bar-capsule-blur, history-click-focus). The patched build could
+  never be cached, so every noctalia change meant a local compile.
+  home-manager's programs.noctalia now uses nixpkgs' noctalia (cache.nixos.org,
+  follows releases).
 
 ## Unsure / watch
 - keyd passthrough claim (SUPER+CTRL+V works, plain SUPER+C/V consumed) is

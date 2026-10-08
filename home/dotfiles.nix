@@ -159,19 +159,12 @@ let
 in
 {
   # ── Noctalia v5 ──────────────────────────────────────────────────────────────
-  # Upstream HM module runs noctalia.service (WantedBy graphical-session.target);
-  # settings left empty so ~/.config/noctalia/config.toml stays runtime-writable.
-  # package is the flake's own build, patched so compositor blur covers only the
-  # bar capsules (from Spike-dotfiles). Patching misses noctalia.cachix.org: local build per bump.
+  # home-manager's module runs noctalia.service with nixpkgs' noctalia (cached,
+  # follows releases). settings left empty so ~/.config/noctalia/config.toml stays
+  # runtime-writable.
   programs.noctalia = {
     enable = true;
     systemd.enable = true;
-    package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [
-        ./noctalia/bar-capsule-blur.patch
-        ./noctalia/history-click-focus.patch # history card click → open/focus sender app
-      ];
-    });
   };
 
   # ── Dotfiles deployment ───────────────────────────────────────────────────────

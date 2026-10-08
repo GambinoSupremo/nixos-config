@@ -55,6 +55,8 @@ from the separate dotfiles repo; see README.md for the repo map.
   adds NixOS-only bits. The two remaining `mustSed` calls (Hyprland session
   bootstrap in hypr/autostart.lua) fail the build if their source text
   changes, so change the dotfiles line and the patch together.
+- noctalia comes from nixpkgs via home-manager's `programs.noctalia` (no flake
+  input, no patches), so it's always downloaded, never compiled here.
 - Files Noctalia rewrites at runtime are seeded once as writable copies, not
   linked. Editing the repo copy doesn't change an existing live file.
 - Formatting-only commits (nixfmt) go in `.git-blame-ignore-revs`.
