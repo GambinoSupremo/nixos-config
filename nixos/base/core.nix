@@ -13,6 +13,13 @@
   i18n.defaultLocale = "en_US.UTF-8";
 
   # ── Nix ───────────────────────────────────────────────────────────────────────
+  # nh: progress tree + package diff for switches (used by update/dotsync).
+  # Cleaning stays with nix.gc below.
+  programs.nh = {
+    enable = true;
+    flake = "/home/gav/nixos-config";
+  };
+
   nix = {
     # Newest Nix release rather than nixpkgs' default.
     package = pkgs.nixVersions.latest;

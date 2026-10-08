@@ -48,7 +48,9 @@ save      # build-check, then commit tracked changes as-is (no switch, no push)
 ```
 
 `update`, `dotsync` and `save` are fish wrappers around `nixos-sync`
-(home/shell.nix). Each first makes sure ~/nixos-config is on an up-to-date
+(home/nixos-sync.sh, wired up in home/shell.nix). Switches go through `nh`
+(build progress tree, then a package diff). Each run's raw output is kept in
+`~/.cache/nixos-sync/last-<command>.log`, and the path is printed on failure. Each first makes sure ~/nixos-config is on an up-to-date
 `main`: it switches to `main` only from a clean tree, then `git pull --ff-only`,
 and stops with a message if either fails. `update` and `dotsync` also need a
 clean tree. If the update or rebuild fails, flake.lock is restored and nothing

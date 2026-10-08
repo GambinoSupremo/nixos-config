@@ -14,7 +14,7 @@ from the separate dotfiles repo; see README.md for the repo map.
 - Never switch or test: no `nixos-rebuild switch/test`, no `sudo`, and don't
   run the fish helpers `rebuild`, `update`, `dotsync` or `save` (they switch,
   commit or push). Gavin does that. Their logic is the `nixos-sync` script in
-  home/shell.nix.
+  home/nixos-sync.sh.
 - Do a read-only inventory first for anything big. Ask before anything
   irreversible (deleting files outside the repo, rewriting history, force).
 - Use `rg`. In fish `grep` is aliased to `rg`; use `command grep` for GNU grep.
