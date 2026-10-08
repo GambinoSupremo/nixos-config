@@ -66,8 +66,8 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
 ## Biweekly update ritual
 
 1. `nix flake update --flake ~/nixos-config` (don't rebuild yet).
-2. `git diff flake.lock` — note old→new revs for noctalia and
-   nixpkgs (niri + hyprland come from nixpkgs).
+2. `git diff flake.lock` — note old→new revs for nixpkgs (niri, hyprland
+   and noctalia all come from nixpkgs).
 3. Release-note check for config-breaking changes: niri, hyprland,
    noctalia.
 4. Migrate configs in the dotfiles repo if needed (respect the mustSed

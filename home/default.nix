@@ -4,7 +4,7 @@
 
 {
   imports = [
-    # One concern per file (noctalia uses HM's native module; package patched in dotfiles.nix)
+    # One concern per file (noctalia: HM's native module with nixpkgs' package)
     ./dotfiles.nix # compositor plumbing, dotfile patching, activation scripts
     ./shell.nix # fish, starship, fzf, zoxide, bat
     ./theming.nix # gtk, cursor
