@@ -59,6 +59,18 @@ let
       done
     done
   '';
+  # Kill whatever Steam is running (every process under its reaper), then back to Big Picture.
+  closeGame = pkgs.writeShellScript "sunshine-close-game" ''
+    tree() { echo "$1"; for c in $(${pkgs.procps}/bin/ps -o pid= --ppid "$1"); do tree "$c"; done; }
+    pids=$(${pkgs.procps}/bin/ps -eo pid=,args= | ${pkgs.gawk}/bin/awk '$2 ~ /\/reaper$/ && $3 == "SteamLaunch" { print $1 }' |
+      while read -r r; do tree "$r"; done)
+    if [ -n "$pids" ]; then
+      kill -TERM $pids 2>/dev/null
+      sleep 5
+      kill -KILL $pids 2>/dev/null
+    fi
+    steam steam://open/bigpicture
+  '';
   streamDisplay = pkgs.writeShellScript "sunshine-stream-display" ''
     # Hyprland-only; elsewhere Sunshine falls back to streaming monitor 0.
     [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ] || exit 0
@@ -129,6 +141,17 @@ in
         name = "Steam Big Picture";
         image-path = "steam.png";
         detached = [ "setsid steam steam://open/bigpicture" ];
+        prep-cmd = [
+          {
+            do = "";
+            undo = "setsid steam steam://close/bigpicture";
+          }
+        ];
+      }
+      {
+        name = "Close game";
+        image-path = "steam.png";
+        detached = [ "setsid ${closeGame}" ];
         prep-cmd = [
           {
             do = "";
