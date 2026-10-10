@@ -45,36 +45,35 @@ in
     }
   );
 
-  # ── Noctalia toasts off the Alienware while gaming ────────────────────────────
-  # Toast layer over a game steals the pointer lock; while one is fullscreen or open on
-  # the Alienware's workspace, move toasts to the Philips.
+  # ── Noctalia Do Not Disturb while gaming ──────────────────────────────────────
+  # A toast (or the config reload moving toasts used to need) breaks the game's pointer
+  # lock, so while a game is open or fullscreen on the Alienware, DND is on.
   systemd.user.services.noctalia-game-toasts = lib.mkIf (!isVM) (
     let
       jq = "${pkgs.jq}/bin/jq";
       watcher = pkgs.writeShellScript "noctalia-game-toasts" ''
-        f="$HOME/.local/state/noctalia/settings.toml"
         cur=unset
-        # $1 = monitors line for [notification], empty = all monitors.
-        set_toasts() {
+        # $1 = on|off. Leaves DND alone if you'd already turned it on yourself.
+        quiet() {
           [ "$1" = "$cur" ] && return
           cur=$1
-          [ -f "$f" ] || return
-          ${pkgs.gawk}/bin/awk -v line="$1" '
-            /^\[/ { sec = ($0 == "[notification]"); print; if (sec && line != "") print line; next }
-            sec && /^monitors = / { next }
-            { print }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
-          noctalia msg config-reload >/dev/null 2>&1
+          if [ "$1" = on ]; then
+            mine=$(noctalia msg notification-dnd-status 2>/dev/null)
+            [ "$mine" = off ] && noctalia msg notification-dnd-set on >/dev/null 2>&1
+          else
+            [ "''${mine:-}" = off ] && noctalia msg notification-dnd-set off >/dev/null 2>&1
+            mine=""
+          fi
         }
         apply() {
           mons=$(hyprctl monitors -j) || return
           ws=$(echo "$mons" | ${jq} '.[] | select(.model == "Dell AW3423DW") | .activeWorkspace.id')
-          phl=$(echo "$mons" | ${jq} -r '.[] | select(.model == "PHL 278E1") | .name')
-          if [ -n "$ws" ] && [ -n "$phl" ] &&
+          if [ -n "$ws" ] &&
              { hyprctl workspaces -j | ${jq} -e --argjson w "$ws" 'any(.[]; .id == $w and .hasfullscreen)' ||
                hyprctl clients -j | ${jq} -e --argjson w "$ws" 'any(.[]; .workspace.id == $w and (.class | test("^steam_app_|[.]exe$")))'; } >/dev/null; then
-            set_toasts "monitors = [ \"$phl\" ]"
+            quiet on
           else
-            set_toasts ""
+            quiet off
           fi
         }
         ${lib.optionalString mango ''
@@ -82,16 +81,15 @@ in
           mango_apply() {
             outs=$(${pkgs.wlr-randr}/bin/wlr-randr --json) || return
             aw=$(echo "$outs" | ${jq} -r '.[] | select(.model == "Dell AW3423DW") | .name')
-            phl=$(echo "$outs" | ${jq} -r '.[] | select(.model == "PHL 278E1") | .name')
-            if [ -n "$aw" ] && [ -n "$phl" ] &&
+            if [ -n "$aw" ] &&
                $mmsg get all-clients | ${jq} -e --arg m "$aw" 'any(.clients[]; .monitor == $m and .is_fullscreen and .is_visible)' >/dev/null; then
-              set_toasts "monitors = [ \"$phl\" ]"
+              quiet on
             else
-              set_toasts ""
+              quiet off
             fi
           }
         ''}
-        trap 'cur=unset; set_toasts ""; exit 0' TERM INT
+        trap 'cur=unset; quiet off; exit 0' TERM INT
         # Idles outside Hyprland/Mango sessions; reattaches if the compositor restarts.
         while :; do
           ${lib.optionalString mango ''
@@ -103,7 +101,7 @@ in
               mango_apply
               { $mmsg watch all-clients & $mmsg watch all-tags; } 2>/dev/null |
               while IFS= read -r _; do mango_apply; done
-              cur=unset; set_toasts ""
+              cur=unset; quiet off
               sleep 5
               continue
             fi
@@ -119,7 +117,7 @@ in
                 fullscreen|workspacev2|openwindow|closewindow|movewindowv2|moveworkspacev2|monitoraddedv2|monitorremovedv2) apply ;;
               esac
             done
-            cur=unset; set_toasts ""
+            cur=unset; quiet off
           fi
           sleep 5
         done
@@ -127,7 +125,7 @@ in
     in
     {
       Unit = {
-        Description = "Keep Noctalia toasts off the Alienware during fullscreen games";
+        Description = "Noctalia Do Not Disturb while a game is open on the Alienware";
         After = [ "graphical-session.target" ];
         PartOf = [ "graphical-session.target" ];
       };
