@@ -167,6 +167,14 @@ commit_lock() {
   ok "Committed: $1"
 }
 
+push_lock() {
+  if quiet git push; then
+    ok "Pushed to origin/main"
+  else
+    warn "Push failed (commit is local; run git push)"
+  fi
+}
+
 after_switch() {
   if [[ "$(readlink -f /run/booted-system/kernel)" != "$(readlink -f /run/current-system/kernel)" ]] ||
     [[ "$(readlink -f /run/booted-system/kernel-modules)" != "$(readlink -f /run/current-system/kernel-modules)" ]]; then
@@ -217,13 +225,7 @@ cmd_update() {
   ok "Switched to the new system"
 
   section "Wrapping up"
-  if commit_lock "$msg"; then
-    if quiet git push; then
-      ok "Pushed to origin/main"
-    else
-      warn "Push failed (commit is local; run git push)"
-    fi
-  fi
+  commit_lock "$msg" && push_lock
   after_switch
 }
 
@@ -244,7 +246,7 @@ cmd_dotsync() {
   ok "Switched to the new system"
 
   section "Wrapping up"
-  commit_lock "flake: update dotfiles" || true
+  commit_lock "flake: update dotfiles" && push_lock
   after_switch
 }
 
