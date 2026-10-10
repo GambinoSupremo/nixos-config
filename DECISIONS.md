@@ -93,7 +93,21 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   home-manager's programs.noctalia now uses nixpkgs' noctalia (cache.nixos.org,
   follows releases).
 
+## 2026-10-09
+- Mango back as a session, from nixpkgs (programs.mango, 0.17.5) instead of the
+  old mangowm flake input. systemd.packages links its mango-session.target.
+  The dotfiles mango/ was brought in line with Hyprland (binds, rules,
+  monitors, tags); home/dotfiles.nix deploys it with one mustSed (bootstrap).
+- Sunshine on Mango: create_virtual_output SUNSHINE + wlr-randr mode, then
+  tagmon the Steam windows onto it (tags are per monitor, so there's no
+  workspace to lend). monitor.conf's SUNSHINE rule makes it the X11 primary;
+  the mode survives reload_config. destroy_all_virtual_output strands windows
+  still on it (they come back only if SUNSHINE is recreated), so stop moves
+  them off first. The script picks Hyprland/Mango from XDG_CURRENT_DESKTOP.
+
 ## Unsure / watch
+- Mango session + Sunshine flow tested only against a headless Mango
+  (2026-10-09); first real login/stream not yet verified.
 - keyd passthrough claim (SUPER+CTRL+V works, plain SUPER+C/V consumed) is
   reasoned from keyd semantics + observed behavior, not live-tested yet.
   WRONG (2026-10-08, from keyd 2.6.0 source): a [meta] binding drops only
