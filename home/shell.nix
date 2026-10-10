@@ -14,7 +14,8 @@ let
       pkgs.nh
       pkgs.coreutils
       pkgs.gnused
-      pkgs.util-linux # script(1): keeps nh's progress tree on a TTY while logging
+      pkgs.util-linux # script(1): keeps the sudo prompt on a TTY while logging
+      pkgs.dix
     ];
     runtimeEnv.NIXOS_SYNC_HOST = host.name;
     text = builtins.readFile ./nixos-sync.sh;

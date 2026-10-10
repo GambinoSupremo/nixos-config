@@ -46,13 +46,70 @@ quiet() {
   return "$rc"
 }
 
-# Runs on the terminal (nh's progress tree needs a TTY) with a copy in the log.
+# Runs on the terminal (sudo needs a TTY) with a copy in the log.
 live() {
   printf '$ %s\n' "$*" >>"$log"
   SHELL="$BASH" script -qefa -c "$(printf '%q ' "$@")" "$log"
 }
 
-nh_switch() { live nh os switch "$flake_dir" -H "$host"; }
+# Build behind a one-line spinner; the build output only goes to the log.
+build_system() {
+  local attr="$flake_dir#nixosConfigurations.$host.config.system.build.toplevel"
+  local blog out pid rc=0 start=$SECONDS i=0 total started cur status
+  local -a frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+  blog=$(mktemp) out=$(mktemp)
+  nix build --no-link --print-out-paths --log-format raw "$attr" >"$out" 2>"$blog" &
+  pid=$!
+  while kill -0 "$pid" 2>/dev/null; do
+    if [[ -t 1 ]]; then
+      total=$(sed -nE 's/^these ([0-9]+) derivations will be built:$/\1/p; s/^this derivation will be built:$/1/p' "$blog" | tail -1)
+      started=$(sed -n "/^building '/p" "$blog" | wc -l)
+      cur=$(sed -nE "s|^building '/nix/store/[a-z0-9]{32}-(.*)\.drv'.*|\1|p" "$blog" | tail -1)
+      if [[ -n "$cur" ]]; then
+        status="Building $started/${total:-?}  ${cur:0:40}"
+      elif [[ -n "$(sed -n "/^copying path /{p;q}" "$blog")" ]]; then
+        status="Downloading"
+      else
+        status="Evaluating"
+      fi
+      printf '\r\e[K%s %s  %s%ss%s' "${frames[i++ % 10]}" "$status" "$bold" "$((SECONDS - start))" "$reset"
+    fi
+    sleep 0.15
+  done
+  wait "$pid" || rc=$?
+  [[ ! -t 1 ]] || printf '\r\e[K'
+  { printf '$ nix build %s\n' "$attr"; cat "$blog"; } >>"$log"
+  if ((rc == 0)); then
+    new_system=$(tail -n 1 "$out")
+    total=$(sed -nE 's/^these ([0-9]+) derivations will be built:$/\1/p; s/^this derivation will be built:$/1/p' "$blog" | tail -1)
+    ok "Built in $((SECONDS - start))s (${total:-0} to build, rest downloaded or cached)"
+  else
+    tail -n 30 "$blog" >&2
+  fi
+  rm -f "$blog" "$out"
+  return "$rc"
+}
+
+# dix's package diff without the store paths, path counts and total size.
+show_diff() {
+  local d
+  d=$(dix --color always /run/current-system "$new_system" 2>/dev/null |
+    sed -E '/(<<<|>>>|PATHS|SIZE)/d' | awk 'NF { if (n++ && gap) print ""; gap = 0; print; next } { gap = 1 }')
+  if [[ "$d" == *'['* ]]; then
+    printf '%s\n' "$d" | sed 's/^/  /'
+  else
+    ok "No package changes"
+  fi
+}
+
+new_system=""
+nh_switch() {
+  build_system || return
+  section "Changes"
+  show_diff
+  section "Activating"
+  live nh os switch "$new_system" --no-nom --diff never -q
+}
 
 # One line per changed root input: name, old → new short rev, date of the new one.
 print_changes() {
@@ -141,7 +198,7 @@ cmd_update() {
   quiet nix flake update --flake "$flake_dir" || restore_and_die "nix flake update failed."
   print_changes "$backup" flake.lock
 
-  section "Switching ($host)"
+  section "Building ($host)"
   local msg="flake: update inputs"
   if ! nh_switch; then
     # Millennium's bun hash often goes stale upstream; retry with it held back.
@@ -182,7 +239,7 @@ cmd_dotsync() {
   quiet nix flake update dotfiles --flake "$flake_dir" || restore_and_die "Dotfiles update failed."
   print_changes "$backup" flake.lock
 
-  section "Switching ($host)"
+  section "Building ($host)"
   nh_switch || restore_and_die "Switch failed."
   ok "Switched to the new system"
 
