@@ -32,11 +32,12 @@ home/                     # home-manager for gav (shared by all hosts):
 
 ## Sessions
 
-SDDM (Wayland greeter on kwin, qylock theme) with two sessions.
-**Hyprland is the daily driver** (`defaultSession`), Niri the backup.
-Noctalia v5 is the bar/shell, run as
-`noctalia.service` (upstream HM module). MangoWM was dropped 2026-09-24; KDE
-Plasma is not installed.
+SDDM (Wayland greeter on kwin, qylock theme) with three sessions.
+**Hyprland is the default** (`defaultSession`); Mango (nixpkgs, back
+2026-10-09) mirrors its binds/rules and streams to Moonlight the same way;
+Niri is the backup (Moonlight gets the ultrawide, no virtual output).
+Noctalia v5 is the bar/shell, run as `noctalia.service` (upstream HM module).
+KDE Plasma is not installed.
 
 ## Rebuild
 
