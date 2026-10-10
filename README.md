@@ -32,7 +32,7 @@ home/                     # home-manager for gav (shared by all hosts):
 
 SDDM (Wayland greeter on kwin, qylock theme). **Hyprland is the only
 session by default.** Mango and Niri are off but kept: flip
-`gav.sessions.mango` / `.niri` in nixos/features/desktop.nix to bring one
+`gav.sessions.mango` / `.niri` in nixos/base/desktop.nix to bring one
 back (dotfiles deploy, Noctalia seeds and Sunshine follow). Mango mirrors
 Hyprland's binds/rules and streams to Moonlight the same way; Niri gets the
 ultrawide on Moonlight (no virtual output).

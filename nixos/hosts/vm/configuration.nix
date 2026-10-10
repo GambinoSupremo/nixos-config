@@ -5,13 +5,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../base/core.nix
-    ../../base/users.nix
-    ../../base/networking.nix
-    ../../features/desktop.nix
-    ../../base/audio.nix
-    ../../base/services.nix
-    ../../base/packages.nix
+    ../../base
   ];
 
   boot.loader.grub.enable = true;

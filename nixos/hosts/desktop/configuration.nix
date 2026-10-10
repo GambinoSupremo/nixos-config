@@ -30,13 +30,7 @@ in
   imports = [
     ./hardware-configuration.nix
     ../../features/nvidia.nix
-    ../../base/core.nix
-    ../../base/users.nix
-    ../../base/networking.nix
-    ../../features/desktop.nix
-    ../../base/audio.nix
-    ../../base/services.nix
-    ../../base/packages.nix
+    ../../base
     ../../features/gaming.nix
     ../../features/sunshine.nix
     ../../features/tuning.nix
