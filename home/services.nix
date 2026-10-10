@@ -46,7 +46,8 @@ in
   );
 
   # ── Noctalia toasts off the Alienware while gaming ────────────────────────────
-  # Toast layer over a fullscreen game steals the pointer lock; move toasts to the Philips.
+  # Toast layer over a game steals the pointer lock; while one is fullscreen or open on
+  # the Alienware's workspace, move toasts to the Philips.
   systemd.user.services.noctalia-game-toasts = lib.mkIf (!isVM) (
     let
       jq = "${pkgs.jq}/bin/jq";
@@ -69,7 +70,8 @@ in
           ws=$(echo "$mons" | ${jq} '.[] | select(.model == "Dell AW3423DW") | .activeWorkspace.id')
           phl=$(echo "$mons" | ${jq} -r '.[] | select(.model == "PHL 278E1") | .name')
           if [ -n "$ws" ] && [ -n "$phl" ] &&
-             hyprctl workspaces -j | ${jq} -e --argjson w "$ws" 'any(.[]; .id == $w and .hasfullscreen)' >/dev/null; then
+             { hyprctl workspaces -j | ${jq} -e --argjson w "$ws" 'any(.[]; .id == $w and .hasfullscreen)' ||
+               hyprctl clients -j | ${jq} -e --argjson w "$ws" 'any(.[]; .workspace.id == $w and (.class | test("^steam_app_|[.]exe$")))'; } >/dev/null; then
             set_toasts "monitors = [ \"$phl\" ]"
           else
             set_toasts ""
@@ -114,7 +116,7 @@ in
             ${pkgs.socat}/bin/socat -U - UNIX-CONNECT:"$sock" 2>/dev/null |
             while IFS= read -r ev; do
               case "''${ev%%>>*}" in
-                fullscreen|workspacev2|closewindow|movewindowv2|moveworkspacev2|monitoraddedv2|monitorremovedv2) apply ;;
+                fullscreen|workspacev2|openwindow|closewindow|movewindowv2|moveworkspacev2|monitoraddedv2|monitorremovedv2) apply ;;
               esac
             done
             cur=unset; set_toasts ""
