@@ -229,4 +229,5 @@ hide_when_no_unread = true
 drawer = true
 
 [widget.workspaces]
+label_source = "name"
 hide_when_empty = true
