@@ -1,5 +1,5 @@
-# CachyOS system tuning (cachyos-settings equivalents): zram, ananicy-cpp with
-# CachyOS rules, VM/IO sysctls. Kernel itself is set in hosts/desktop.
+# System tuning borrowed from CachyOS: zram, ananicy-cpp with its rules, and
+# VM/IO sysctls. The kernel itself is set in hosts/desktop.
 { pkgs, ... }:
 
 {
