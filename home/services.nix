@@ -73,9 +73,33 @@ in
             set_toasts ""
           fi
         }
+        mmsg=${pkgs.mango}/bin/mmsg
+        mango_apply() {
+          outs=$(${pkgs.wlr-randr}/bin/wlr-randr --json) || return
+          aw=$(echo "$outs" | ${jq} -r '.[] | select(.model == "Dell AW3423DW") | .name')
+          phl=$(echo "$outs" | ${jq} -r '.[] | select(.model == "PHL 278E1") | .name')
+          if [ -n "$aw" ] && [ -n "$phl" ] &&
+             $mmsg get all-clients | ${jq} -e --arg m "$aw" 'any(.clients[]; .monitor == $m and .is_fullscreen and .is_visible)' >/dev/null; then
+            set_toasts "monitors = [ \"$phl\" ]"
+          else
+            set_toasts ""
+          fi
+        }
         trap 'cur=unset; set_toasts ""; exit 0' TERM INT
-        # Idles outside Hyprland sessions; reattaches if Hyprland restarts.
+        # Idles outside Hyprland/Mango sessions; reattaches if the compositor restarts.
         while :; do
+          msock=$(ls -t "$XDG_RUNTIME_DIR"/mango-*.sock 2>/dev/null | head -1)
+          if [ -n "$msock" ] && MANGO_INSTANCE_SIGNATURE=$msock $mmsg get version >/dev/null 2>&1; then
+            export MANGO_INSTANCE_SIGNATURE=$msock
+            # wlr-randr needs the session's display; the unit may predate it.
+            export WAYLAND_DISPLAY=$(systemctl --user show-environment | sed -n 's/^WAYLAND_DISPLAY=//p')
+            mango_apply
+            { $mmsg watch all-clients & $mmsg watch all-tags; } 2>/dev/null |
+            while IFS= read -r _; do mango_apply; done
+            cur=unset; set_toasts ""
+            sleep 5
+            continue
+          fi
           sig=$(ls -t "$XDG_RUNTIME_DIR/hypr" 2>/dev/null | head -1)
           sock="$XDG_RUNTIME_DIR/hypr/$sig/.socket2.sock"
           if [ -n "$sig" ] && [ -S "$sock" ]; then
