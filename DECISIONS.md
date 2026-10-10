@@ -104,6 +104,10 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   the mode survives reload_config. destroy_all_virtual_output strands windows
   still on it (they come back only if SUNSHINE is recreated), so stop moves
   them off first. The script picks Hyprland/Mango from XDG_CURRENT_DESKTOP.
+- Mango and Niri off by default (2026-10-09) behind gav.sessions.{mango,niri}.
+  Mango streamed ~55 fps vs 120 on Hyprland, and Hyprland got per-monitor
+  workspaces + layouts, so neither is needed day to day. Turned on, the build
+  matches the old always-on one (dotfiles-patched identical).
 
 ## Unsure / watch
 - Mango session + Sunshine flow tested only against a headless Mango
