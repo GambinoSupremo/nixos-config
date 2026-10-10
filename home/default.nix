@@ -8,9 +8,8 @@
     ./dotfiles.nix # compositor plumbing, dotfile patching, activation scripts
     ./shell.nix # fish, starship, fzf, zoxide, bat
     ./theming.nix # gtk, cursor
-    ./programs.nix # git, neovim, obs, signal, pywalfox
+    ./programs.nix # zen, git, neovim, obs, satty, signal, vesktop
     ./services.nix # mullvad-gui + noctalia-game-toasts user services
-    ./zen.nix # Zen Browser — declarative profile, extensions, policies
   ];
 
   home.username = "gav";
