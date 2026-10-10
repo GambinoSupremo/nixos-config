@@ -71,17 +71,13 @@ let
     fi
     steam steam://open/bigpicture
   '';
-  streamDisplay = pkgs.writeShellScript "sunshine-stream-display" ''
-    # Hyprland-only; elsewhere Sunshine falls back to streaming monitor 0.
-    [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ] || exit 0
-
+  hyprStream = pkgs.writeShellScript "sunshine-hypr-stream" ''
     case "$1" in
     start)
       # Clear a leftover from a stream whose undo never ran.
       hyprctl output destroy SUNSHINE >/dev/null 2>&1
       # Noctalia rewrites noctalia.lua on wallpaper changes; no auto-reload mid-stream.
       hyprctl eval 'hl.config({ misc = { disable_autoreload = true } })'
-      ${puck "0"}
       hyprctl output create headless SUNSHINE
       # Output appears asynchronously; mode/workspace calls before then silently fail.
       for _ in $(seq 50); do
@@ -103,10 +99,95 @@ let
       [ -n "$aw" ] && ${pkgs.xrandr}/bin/xrandr --output "$aw" --primary
       # Re-enable and pick up any theme changes made during the stream.
       hyprctl eval 'hl.config({ misc = { disable_autoreload = false } })'
-      ${puck "1"}
       hyprctl reload
       ;;
     esac
+  '';
+
+  # ── Mango ──────────────────────────────────────────────────────────────────
+  # Mango tags are per monitor, so move the Steam windows themselves. monitor.conf's
+  # SUNSHINE rule makes it the X11 primary; its mode survives config reloads.
+  mmsg = "${pkgs.mango}/bin/mmsg";
+  isSteam = ''.appid == "steam" or (.appid | startswith("steam_app_"))'';
+  mangoLend = pkgs.writeShellScript "sunshine-mango-lend" ''
+    jq=${pkgs.jq}/bin/jq
+    ${pkgs.wlr-randr}/bin/wlr-randr --output SUNSHINE \
+      --custom-mode "''${SUNSHINE_CLIENT_WIDTH:-1920}x''${SUNSHINE_CLIENT_HEIGHT:-1080}@''${SUNSHINE_CLIENT_FPS:-60}Hz"
+    # Runtime rules (later wins over rule.conf) so new Steam windows open on the stream.
+    ${mmsg} dispatch 'setoption,windowrule,tags:2,monitor:SUNSHINE,appid:^steam$'
+    ${mmsg} dispatch 'setoption,windowrule,tags:2,monitor:SUNSHINE,appid:^steam_app_'
+    ${mmsg} get all-clients | $jq -r '.clients[] | select((${isSteam}) and .monitor != "SUNSHINE") | .id' |
+    while read -r id; do
+      ${mmsg} dispatch tagmon,SUNSHINE,1 "client,$id"
+    done
+    ${mmsg} dispatch focusmon,SUNSHINE
+    ${mmsg} dispatch view,2,0
+    ${mmsg} get all-clients | $jq -r '.clients[] | select((.appid | startswith("steam_app_")) and (.is_fullscreen or .is_floating | not)) | .id' |
+    while read -r id; do
+      ${mmsg} dispatch togglefullscreen "client,$id"
+    done
+  '';
+  # Pull stray games onto the stream (Noctalia's theme apply reloads Mango, dropping the
+  # runtime rules) and fullscreen each new one, like gameWatch.
+  mangoGameWatch = pkgs.writeShellScript "sunshine-mango-game-watch" ''
+    jq=${pkgs.jq}/bin/jq
+    seen=" "
+    ${mmsg} watch all-clients | while IFS= read -r ev; do
+      while read -r id mon; do
+        [ -n "$id" ] || continue
+        [ "$mon" = SUNSHINE ] || ${mmsg} dispatch tagmon,SUNSHINE,1 "client,$id" >/dev/null
+        case "$seen" in *" $id "*) continue ;; esac
+        seen="$seen$id "
+        sleep 1
+        ${mmsg} get client "$id" | $jq -e '.is_fullscreen or .is_floating' >/dev/null ||
+          ${mmsg} dispatch togglefullscreen "client,$id" >/dev/null
+      done <<< "$(echo "$ev" | $jq -r '.clients[]? | select(.appid | startswith("steam_app_")) | "\(.id) \(.monitor)"')"
+    done
+  '';
+  mangoStream = pkgs.writeShellScript "sunshine-mango-stream" ''
+    jq=${pkgs.jq}/bin/jq
+    onStream() { ${mmsg} get all-clients | $jq -r '.clients[] | select(.monitor == "SUNSHINE") | .id'; }
+    case "$1" in
+    start)
+      # Reuse a leftover from a stream whose undo never ran; windows on it stay put.
+      if ! ${mmsg} get all-monitors | $jq -e 'any(.monitors[]; .name == "SUNSHINE")' >/dev/null; then
+        ${mmsg} dispatch create_virtual_output,SUNSHINE
+        for _ in $(seq 50); do
+          ${mmsg} get all-monitors | $jq -e 'any(.monitors[]; .name == "SUNSHINE")' >/dev/null && break
+          sleep 0.1
+        done
+      fi
+      ${mangoLend}
+      [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null
+      setsid ${mangoGameWatch} >/dev/null 2>&1 < /dev/null & echo $! > "${watchPid}"
+      ;;
+    stop)
+      [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null; rm -f "${watchPid}"
+      # Windows left on a destroyed output are stranded until it comes back; move them all first.
+      for _ in $(seq 10); do
+        ids=$(onStream)
+        [ -n "$ids" ] || break
+        for id in $ids; do
+          ${mmsg} dispatch 'tagmon,model:Dell AW3423DW,1' "client,$id" >/dev/null
+        done
+        sleep 0.2
+      done
+      [ -z "$(onStream)" ] && ${mmsg} dispatch destroy_all_virtual_output
+      # Drops the stream's runtime window rules.
+      ${mmsg} dispatch reload_config
+      ;;
+    esac
+  '';
+
+  streamDisplay = pkgs.writeShellScript "sunshine-stream-display" ''
+    [ "$1" = start ] && { ${puck "0"} }
+    # Elsewhere (niri) Sunshine falls back to streaming monitor 0.
+    case "$XDG_CURRENT_DESKTOP" in
+    Hyprland) ${hyprStream} "$1" ;;
+    mango) ${mangoStream} "$1" ;;
+    esac
+    [ "$1" = stop ] && { ${puck "1"} }
+    exit 0
   '';
 in
 {
