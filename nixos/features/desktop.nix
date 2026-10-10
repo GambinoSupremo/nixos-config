@@ -1,6 +1,7 @@
-# Graphical stack: SDDM plus Hyprland (primary) and Niri (backup), with
+# Graphical stack: SDDM plus Hyprland (primary), Mango and Niri, with
 # portals, keyring, and fonts.
 {
+  config,
   lib,
   pkgs,
   ...
@@ -8,8 +9,10 @@
 
 {
   # ── Compositors ───────────────────────────────────────────────────────────────
-  # MangoWM disabled 2026-09-24; its HM deploy/patching removed 2026-10-01
-  # (re-enable: mangowm input + its NixOS/HM modules, see git history).
+  # Mango — nixpkgs module registers the session + wlr portal config. Its
+  # mango-session.target ships in share/systemd/user, which the module doesn't link.
+  programs.mango.enable = true;
+  systemd.packages = [ config.programs.mango.package ];
 
   # Niri — backup; nixpkgs module registers session + portal config.
   programs.niri.enable = true;
