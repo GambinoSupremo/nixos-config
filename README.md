@@ -10,22 +10,23 @@ input, patched for NixOS at build time.
 ```
 flake.nix                 # inputs + nixosConfigurations (desktop, vm)
 nixos/
-  base/                   # imported by every host: core (locale/nix/GC),
-                          # users, networking (+mullvad daemon), audio
-                          # (pipewire), services (keyd, bluetooth, ...),
-                          # packages (systemPackages)
-  features/               # opt-in per host:
-    desktop.nix           #   SDDM + Hyprland (+ optional Mango/Niri) + portals + fonts
-    nvidia.nix            #   driver pin + Wayland env (desktop host)
+  base/                   # every host (default.nix lists them):
+                          #   core (nix/locale/GC), users, networking
+                          #   (+Mullvad), desktop (SDDM, Hyprland, optional
+                          #   Mango/Niri, portals, fonts), audio, services
+                          #   (keyd, bluetooth, ...), packages
+  features/               # desktop PC extras:
+    nvidia.nix            #   driver pin + Wayland env
     gaming.nix            #   Steam/gamescope/gamemode/novpn
     sunshine.nix          #   Moonlight host + virtual stream display
+    tuning.nix            #   zram, ananicy, sysctls (borrowed from CachyOS)
   hosts/
     desktop/              # gavos — physical machine
     vm/                   # Proxmox VM
 home/                     # home-manager for gav (shared by all hosts):
                           #   dotfiles.nix (dotfile patching/deployment — the
-                          #   heart of the repo), shell, theming, programs,
-                          #   services, zen, noctalia/config.toml
+                          #   heart of the repo), shell, theming, programs
+                          #   (incl. Zen), services, noctalia/
 ```
 
 ## Sessions

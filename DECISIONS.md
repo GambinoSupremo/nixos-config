@@ -41,8 +41,7 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   dropped, so these are now the only in-repo record.
 - pywalfox-native in systemPackages: kept for the CLI; the HM native-host
   json references the store path directly and doesn't need it.
-- defaultSession = "hyprland" despite Mango being the daily driver — as
-  found; deliberate choice, not cleanup material.
+- defaultSession = "hyprland": Hyprland is the daily driver (Mango/Niri off).
 - /etc/nixos pre-flake leftovers: since removed (empty as of 2026-10-01).
 
 ## 2026-08-03
@@ -109,9 +108,12 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   workspaces + layouts, so neither is needed day to day. Turned on, the build
   matches the old always-on one (dotfiles-patched identical).
 
+- Condense (2026-10-09): cachyos.nix renamed tuning.nix; laptop host,
+  amd.nix and the nixos-hardware input removed (never built); base/default.nix
+  lists the shared modules and desktop.nix moved into base; zen.nix folded into
+  programs.nix with prefs instead of extra policies (Sync owns extensions).
+
 ## Unsure / watch
-- Mango session + Sunshine flow tested only against a headless Mango
-  (2026-10-09); first real login/stream not yet verified.
 - keyd passthrough claim (SUPER+CTRL+V works, plain SUPER+C/V consumed) is
   reasoned from keyd semantics + observed behavior, not live-tested yet.
   WRONG (2026-10-08, from keyd 2.6.0 source): a [meta] binding drops only
