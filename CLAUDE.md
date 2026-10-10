@@ -51,8 +51,8 @@ from the separate dotfiles repo; see README.md for the repo map.
   Dotfiles changes only land after they're pushed and
   `nix flake update dotfiles` is run. To test unpushed dotfiles, build with
   `--override-input dotfiles path:/home/gav/Projects/dotfiles`.
-- home/dotfiles.nix copies niri/, hypr/ and ghostty/ from the dotfiles and
-  adds NixOS-only bits. The two remaining `mustSed` calls (Hyprland session
+- home/dotfiles.nix copies hypr/ and ghostty/ (plus mango/ and niri/ when
+  `gav.sessions` enables them) from the dotfiles and adds NixOS-only bits. The two remaining `mustSed` calls (Hyprland session
   bootstrap in hypr/autostart.lua) fail the build if their source text
   changes, so change the dotfiles line and the patch together.
 - noctalia comes from nixpkgs via home-manager's `programs.noctalia` (no flake

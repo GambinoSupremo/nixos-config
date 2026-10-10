@@ -1,6 +1,12 @@
 # Sunshine (Moonlight streaming host). Each stream gets a headless virtual
 # display at the client's resolution/refresh; physical monitors stay on.
-{ pkgs, host, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  host,
+  ...
+}:
 
 let
   alienware = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH";
@@ -184,7 +190,7 @@ let
     # Elsewhere (niri) Sunshine falls back to streaming monitor 0.
     case "$XDG_CURRENT_DESKTOP" in
     Hyprland) ${hyprStream} "$1" ;;
-    mango) ${mangoStream} "$1" ;;
+    ${lib.optionalString config.gav.sessions.mango ''mango) ${mangoStream} "$1" ;;''}
     esac
     [ "$1" = stop ] && { ${puck "1"} }
     exit 0

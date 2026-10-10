@@ -15,7 +15,7 @@ nixos/
                           # (pipewire), services (keyd, bluetooth, ...),
                           # packages (systemPackages)
   features/               # opt-in per host:
-    desktop.nix           #   SDDM + Hyprland/Niri sessions + portals + fonts
+    desktop.nix           #   SDDM + Hyprland (+ optional Mango/Niri) + portals + fonts
     nvidia.nix            #   driver pin + Wayland env (desktop host)
     amd.nix               #   laptop-only GPU config
     gaming.nix            #   Steam/gamescope/gamemode/novpn
@@ -32,10 +32,12 @@ home/                     # home-manager for gav (shared by all hosts):
 
 ## Sessions
 
-SDDM (Wayland greeter on kwin, qylock theme) with three sessions.
-**Hyprland is the default** (`defaultSession`); Mango (nixpkgs, back
-2026-10-09) mirrors its binds/rules and streams to Moonlight the same way;
-Niri is the backup (Moonlight gets the ultrawide, no virtual output).
+SDDM (Wayland greeter on kwin, qylock theme). **Hyprland is the only
+session by default.** Mango and Niri are off but kept: flip
+`gav.sessions.mango` / `.niri` in nixos/features/desktop.nix to bring one
+back (dotfiles deploy, Noctalia seeds and Sunshine follow). Mango mirrors
+Hyprland's binds/rules and streams to Moonlight the same way; Niri gets the
+ultrawide on Moonlight (no virtual output).
 Noctalia v5 is the bar/shell, run as `noctalia.service` (upstream HM module).
 KDE Plasma is not installed.
 
