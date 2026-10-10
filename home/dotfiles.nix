@@ -12,7 +12,7 @@
 
 let
   inherit (host) isVM;
-  sessions = osConfig.gav.sessions; # nixos/features/desktop.nix
+  sessions = osConfig.gav.sessions; # nixos/base/desktop.nix
   configDirs = [
     "hypr"
     "ghostty"
