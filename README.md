@@ -17,13 +17,11 @@ nixos/
   features/               # opt-in per host:
     desktop.nix           #   SDDM + Hyprland (+ optional Mango/Niri) + portals + fonts
     nvidia.nix            #   driver pin + Wayland env (desktop host)
-    amd.nix               #   laptop-only GPU config
     gaming.nix            #   Steam/gamescope/gamemode/novpn
     sunshine.nix          #   Moonlight host + virtual stream display
   hosts/
     desktop/              # gavos — physical machine
     vm/                   # Proxmox VM
-    laptop/               # spare AMD laptop; NOT wired into flake outputs
 home/                     # home-manager for gav (shared by all hosts):
                           #   dotfiles.nix (dotfile patching/deployment — the
                           #   heart of the repo), shell, theming, programs,

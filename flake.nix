@@ -23,13 +23,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # For the laptop's AMD module; follows keeps a second stale nixpkgs
-    # copy out of the lock file.
-    nixos-hardware = {
-      url = "github:NixOS/nixos-hardware/master";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Consumed as a plain source tree and built against the system Hyprland so
     # the plugin ABI matches (the repo's own flake targets Hyprland master).
     hyprland-scroll-overview = {
