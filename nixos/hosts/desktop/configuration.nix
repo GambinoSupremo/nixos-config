@@ -39,12 +39,12 @@ in
     ../../base/packages.nix
     ../../features/gaming.nix
     ../../features/sunshine.nix
-    ../../features/cachyos.nix
+    ../../features/tuning.nix
     inputs.qylock.nixosModules.default
   ];
 
   # Zen kernel from nixpkgs (desktop-tuned, on cache.nixos.org). CachyOS tuning
-  # stays in features/cachyos.nix; see DECISIONS.md for why the kernel changed.
+  # stays in features/tuning.nix; see DECISIONS.md for why the kernel changed.
   boot.kernelPackages = pkgs.linuxPackages_zen;
 
   programs.qylock = {
