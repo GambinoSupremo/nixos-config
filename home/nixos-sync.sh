@@ -238,7 +238,8 @@ cmd_dotsync() {
   cp flake.lock "$backup"
 
   section "Updating dotfiles"
-  quiet nix flake update dotfiles --flake "$flake_dir" || restore_and_die "Dotfiles update failed."
+  # --refresh: Nix caches the GitHub branch for an hour, so a fresh push can be missed.
+  quiet nix flake update dotfiles --refresh --flake "$flake_dir" || restore_and_die "Dotfiles update failed."
   print_changes "$backup" flake.lock
 
   section "Building ($host)"
