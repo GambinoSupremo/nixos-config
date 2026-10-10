@@ -34,13 +34,14 @@ let
     done
     hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })'
     sleep 0.5
-    hyprctl clients -j | $jq -r '.[] | select((.class | startswith("steam_app_")) and .fullscreen == 0) | .address' |
+    hyprctl clients -j | $jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and .fullscreen == 0) | .address' |
     while read -r a; do
       hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
       hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
     done
   '';
   # XWayland games sometimes map on the wrong workspace despite the ws-2 rule; pull them back.
+  # Proton Wayland games (PROTON_ENABLE_WAYLAND=1) are named after the exe, hence [.]exe.
   gameWatch = pkgs.writeShellScript "sunshine-game-watch" ''
     ${pkgs.socat}/bin/socat -U - UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" |
     while IFS= read -r ev; do
@@ -51,14 +52,14 @@ let
         continue
       fi
       case "$ev" in openwindow\>\>*|movewindowv2\>\>*) ;; *) continue ;; esac
-      hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | startswith("steam_app_")) and .workspace.name != "2") | .address' |
+      hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and .workspace.name != "2") | .address' |
       while read -r a; do
         hyprctl dispatch "hl.dsp.window.move({ workspace = \"2\", window = \"address:$a\", follow = true })"
       done
       # Games launched mid-stream open windowed under fullscreen Big Picture; bring them over it.
       case "$ev" in openwindow\>\>*) ;; *) continue ;; esac
       sleep 1
-      hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | startswith("steam_app_")) and .fullscreen == 0 and (.floating | not)) | .address' |
+      hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and .fullscreen == 0 and (.floating | not)) | .address' |
       while read -r a; do
         hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
         hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
