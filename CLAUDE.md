@@ -7,13 +7,13 @@ from the separate dotfiles repo; see README.md for the repo map.
 
 - Commit messages and comments read like a person wrote them. Never add
   Co-Authored-By or any AI attribution.
-- Work on a branch (`cleanup/<topic>`), one commit per logical change.
-  Gavin merges with `--ff-only`.
-- Never push this repo. Gavin pushes (his `update` helper pushes its own
-  flake.lock commit).
+- Work on a branch (`cleanup/<topic>`) based on current `main`, one commit
+  per logical change. Gavin lands it with `apply`, which only handles one
+  waiting branch per repo, so put one request's commits on one branch.
+- Never push this repo. Gavin's `apply` and `update` helpers push it.
 - Never switch or test: no `nixos-rebuild switch/test`, no `sudo`, and don't
-  run the fish helpers `rebuild`, `update`, `dotsync` or `save` (they switch,
-  commit or push). Gavin does that. Their logic is the `nixos-sync` script in
+  run the fish helpers `apply`, `rebuild`, `update`, `dotsync` or `save`
+  (they switch, commit or push). Gavin does that. Their logic is the `nixos-sync` script in
   home/nixos-sync.sh.
 - Do a read-only inventory first for anything big. Ask before anything
   irreversible (deleting files outside the repo, rewriting history, force).

@@ -1,4 +1,4 @@
-# nixos-sync update|dotsync|save — backs the fish helpers in home/shell.nix.
+# nixos-sync apply|update|dotsync|save — backs the fish helpers in home/shell.nix.
 # NIXOS_SYNC_HOST (the flake output name) is set by writeShellApplication.
 
 flake_dir="$HOME/nixos-config"
@@ -132,9 +132,10 @@ print_changes() {
   done <<<"$changes"
 }
 
-# Be on an up-to-date main. Only switch branches with a clean tree.
+# Be on an up-to-date main (in $1, default nixos-config). Only switch branches
+# with a clean tree.
 preflight() {
-  cd "$flake_dir"
+  cd "${1:-$flake_dir}"
   local branch before
   branch=$(git branch --show-current)
   if [[ "$branch" != main ]]; then
@@ -154,7 +155,7 @@ preflight() {
 
 require_clean() {
   [[ -z "$(git status --porcelain)" ]] ||
-    die "$flake_dir has uncommitted changes. Commit them (or run save) first."
+    die "$PWD has uncommitted changes. Commit them (or run save) first."
 }
 
 # Commit flake.lock and nothing else; no-op when it didn't change.
@@ -229,6 +230,99 @@ cmd_update() {
   after_switch
 }
 
+# Fast-forward main to the one cleanup/* branch with commits main lacks.
+# Sets landed to its name, or empty when there was nothing to land.
+landed=""
+land_branch() {
+  local b
+  local -a branches pending=()
+  landed=""
+  mapfile -t branches < <(git for-each-ref --format='%(refname:short)' refs/heads/cleanup/)
+  for b in "${branches[@]}"; do
+    [[ "$(git cherry main "$b")" != *+* ]] || pending+=("$b")
+  done
+  case ${#pending[@]} in
+    0) ok "No new branch from Claude" ;;
+    1)
+      quiet git merge --ff-only "${pending[0]}" ||
+        die "main moved on since '${pending[0]}' was made. Ask Claude to rebase it."
+      landed=${pending[0]}
+      ok "Merged $landed"
+      ;;
+    *) die "More than one branch waiting (${pending[*]}). Ask Claude to sort them out." ;;
+  esac
+}
+
+# Delete cleanup/* branches, local and on origin, that are fully on main.
+prune_branches() {
+  local b
+  local -a branches
+  mapfile -t branches < <(git for-each-ref --format='%(refname:short)' refs/heads/cleanup/)
+  for b in "${branches[@]}"; do
+    [[ "$(git cherry main "$b")" == *+* ]] || { git branch -q -D "$b" && ok "Deleted branch $b"; }
+  done
+  mapfile -t branches < <(git for-each-ref --format='%(refname:lstrip=3)' refs/remotes/origin/cleanup/)
+  for b in "${branches[@]}"; do
+    [[ "$(git cherry main "origin/$b")" == *+* ]] && continue
+    if quiet git push origin --delete "$b"; then
+      ok "Deleted branch $b on GitHub"
+    else
+      warn "Couldn't delete $b on GitHub"
+    fi
+  done
+}
+
+# Everything Claude left: land its branch in each repo, push dotfiles,
+# refresh the dotfiles pin, switch, then push nixos-config.
+cmd_apply() {
+  start_log apply
+  local before dot_dir="$HOME/Projects/dotfiles"
+  section "Checking ~/nixos-config"
+  preflight
+  require_clean
+  before=$(git rev-parse HEAD)
+  backup=$(mktemp)
+  cp flake.lock "$backup"
+  land_branch
+
+  if [[ -d "$dot_dir/.git" ]]; then
+    section "Checking ~/Projects/dotfiles"
+    preflight "$dot_dir"
+    require_clean
+    land_branch
+    if [[ -n "$(git rev-list origin/main..main)" ]]; then
+      quiet git push || die "Couldn't push dotfiles. Nothing else was changed."
+      ok "Pushed dotfiles"
+    fi
+    prune_branches
+    cd "$flake_dir"
+  fi
+
+  section "Updating dotfiles pin"
+  quiet nix flake update dotfiles --refresh --flake "$flake_dir" || {
+    git reset -q --hard "$before"
+    die "Dotfiles update failed. ~/nixos-config is back where it was."
+  }
+  print_changes "$backup" flake.lock
+
+  section "Building ($host)"
+  if ! nh_switch; then
+    git reset -q --hard "$before"
+    die "Build failed. Your system didn't change and ~/nixos-config is back where it was. Show Claude this."
+  fi
+  ok "Switched to the new system"
+
+  section "Wrapping up"
+  commit_lock "flake: update dotfiles" || true
+  if quiet git push; then
+    ok "Pushed to origin/main"
+    prune_branches
+  else
+    warn "Push failed (commits are local; run git push)"
+  fi
+  after_switch
+}
+
 cmd_dotsync() {
   start_log dotsync
   section "Checking ~/nixos-config"
@@ -266,8 +360,9 @@ cmd_save() {
 }
 
 case "${1:-}" in
+  apply) cmd_apply ;;
   update) cmd_update ;;
   dotsync) cmd_dotsync ;;
   save) cmd_save ;;
-  *) die "usage: nixos-sync update|dotsync|save" ;;
+  *) die "usage: nixos-sync apply|update|dotsync|save" ;;
 esac
