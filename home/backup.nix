@@ -51,7 +51,7 @@ let
           echo "Stopped. Nothing was created; run nas-backup-setup again."
           exit 1
         fi
-        rclone config create pcloud-crypt crypt remote=pcloud:NAS-Backup password="$pw" --obscure >/dev/null
+        rclone config create pcloud-crypt crypt remote=pcloud:Gavin/NAS-Backup password="$pw" --obscure >/dev/null
       fi
       echo "✓ Encryption set up"
 
