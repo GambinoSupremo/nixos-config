@@ -10,6 +10,7 @@
     ./theming.nix # gtk, cursor
     ./programs.nix # zen, git, neovim, obs, satty, signal, vesktop
     ./services.nix # mullvad-gui + noctalia-game-toasts user services
+    ./backup.nix # nightly encrypted NAS Personal → pCloud backup (desktop)
   ];
 
   home.username = "gav";
