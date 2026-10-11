@@ -84,6 +84,7 @@
 
     # ── Applications ─────────────────────────────────────────────────────────
     obsidian
+    pcloud # pCloud Drive (Electron); unfree
     signal-desktop
     vesktop # Discord
     element-desktop
