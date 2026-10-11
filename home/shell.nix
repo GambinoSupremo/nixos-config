@@ -4,7 +4,7 @@
 { pkgs, host, ... }:
 
 let
-  # Backs the update/dotsync/save fish functions. writeShellApplication runs
+  # Backs the apply/update/dotsync/save fish functions. writeShellApplication runs
   # shellcheck at build time.
   nixosSync = pkgs.writeShellApplication {
     name = "nixos-sync";
@@ -44,9 +44,10 @@ in
       grep = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${host.name}";
     };
-    # update: main + clean + pull, update all inputs, switch, commit only
-    # flake.lock and push. dotsync/save: same checks, commit but never push.
+    # apply: land Claude's branches, switch, push. update: main + clean + pull,
+    # update all inputs, switch, commit only flake.lock and push.
     functions = {
+      apply = "${nixosSync}/bin/nixos-sync apply";
       update = "${nixosSync}/bin/nixos-sync update";
       dotsync = "${nixosSync}/bin/nixos-sync dotsync";
       save = "${nixosSync}/bin/nixos-sync save";
