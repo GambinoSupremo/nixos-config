@@ -60,6 +60,7 @@ in
     # Nautilus sidebar pins; file is a read-only symlink, so add pins here, not via Ctrl+D.
     gtk3.bookmarks = [
       "smb://gavin@10.0.0.117/plexmedia NAS"
+      "smb://gavin@10.0.0.117/Personal Personal NAS"
       "file://${config.home.homeDirectory}/Downloads"
       "file://${config.home.homeDirectory}/Documents"
       "file://${config.home.homeDirectory}/Pictures"
