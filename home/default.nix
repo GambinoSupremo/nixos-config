@@ -9,7 +9,7 @@
     ./shell.nix # fish, starship, fzf, zoxide, bat
     ./theming.nix # gtk, cursor
     ./programs.nix # zen, git, neovim, obs, satty, signal, vesktop
-    ./services.nix # mullvad-gui + noctalia-game-toasts user services
+    ./services.nix # mullvad-gui user service
     ./backup.nix # nightly encrypted NAS Personal → pCloud backup (desktop)
     ./plex-log.nix # Plex webhooks → Obsidian Movies/TV notes (desktop)
     ./kobo-sync.nix # kobo-sync: Kobo reading log → Obsidian Books notes (desktop)
