@@ -12,6 +12,7 @@
     ./services.nix # mullvad-gui + noctalia-game-toasts user services
     ./backup.nix # nightly encrypted NAS Personal → pCloud backup (desktop)
     ./plex-log.nix # Plex webhooks → Obsidian Movies/TV notes (desktop)
+    ./kobo-sync.nix # kobo-sync: Kobo reading log → Obsidian Books notes (desktop)
   ];
 
   home.username = "gav";
