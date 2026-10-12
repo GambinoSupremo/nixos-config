@@ -59,6 +59,9 @@ in
     "L+ /var/lib/sddm/.config/kwinoutputconfig.json - - - - ${./sddm-kwinoutputconfig.json}"
   ];
 
+  # Plex webhooks for the Obsidian watch log (home/plex-log.nix); LAN interface only.
+  networking.firewall.interfaces.enp7s0.allowedTCPPorts = [ 8765 ];
+
   # systemd-boot: plain but instant. (Tried themed GRUB 2026-07-09, reverted —
   # the menu load lag wasn't worth cosmetics on a menu that's hidden anyway.)
   boot.loader.systemd-boot.enable = true;
