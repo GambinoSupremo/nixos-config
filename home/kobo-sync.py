@@ -1,5 +1,5 @@
-# Kobo reading log -> Obsidian Collections/Books notes. Reads a copy of KoboReader.sqlite
-# (never the device itself); covers come from Open Library and are saved in the vault.
+# Kobo reading log -> Obsidian Collections/Books notes, for books you've opened. Reads a copy
+# of KoboReader.sqlite; covers come from the Kobo itself (Open Library as a fallback).
 import json
 import os
 import re
@@ -13,6 +13,8 @@ import urllib.request
 KOBO, VAULT = sys.argv[1], sys.argv[2]
 BOOKS = os.path.join(VAULT, "Collections", "Books")
 POSTERS = os.path.join(VAULT, "Attachments", "Posters")
+# Books already imported; a note you delete stays deleted instead of coming back.
+SEEN = os.path.join(os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"), "kobo-sync-seen.json")
 KEYS = ["title", "author", "coverUrl", "read", "started", "finished", "personalRating"]
 norm = lambda t: re.sub(r"[^a-z0-9]", "", t.lower().split(":")[0].replace("&", "and"))  # noqa: E731
 
@@ -22,7 +24,24 @@ def fetch(url):
         return r.read()
 
 
-def cover(title, author, name):
+def kobo_covers():
+    """ImageId -> largest cover file the Kobo has cached for it."""
+    best = {}
+    for root, _, files in os.walk(os.path.join(KOBO, ".kobo-images")):
+        for f in files:
+            p = os.path.join(root, f)
+            iid = f.split(" - ")[0]
+            if iid not in best or os.path.getsize(p) > os.path.getsize(best[iid]):
+                best[iid] = p
+    return best
+
+
+def cover(title, author, name, image_id):
+    fname = re.sub(r'[\\/:*?"<>|#^\[\]]', "", name) + ".jpg"
+    os.makedirs(POSTERS, exist_ok=True)
+    if image_id in COVERS:
+        shutil.copy(COVERS[image_id], os.path.join(POSTERS, fname))
+        return f"[[{fname}]]"
     try:
         q = urllib.parse.urlencode({"title": title.split(":")[0], "author": author.split(",")[0],
                                     "limit": 1, "fields": "cover_i"})
@@ -33,8 +52,6 @@ def cover(title, author, name):
     except Exception as e:
         print(f"  (no cover for {title}: {e})")
         return ""
-    fname = re.sub(r'[\\/:*?"<>|#^\[\]]', "", name) + ".jpg"
-    os.makedirs(POSTERS, exist_ok=True)
     with open(os.path.join(POSTERS, fname), "wb") as f:
         f.write(data)
     return f"[[{fname}]]"
@@ -76,17 +93,20 @@ with tempfile.TemporaryDirectory() as tmpdir:
     db_path = os.path.join(tmpdir, "KoboReader.sqlite")
     shutil.copy(os.path.join(KOBO, ".kobo", "KoboReader.sqlite"), db_path)
     db = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    # Opened books only; downloaded-but-unopened ones are Kobo Plus/wishlist browsing.
     rows = db.execute("""SELECT Title, Attribution, ReadStatus, DateLastRead, LastTimeStartedReading,
-                                LastTimeFinishedReading, IsDownloaded
+                                LastTimeFinishedReading, ImageId
                          FROM content WHERE ContentType = 6
-                           AND (ReadStatus > 0 OR IsDownloaded = 'true')""").fetchall()
+                           AND (ReadStatus > 0 OR IFNULL(DateLastRead, '') != ''
+                                OR IFNULL(LastTimeStartedReading, '') != '')""").fetchall()
     db.close()
 
 # One entry per title: the furthest status and the earliest start wins.
 books = {}
-for title, author, status, last, started, finished, _ in rows:
+COVERS = kobo_covers()
+for title, author, status, last, started, finished, image_id in rows:
     b = books.setdefault(norm(title), {"title": title, "author": author or "", "status": 0,
-                                       "started": "", "finished": ""})
+                                       "started": "", "finished": "", "image": image_id})
     day = lambda t: (t or "")[:10]  # noqa: E731
     if status == 2 and status >= b["status"]:
         b["finished"] = max(b["finished"], day(finished) or day(last))
@@ -100,16 +120,20 @@ for f in os.listdir(BOOKS):
     if f.endswith(".md"):
         existing[norm(value(read_note(os.path.join(BOOKS, f))[0], "title") or f[:-3])] = os.path.join(BOOKS, f)
 
+seen = set(json.load(open(SEEN))) if os.path.exists(SEEN) else set()
 created = updated = 0
 for key, b in sorted(books.items()):
     path = existing.get(key)
+    if not path and key in seen:
+        continue
+    seen.add(key)
     if path:
         blocks, order, body = read_note(path)
     else:
         name = f"{b['title'].split(':')[0]} - {b['author'].split(',')[0]}".strip(" -")
         path = os.path.join(BOOKS, re.sub(r'[\\/:*?"<>|#^\[\]]', "", name) + ".md")
         new = {"title": b["title"], "author": b["author"].replace(",", ", "),
-               "coverUrl": cover(b["title"], b["author"], name), "read": False,
+               "coverUrl": cover(b["title"], b["author"], name, b["image"]), "read": False,
                "started": "", "finished": "", "personalRating": 0}
         blocks = {k: [f"{k}: {json.dumps(new[k], ensure_ascii=False)}"] for k in KEYS}
         order, body = list(KEYS), ""
@@ -117,6 +141,8 @@ for key, b in sorted(books.items()):
         print(f"  new: {b['title']}")
     before = dict(blocks)
 
+    if not value(blocks, "coverUrl"):
+        put(blocks, order, "coverUrl", cover(b["title"], b["author"], os.path.basename(path)[:-3], b["image"]) or "")
     if b["started"] and not value(blocks, "started"):
         put(blocks, order, "started", b["started"])
     if b["status"] == 2:
@@ -131,4 +157,7 @@ for key, b in sorted(books.items()):
         print(f"  updated: {b['title']}")
     write_note(path, blocks, order, body)
 
+os.makedirs(os.path.dirname(SEEN), exist_ok=True)
+with open(SEEN, "w") as f:
+    json.dump(sorted(seen), f)
 print(f"Kobo: {len(books)} books, {created} new notes, {updated} updated.")
