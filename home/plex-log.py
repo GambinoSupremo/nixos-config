@@ -18,18 +18,52 @@ MEDIA_DB = os.path.join(VAULT, ".obsidian/plugins/obsidian-media-db-plugin/data.
 KEYS = ["title", "year", "image", "watched", "started", "lastWatched", "personalRating"]
 
 
-def omdb(title, kind, imdb=None):
+def fetch(url):
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "plex-log/1.0"}), timeout=10) as r:
+        return r.read()
+
+
+def lookup(title, kind, imdb=None):
+    """Title, Year and Poster URL: OMDb first, Cinemeta (no key) when OMDb is down or empty."""
     try:
         key = json.load(open(MEDIA_DB))["OMDbKeyId"]
         q = {"apikey": key, "type": kind, **({"i": imdb} if imdb else {"t": title})}
-        with urllib.request.urlopen("https://www.omdbapi.com/?" + urllib.parse.urlencode(q), timeout=10) as r:
-            d = json.load(r)
-        if d.get("Poster") == "N/A":
-            d.pop("Poster")
-        return d if d.get("Response") == "True" else {}
+        d = json.loads(fetch("https://www.omdbapi.com/?" + urllib.parse.urlencode(q)))
+        if d.get("Response") == "True" and d.get("Poster", "N/A") != "N/A":
+            return d
     except Exception as e:
         print(f"OMDb lookup failed for {title}: {e}", flush=True)
-        return {}
+    norm = lambda t: re.sub(r"[^a-z0-9]", "", t.lower().replace("&", "and"))  # noqa: E731
+    try:
+        base = "https://v3-cinemeta.strem.io"
+        if imdb:
+            metas = [json.loads(fetch(f"{base}/meta/{kind}/{imdb}.json")).get("meta", {})]
+        else:
+            url = f"{base}/catalog/{kind}/top/search={urllib.parse.quote(title)}.json"
+            metas = json.loads(fetch(url)).get("metas", [])
+        m = next((m for m in metas if m.get("poster") and (imdb or norm(m.get("name", "")) == norm(title))), None)
+        if m:
+            return {"Title": m["name"], "Year": str(m.get("releaseInfo", "")), "Poster": m["poster"]}
+    except Exception as e:
+        print(f"Cinemeta lookup failed for {title}: {e}", flush=True)
+    return {}
+
+
+def save_poster(url, name):
+    """Keep posters in the vault so cards work on the phone away from home."""
+    if not url:
+        return ""
+    try:
+        data = fetch(url)
+    except Exception as e:
+        print(f"Poster download failed for {name}: {e}", flush=True)
+        return ""
+    fname = re.sub(r'[\\/:*?"<>|#^\[\]]', "", name) + (".webp" if data[8:12] == b"WEBP" else ".jpg")
+    folder = os.path.join(VAULT, "Attachments", "Posters")
+    os.makedirs(folder, exist_ok=True)
+    with open(os.path.join(folder, fname), "wb") as f:
+        f.write(data)
+    return f"[[{fname}]]"
 
 
 def read_note(path):
@@ -85,7 +119,7 @@ def handle(event, md):
     os.makedirs(folder, exist_ok=True)
     path = find_note(folder, title)
     if path is None:
-        info = omdb(title, kind, imdb)
+        info = lookup(title, kind, imdb)
         title = info.get("Title", title)
         year = info.get("Year", str(md.get("year", "")))
         path = find_note(folder, title) or os.path.join(
@@ -94,7 +128,8 @@ def handle(event, md):
         blocks, order, body = read_note(path)
     else:
         blocks, order, body = {}, [], ""
-        new = {"title": title, "year": year, "image": info.get("Poster", ""), "watched": False,
+        new = {"title": title, "year": year, "image": save_poster(info.get("Poster"), os.path.basename(path)[:-3]),
+               "watched": False,
                "started": "", "lastWatched": "", "personalRating": 0}
         for k in KEYS:
             blocks[k] = [f"{k}: {json.dumps(new[k], ensure_ascii=False)}"]
@@ -106,9 +141,9 @@ def handle(event, md):
             order.append(k)
         blocks[k] = [f"{k}: {json.dumps(v, ensure_ascii=False)}"]
 
-    # OMDb is flaky; fill in a missing poster on a later event.
-    if not value(blocks, "image") and (info := info or omdb(title, kind, imdb)).get("Poster"):
-        put("image", info["Poster"])
+    # Lookups can fail; fill in a missing poster on a later event.
+    if not value(blocks, "image") and (info := info or lookup(title, kind, imdb)).get("Poster"):
+        put("image", save_poster(info["Poster"], os.path.basename(path)[:-3]))
         if not value(blocks, "year"):
             put("year", info.get("Year", ""))
     if event in ("media.play", "media.resume") and not value(blocks, "started"):
