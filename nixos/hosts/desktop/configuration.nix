@@ -34,6 +34,7 @@ in
     ../../features/gaming.nix
     ../../features/sunshine.nix
     ../../features/tuning.nix
+    ../../features/razer-white.nix
     inputs.qylock.nixosModules.default
   ];
 
