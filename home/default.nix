@@ -13,6 +13,7 @@
     ./backup.nix # nightly encrypted NAS Personal → pCloud backup (desktop)
     ./plex-log.nix # Plex webhooks → Obsidian Movies/TV notes (desktop)
     ./kobo-sync.nix # kobo-sync: Kobo reading log → Obsidian Books notes (desktop)
+    ./vesktop-mic.nix # vesktop-mic: mute Discord's mic stream during in-game push-to-talk
   ];
 
   home.username = "gav";
