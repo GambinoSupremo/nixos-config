@@ -12,10 +12,8 @@
       "video" # brightness control, video devices
       "audio" # audio devices (belt-and-suspenders with pipewire)
       "input" # keyd and input-remapper access
-      "plugdev" # USB HID / openrazer
       "dialout" # /dev/ttyACM* — ZMK Studio serial, flashing
     ];
-    # openrazer adds "openrazer" group automatically via hardware.openrazer
   };
 
   # Registers fish as a valid login shell system-wide and enables vendor completions.

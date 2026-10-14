@@ -32,13 +32,6 @@
     };
   };
 
-  # ── OpenRazer ─────────────────────────────────────────────────────────────────
-  # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
-  hardware.openrazer = {
-    enable = true;
-    users = [ "gav" ];
-  };
-
   # ── GameMode ──────────────────────────────────────────────────────────────────
   # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
   programs.gamemode.enable = true;

@@ -128,7 +128,6 @@
     # millennium: via its own flake, wired as the Steam package in features/gaming.nix
 
     # ── Peripherals ───────────────────────────────────────────────────────────
-    polychromatic # Razer lighting GUI; openrazer daemon via hardware.openrazer in services.nix
     zmk-studio # runtime keymap editor for the Lily58 (firmware built in ~/Projects/zmk-config)
 
     # ── Networking ────────────────────────────────────────────────────────────

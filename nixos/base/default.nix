@@ -7,7 +7,7 @@
     ./networking.nix # NetworkManager, firewall, Mullvad, resolved
     ./desktop.nix # SDDM, Hyprland (+ optional Mango/Niri), portals, fonts
     ./audio.nix # PipeWire
-    ./services.nix # keyd, bluetooth, openrazer, ...
+    ./services.nix # keyd, bluetooth, gamemode, ...
     ./packages.nix # systemPackages
   ];
 }
