@@ -34,10 +34,11 @@ let
     done
     hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })'
     sleep 0.5
-    hyprctl clients -j | $jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and .fullscreen == 0) | .address' |
-    while read -r a; do
+    # Focus a running game (fullscreen) so Big Picture doesn't keep the controller on reconnect.
+    hyprctl clients -j | $jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and (.floating | not)) | "\(.address) \(.fullscreen)"' |
+    while read -r a fs; do
       hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
-      hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
+      [ "$fs" = 0 ] && hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
     done
   '';
   # XWayland games sometimes map on the wrong workspace despite the ws-2 rule; pull them back.
