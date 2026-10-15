@@ -56,14 +56,15 @@ let
       while read -r a; do
         hyprctl dispatch "hl.dsp.window.move({ workspace = \"2\", window = \"address:$a\", follow = true })"
       done
-      # Games launched mid-stream open windowed under fullscreen Big Picture; bring them over it.
+      # Games open "silent" (unfocused) behind Big Picture, which then eats the controller.
+      # Focus each new game window and make sure it's fullscreen.
       case "$ev" in openwindow\>\>*) ;; *) continue ;; esac
+      IFS=, read -r a _ cls _ <<< "''${ev#openwindow>>}"
+      case "$cls" in steam_app_*|*.exe) ;; *) continue ;; esac
       sleep 1
-      hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and .fullscreen == 0 and (.floating | not)) | .address' |
-      while read -r a; do
-        hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
+      hyprctl dispatch "hl.dsp.focus({ window = \"address:0x$a\" })"
+      hyprctl clients -j | ${pkgs.jq}/bin/jq -e --arg a "0x$a" '.[] | select(.address == $a and .fullscreen == 0 and (.floating | not))' >/dev/null &&
         hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
-      done
     done
   '';
   # Kill whatever Steam is running (every process under its reaper), then back to Big Picture.
