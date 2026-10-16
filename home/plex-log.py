@@ -1,5 +1,6 @@
 # Plex webhooks -> Obsidian Collections notes. Play creates the note and sets started;
 # scrobble (~90% watched) marks a movie watched or bumps a show's lastWatched.
+# On start it also catches up on whatever Plex logged while this PC was off.
 import email.parser
 import email.policy
 import json
@@ -7,6 +8,8 @@ import os
 import re
 import sys
 import tempfile
+import threading
+import time
 import urllib.parse
 import urllib.request
 from datetime import date
@@ -16,6 +19,8 @@ VAULT, PORT, PLEX_IP = (sys.argv[1:4] + [None] * 3)[:3]
 OWNER_ID = 1  # the server owner's local account id; shared users are ignored
 MEDIA_DB = os.path.join(VAULT, ".obsidian/plugins/obsidian-media-db-plugin/data.json")
 KEYS = ["title", "year", "image", "watched", "started", "lastWatched", "personalRating"]
+STATE = os.path.join(os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"), "plex-log-last")
+TOKEN_FILE = os.path.expanduser("~/.config/plex-token")  # optional; not needed if Plex allows this PC without auth
 
 
 def fetch(url):
@@ -105,8 +110,8 @@ def find_note(folder, title):
     return None
 
 
-def handle(event, md):
-    today = date.today().isoformat()
+def handle(event, md, today=None):
+    today = today or date.today().isoformat()
     info, year = {}, ""
     if md.get("type") == "movie":
         folder, kind, title = "Movies", "movie", md.get("title", "")
@@ -149,12 +154,50 @@ def handle(event, md):
     if event in ("media.play", "media.resume") and not value(blocks, "started"):
         put("started", today)
     if event == "media.scrobble":
-        if not value(blocks, "started"):
+        if not value(blocks, "started") or value(blocks, "started") > today:
             put("started", today)
-        put("lastWatched", today)
+        if value(blocks, "lastWatched") < today:
+            put("lastWatched", today)
         if kind == "movie":
             put("watched", True)
     write_note(path, blocks, order, body)
+
+
+def save_last(ts):
+    os.makedirs(os.path.dirname(STATE), exist_ok=True)
+    with open(STATE, "w") as f:
+        f.write(str(int(ts)))
+
+
+def catch_up():
+    """Log views from Plex's history that happened since the last check (e.g. while the PC was off)."""
+    if not os.path.exists(STATE):
+        return save_last(time.time())  # first run: start from now, the old history was imported once
+    last = int(open(STATE).read().strip() or 0)
+    headers = {"Accept": "application/json"}
+    if os.path.exists(TOKEN_FILE):
+        headers["X-Plex-Token"] = open(TOKEN_FILE).read().strip()
+    url = f"http://{PLEX_IP}:32400/status/sessions/history/all?sort=viewedAt:asc&viewedAt>={last + 1}&accountID={OWNER_ID}"
+    for attempt in range(10):  # the network can take a moment after login
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30) as r:
+                views = json.loads(r.read())["MediaContainer"].get("Metadata", [])
+            break
+        except Exception as e:
+            if attempt == 9:
+                print(f"Catch-up couldn't reach Plex: {e}", flush=True)
+                return
+            time.sleep(30)
+    for v in views:
+        if v.get("accountID") != OWNER_ID or v.get("viewedAt", 0) <= last:
+            continue
+        try:
+            handle("media.scrobble", v, date.fromtimestamp(v["viewedAt"]).isoformat())
+            print(f"Caught up: {v.get('grandparentTitle') or v.get('title')}", flush=True)
+        except Exception as e:
+            print(f"Couldn't catch up on {v.get('title')}: {e}", flush=True)
+        last = max(last, v["viewedAt"])
+    save_last(max(last, time.time() - 60))
 
 
 class Hook(BaseHTTPRequestHandler):
@@ -174,6 +217,8 @@ class Hook(BaseHTTPRequestHandler):
                 p = json.loads(part.get_content())
                 if p.get("Account", {}).get("id") != OWNER_ID:
                     return
+                if p.get("event") == "media.scrobble":
+                    save_last(time.time())
                 if p.get("event") in ("media.play", "media.resume", "media.scrobble"):
                     try:
                         handle(p["event"], p.get("Metadata", {}))
@@ -185,4 +230,5 @@ class Hook(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    threading.Thread(target=catch_up, daemon=True).start()
     ThreadingHTTPServer(("0.0.0.0", int(PORT)), Hook).serve_forever()
