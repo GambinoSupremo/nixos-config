@@ -2,7 +2,7 @@
   description = "gav's nixos configuration";
 
   inputs = {
-    # Rolling unstable; NVIDIA driver branch selected in nixos/features/nvidia.nix.
+    # Rolling unstable.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     home-manager = {
