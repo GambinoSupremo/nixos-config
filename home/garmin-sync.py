@@ -20,7 +20,10 @@ MILES = 1609.344
 # Garmin type keys (road_biking, trail_running, lap_swimming...) matched by a piece of the name.
 ICONS = {"run": "🏃", "bik": "🚴", "cycl": "🚴", "walk": "🚶", "hik": "🥾", "swim": "🏊",
          "strength": "🏋️", "yoga": "🧘"}
-BEGIN, END = "%% garmin-sync %%", "%% end garmin-sync %%"
+# The Workouts heading plus the icon lines under it belong to garmin-sync; anything else you
+# write there stays. (Older notes used %% garmin-sync %% markers; those get swapped out.)
+OLD_BLOCK = re.compile(r"%% garmin-sync %%.*?%% end garmin-sync %%\n?", re.S)
+WORKOUTS = re.compile(r"^## Workouts\n(?:- [^\w\s].*\n?)*", re.M)
 
 
 def login():
@@ -104,11 +107,12 @@ def update(d, summary, sleep, acts):
         new = put(new, "bodyBattery", summary["bodyBatteryHighestValue"])
     if acts:
         new = put(new, "workouts", ", ".join(workout(a, short=True) for a in acts))
-    block = "\n".join([BEGIN, "## Workouts", *map(workout, acts), END]) if acts else ""
-    if BEGIN in body:
-        body = re.sub(re.escape(BEGIN) + r".*?" + re.escape(END), lambda _: block, body, flags=re.S)
+    block = "\n".join(["## Workouts", *map(workout, acts)]) + "\n" if acts else ""
+    body = OLD_BLOCK.sub(lambda _: block, body, count=1)
+    if WORKOUTS.search(body):
+        body = WORKOUTS.sub(lambda _: block, body, count=1)
     elif block:
-        body = body.rstrip("\n") + "\n\n" + block + "\n"
+        body = body.rstrip("\n") + "\n\n" + block
     out = ("---\n" + "\n".join(new) + "\n---\n" if new else "") + body
     if out == text:
         return False
