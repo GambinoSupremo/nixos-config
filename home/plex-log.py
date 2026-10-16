@@ -1,6 +1,7 @@
 # Plex webhooks -> Obsidian Collections notes. Play creates the note and sets started;
 # scrobble (~90% watched) marks a movie watched or bumps a show's lastWatched.
-# On start it also catches up on whatever Plex logged while this PC was off.
+# On start it also catches up on whatever Plex logged while this PC was off. Finished
+# episodes and movies also go under "## Watched" in that day's daily note.
 import email.parser
 import email.policy
 import json
@@ -101,6 +102,34 @@ def write_note(path, blocks, order, body):
     os.replace(tmp, path)
 
 
+def daily_path(day):
+    """Daily note path from Obsidian's own daily-notes setting."""
+    cfg = json.load(open(os.path.join(VAULT, ".obsidian", "daily-notes.json")))
+    tokens = {"YYYY": "%Y", "MMMM": "%B", "MM": "%m", "DD": "%d", "dddd": "%A"}
+    fmt = re.sub("YYYY|MMMM|MM|DD|dddd", lambda m: tokens[m.group(0)], cfg.get("format") or "YYYY-MM-DD")
+    return os.path.join(VAULT, cfg.get("folder", ""), day.strftime(fmt) + ".md")
+
+
+def log_watched(day, entry):
+    """Add one line under ## Watched in that day's note (once)."""
+    d = date.fromisoformat(day)
+    path = daily_path(d)
+    text = open(path, encoding="utf-8").read() if os.path.exists(path) else d.strftime(f"# %A, %B {d.day}\n\n- \n")
+    if entry in text.split("\n"):
+        return
+    m = re.search(r"^## Watched\n(?:- [^\w\s].*\n?)*", text, re.M)
+    if m:
+        section = m.group(0).rstrip("\n") + "\n" + entry + "\n"
+        text = text[:m.start()] + section + text[m.end():]
+    else:
+        text = text.rstrip("\n") + "\n\n## Watched\n" + entry + "\n"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(VAULT), prefix=".plex-log-")
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        f.write(text)
+    os.replace(tmp, path)
+
+
 def find_note(folder, title):
     for f in os.listdir(folder):
         if f.endswith(".md"):
@@ -161,6 +190,14 @@ def handle(event, md, today=None):
         if kind == "movie":
             put("watched", True)
     write_note(path, blocks, order, body)
+    if event == "media.scrobble":
+        note = f"[[{os.path.basename(path)[:-3]}|{value(blocks, 'title') or title}]]"
+        if kind == "movie":
+            log_watched(today, f"- 🎬 {note}")
+        else:
+            ep = f"S{md['parentIndex']}E{md['index']}" if md.get("parentIndex") and md.get("index") else ""
+            name = f'"{md["title"]}"' if md.get("title") else ""
+            log_watched(today, " · ".join(filter(None, [f"- 📺 {note}", " ".join(filter(None, [ep, name]))])))
 
 
 def save_last(ts):
