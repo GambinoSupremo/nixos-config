@@ -207,8 +207,6 @@ in
 
   services.sunshine = {
     enable = true;
-    # CUDA build → NVENC encoding (default build falls back to CPU x264).
-    package = pkgs.sunshine.override { cudaSupport = true; };
     openFirewall = true;
     settings = {
       sunshine_name = host.hostName;
