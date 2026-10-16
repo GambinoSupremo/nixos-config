@@ -29,7 +29,7 @@ in
   # changes the system hash even with nothing functional changed.
   imports = [
     ./hardware-configuration.nix
-    ../../features/nvidia.nix
+    ../../features/amd.nix
     ../../base
     ../../features/gaming.nix
     ../../features/sunshine.nix
