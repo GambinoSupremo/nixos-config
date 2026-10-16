@@ -22,7 +22,7 @@ ICONS = {"run": "🏃", "bik": "🚴", "cycl": "🚴", "walk": "🚶", "hik": "�
          "strength": "🏋️", "yoga": "🧘"}
 # The Workouts heading plus the icon lines under it belong to garmin-sync; anything else you
 # write there stays. (Older notes used %% garmin-sync %% markers; those get swapped out.)
-OLD_BLOCK = re.compile(r"%% garmin-sync %%.*?%% end garmin-sync %%\n?", re.S)
+OLD_BLOCK = re.compile(r"\n*%% garmin-sync %%.*?%% end garmin-sync %%\n?", re.S)
 WORKOUTS = re.compile(r"^## Workouts\n(?:- [^\w\s].*\n?)*", re.M)
 
 
@@ -108,8 +108,11 @@ def update(d, summary, sleep, acts):
     if acts:
         new = put(new, "workouts", ", ".join(workout(a, short=True) for a in acts))
     block = "\n".join(["## Workouts", *map(workout, acts)]) + "\n" if acts else ""
-    body = OLD_BLOCK.sub(lambda _: block, body, count=1)
-    if WORKOUTS.search(body):
+    body = OLD_BLOCK.sub("\n", body)
+    found = list(WORKOUTS.finditer(body))
+    for m in reversed(found[1:]):  # a doubled-up section from an older run
+        body = body[:m.start()].rstrip("\n") + "\n" + body[m.end():].lstrip("\n")
+    if found:
         body = WORKOUTS.sub(lambda _: block, body, count=1)
     elif block:
         body = body.rstrip("\n") + "\n\n" + block
