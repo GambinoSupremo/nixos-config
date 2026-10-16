@@ -191,7 +191,7 @@
   ];
 
   # ── OBS Studio ───────────────────────────────────────────────────────────────
-  # obs-vaapi → VA-API (NVDEC) encoding; obs-vkcapture → GPU-side game capture.
+  # obs-vaapi → VA-API encoding; obs-vkcapture → GPU-side game capture.
   programs.obs-studio = {
     enable = true;
     plugins = with pkgs.obs-studio-plugins; [

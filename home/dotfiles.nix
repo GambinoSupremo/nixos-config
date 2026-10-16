@@ -68,10 +68,6 @@ let
 
       # ── NixOS additions ─────────────────────────────────────────────────────────
       # Minimal fallback so the session is never a dead end if hyprland.lua fails.
-      # NVIDIA wlroots vars scoped here so they don't poison KWin.
-      env = GBM_BACKEND,nvidia-drm
-      env = __GLX_VENDOR_LIBRARY_NAME,nvidia
-      env = WLR_NO_HARDWARE_CURSORS,1
       # Matched by EDID description (connector names renumber); wildcard catch-all.
       monitor = desc:Dell Inc. Dell AW3423DW #tBszGDAYBQUH, 3440x1440@174, 0x0, 1
       monitor = desc:Philips Consumer Electronics Company PHL 278E1 0x0000065F, 3840x2160@60, 3440x0, 1.5
