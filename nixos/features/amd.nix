@@ -1,12 +1,14 @@
 # AMD Radeon RX 9070 XT (desktop only): amdgpu with early KMS, Mesa/RADV,
 # Wayland/gaming session env.
-_: {
+{ pkgs, ... }:
+{
   services.xserver.videoDrivers = [ "amdgpu" ];
   hardware.amdgpu.initrd.enable = true; # early KMS: full-res boot and greeter
 
   # Mesa ships RADV (Vulkan) and radeonsi VA-API by default; no extraPackages.
   hardware.graphics.enable = true;
   hardware.graphics.enable32Bit = true; # 32-bit libs for Steam/Proton
+  environment.systemPackages = [ pkgs.libva-utils ]; # vainfo: check VA-API encode for Sunshine
 
   # Single-GPU box (iGPU disabled in BIOS), so every compositor picks the 9070 XT.
 
