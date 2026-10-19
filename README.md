@@ -97,9 +97,10 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
 - **Monitor identity vs port names**: the DP-N index flips between boots
   (still happens on the RX 9070 XT). Niri and
   hypr/monitor.lua match by identity/EDID desc (never switch to port names).
-- **VRR / gamma flicker**: fluctuating refresh causes visible gamma flicker
-  on the QD-OLED desktop. Policy everywhere is fullscreen-games-only VRR:
-  Hyprland `vrr = 2`, niri `on-demand=true` + steam_app rule.
+- **VRR is off on the Alienware** (Hyprland `vrr = 0`). Its G-SYNC module and
+  the RX 9070 XT don't get along: fullscreen VRR stuttered and flickered every
+  game and logged amdgpu DMCUB errors. Monitor `vrr` changes only apply after
+  Hyprland restarts (log out/in). Cap games at 175, the panel's refresh.
 - **Colour / HDR**: the AW3423DW runs in its own Creator mode with the sRGB
   colour space (gamma 2.2), so it clamps to sRGB itself and the compositors
   send plain sRGB (`cm = "srgb"` in dotfiles hypr/monitor.lua). HDR is
