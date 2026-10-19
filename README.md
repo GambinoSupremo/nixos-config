@@ -16,7 +16,7 @@ nixos/
                           #   Mango/Niri, portals, fonts), audio, services
                           #   (keyd, bluetooth, ...), packages
   features/               # desktop PC extras:
-    nvidia.nix            #   driver pin + Wayland env
+    amd.nix               #   amdgpu/Mesa + Wayland env
     gaming.nix            #   Steam/gamescope/gamemode/novpn
     sunshine.nix          #   Moonlight host + virtual stream display
     tuning.nix            #   zram, ananicy, sysctls (borrowed from CachyOS)
@@ -94,15 +94,9 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
 
 ## Known constraints (load-bearing — do not rediscover these)
 
-- **Monitor identity vs port names**: the NVIDIA DP-N index flips with GPU
-  probe order (DP-1/DP-2 vs DP-3/DP-4 both seen). Niri and hypr/monitor.lua
-  match by identity/EDID desc (never switch to port names).
-- **NVIDIA driver pin**: `nvidiaPackages.latest` (615 as of 2026-10), open
-  modules. The 595 branch intermittently scanned the AW3423DW into a corner.
-  Move back to `.stable` once stable ≥ 610 (details in nixos/features/nvidia.nix).
-- **NVIDIA cursor bug**: hardware cursors freeze under the HDR/10-bit
-  pipeline. Hyprland: `no_hardware_cursors = true` + `min_refresh_rate = 60`
-  (software cursors render no frames on an idle VRR screen otherwise).
+- **Monitor identity vs port names**: the DP-N index flips between boots
+  (seen on both the old NVIDIA card and the RX 9070 XT). Niri and
+  hypr/monitor.lua match by identity/EDID desc (never switch to port names).
 - **VRR / gamma flicker**: fluctuating refresh causes visible gamma flicker
   on the QD-OLED desktop. Policy everywhere is fullscreen-games-only VRR:
   Hyprland `vrr = 2`, niri `on-demand=true` + steam_app rule.
@@ -116,14 +110,11 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
   Super+Shift+Z arrives as Ctrl+Shift+Z (redo) and no compositor bind on Super
   plus Z, X, C or V can ever fire. Ghostty maps Shift+Insert to clipboard paste
   and Shift+Delete to copy (dotfiles ghostty/config).
-- **wlroots NVIDIA env vars** (`GBM_BACKEND`, `__GLX_VENDOR_LIBRARY_NAME`,
-  `WLR_NO_HARDWARE_CURSORS`) are scoped per-compositor and must NEVER go
-  into global sessionVariables — they black-screen KWin.
 - **kvantum / qt.style**: setting HM `qt.style` (or installing kvantum
   system-wide) makes KDE's QML import "kvantum" and black-screens
   plasmashell. All compositors use `QT_QPA_PLATFORMTHEME=kde`. Re-test on
   Plasma major bumps.
-- **Electron apps**: `NIXOS_OZONE_WL=1` (nvidia.nix) puts them on Wayland.
+- **Electron apps**: `NIXOS_OZONE_WL=1` (amd.nix) puts them on Wayland.
   Signal must launch with `--password-store=gnome-libsecret` everywhere or
   the keyring backend flips between sessions and loses the encryption key.
   tidal-hifi: never re-enable its gpuRasterization flag (GPU-process crash

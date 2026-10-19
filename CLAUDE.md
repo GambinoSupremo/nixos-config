@@ -21,7 +21,7 @@ from the separate dotfiles repo; see README.md for the repo map.
 - Never edit `nvim/lua/plugins/dankcolors.lua` in the dotfiles repo
   (hand-curated, never regenerate).
 - Monitors are matched by identity string (EDID description/model), never by
-  port name. The NVIDIA DP-N numbering flips between boots.
+  port name. The DP-N numbering flips between boots.
 - keyd owns Super+Z/X/C/V (undo/cut/copy/paste), including with Shift, Ctrl
   or Alt held. Never bind Super with Z, X, C or V in niri or Hyprland.
 - The AW3423DW is in its own Creator/sRGB mode, so the compositors send plain
