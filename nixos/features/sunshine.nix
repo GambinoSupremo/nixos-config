@@ -1,5 +1,6 @@
 # Sunshine (Moonlight streaming host). Each stream gets a headless virtual
 # display at the client's resolution/refresh; physical monitors stay on.
+# Steam Remote Play sessions get the same display, started from Steam's log.
 {
   config,
   lib,
@@ -198,12 +199,43 @@ let
     [ "$1" = stop ] && { ${puck "1"} }
     exit 0
   '';
+  # Steam logs each Remote Play session; reuse the Moonlight display prep at the
+  # Steam Machine's 1440p120 (Remote Play has no client-mode hook like Sunshine's).
+  remotePlayWatch = pkgs.writeShellScript "remoteplay-watch" ''
+    log="$HOME/.local/share/Steam/logs/streaming_log.txt"
+    flag="$XDG_RUNTIME_DIR/remoteplay-active"
+    rm -f "$flag"
+    ${pkgs.coreutils}/bin/tail -F -n0 "$log" 2>/dev/null | while IFS= read -r line; do
+      case "$line" in
+      *"Streaming started to "*)
+        # Skip if a Moonlight stream already owns SUNSHINE.
+        hyprctl monitors -j | ${pkgs.jq}/bin/jq -e 'any(.[]; .name == "SUNSHINE")' >/dev/null && continue
+        touch "$flag"
+        SUNSHINE_CLIENT_WIDTH=2560 SUNSHINE_CLIENT_HEIGHT=1440 SUNSHINE_CLIENT_FPS=120 ${streamDisplay} start
+        ;;
+      *"PipeWire: Unloading null sink"*)
+        [ -f "$flag" ] && { rm -f "$flag"; ${streamDisplay} stop; }
+        ;;
+      esac
+    done
+  '';
 in
 {
   # Let the stream script (user) disconnect/reconnect the puck via sysfs.
   services.udev.extraRules = ''
     ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="28de", ATTR{idProduct}=="1304", RUN+="${pkgs.coreutils}/bin/chgrp users /sys%p/authorized", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys%p/authorized"
   '';
+
+  systemd.user.services.remoteplay-watch = {
+    description = "Virtual display for Steam Remote Play sessions";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = remotePlayWatch;
+      Restart = "on-failure";
+    };
+  };
 
   services.sunshine = {
     enable = true;
