@@ -7,7 +7,7 @@
 
 let
   qylockThemes = inputs.qylock.legacyPackages.${pkgs.stdenv.hostPlatform.system}.mkSddmThemes { };
-  # pixel-dusk-city with bg.mp4 transcoded to animated WebP (greeter video decode freezes on NVIDIA).
+  # pixel-dusk-city with bg.mp4 transcoded to animated WebP (the greeter's video decode froze).
   loginTheme =
     pkgs.runCommand "sddm-theme-pixel-dusk-city-webp" { nativeBuildInputs = [ pkgs.ffmpeg-headless ]; }
       ''

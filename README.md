@@ -95,7 +95,7 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
 ## Known constraints (load-bearing — do not rediscover these)
 
 - **Monitor identity vs port names**: the DP-N index flips between boots
-  (seen on both the old NVIDIA card and the RX 9070 XT). Niri and
+  (still happens on the RX 9070 XT). Niri and
   hypr/monitor.lua match by identity/EDID desc (never switch to port names).
 - **VRR / gamma flicker**: fluctuating refresh causes visible gamma flicker
   on the QD-OLED desktop. Policy everywhere is fullscreen-games-only VRR:
@@ -118,7 +118,7 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
   Signal must launch with `--password-store=gnome-libsecret` everywhere or
   the keyring backend flips between sessions and loses the encryption key.
   tidal-hifi: never re-enable its gpuRasterization flag (GPU-process crash
-  on NVIDIA+Wayland; fix lives in ~/.config/tidal-hifi/config.json).
+  on Wayland; fix lives in ~/.config/tidal-hifi/config.json).
 - **Mullvad**: the GUI user service polls the system daemon with a BOUNDED
   wait (home/services.nix) — an unbounded loop hung activation during
   rebuilds. `mullvad-exclude` is setuid and dies in Steam's nosuid sandbox;

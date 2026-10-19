@@ -6,7 +6,7 @@
   # ── Boot ─────────────────────────────────────────────────────────────────────
   # Boot loader, kernel, and Plymouth are all per-host (nixos/hosts/*).
   # Don't re-add chaotic-nyx for linux-cachyos: its module forces from-source
-  # rebuilds of the base system and its overlay drops allowUnfree (breaks NVIDIA).
+  # rebuilds of the base system and its overlay drops allowUnfree (breaks Steam).
 
   # ── Locale / Time ─────────────────────────────────────────────────────────────
   time.timeZone = "America/Los_Angeles";
@@ -55,7 +55,7 @@
     icu
   ];
 
-  # Required for obsidian, vivaldi, nvidia, spotify, etc.
+  # Required for obsidian, vivaldi, steam, spotify, etc.
   nixpkgs.config.allowUnfree = true;
 
   # ── System version ────────────────────────────────────────────────────────────

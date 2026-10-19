@@ -65,8 +65,8 @@ in
     # ── Display Manager ───────────────────────────────────────────────────────────
     services.displayManager.sddm = {
       enable = true;
-      # Wayland greeter on kwin: the X11 greeter fails to respawn after logout on
-      # this NVIDIA box (black screen). mkForce beats SilentSDDM's !xserver.enable.
+      # Wayland greeter on kwin: the X11 greeter failed to respawn after logout
+      # (black screen). mkForce beats SilentSDDM's !xserver.enable.
       wayland.enable = lib.mkForce true;
       wayland.compositor = "kwin";
       # Empty X11 SessionDir hides the "Plasma (X11)" entry from the session list.

@@ -112,7 +112,7 @@
 
     # ── Media ────────────────────────────────────────────────────────────────
     spotify # was spotify-launcher (AUR downloader wrapper)
-    # "gray screen" = its gpuRasterization flag crashing NVIDIA+Wayland.
+    # "gray screen" = its gpuRasterization flag crashing the GPU process on Wayland.
     # Localhost DevTools port lets tidal-live-theme (home/theming.nix) recolor it live.
     (symlinkJoin {
       name = "tidal-hifi-devtools";
