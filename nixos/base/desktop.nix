@@ -1,4 +1,4 @@
-# Graphical stack: SDDM plus Hyprland, optional Mango and Niri sessions, with
+# Graphical stack: Noctalia Greeter (greetd) plus Hyprland, optional Mango and Niri sessions, with
 # portals, keyring, and fonts.
 {
   config,
@@ -38,7 +38,7 @@ in
     # hyprSessionBootstrap in home/dotfiles.nix (the bare target raced noctalia).
     programs.hyprland = {
       enable = true;
-      # false alone doesn't drop the duplicate SDDM entry — the package ships
+      # false alone doesn't drop the duplicate session entry — the package ships
       # hyprland-uwsm.desktop itself; the symlinkJoin strips that one file.
       withUWSM = false;
       # The module calls .override on the package, so the wrapper re-exposes it
@@ -63,18 +63,21 @@ in
     };
 
     # ── Display Manager ───────────────────────────────────────────────────────────
-    services.displayManager.sddm = {
+    # Noctalia Greeter on greetd; `noctalia msg greeter-sync` copies wallpaper,
+    # colours and monitor layout from the running shell.
+    services.displayManager.noctalia-greeter = {
       enable = true;
-      # Wayland greeter on kwin: the X11 greeter failed to respawn after logout
-      # (black screen). mkForce beats SilentSDDM's !xserver.enable.
-      wayland.enable = lib.mkForce true;
-      wayland.compositor = "kwin";
-      # Empty X11 SessionDir hides the "Plasma (X11)" entry from the session list.
-      settings.X11.SessionDir = "/var/empty";
+      passwordlessSyncUsers = [ "gav" ];
+      cursorTheme = {
+        package = pkgs.bibata-cursors;
+        name = "Bibata-Modern-Ice";
+      };
     };
+    # greetd doesn't set XDG_DATA_DIRS, which is where the greeter looks for sessions.
+    services.greetd.settings.default_session.command = lib.mkForce "env XDG_DATA_DIRS=${config.services.displayManager.sessionData.desktops}/share ${lib.getExe' config.services.displayManager.noctalia-greeter.package "noctalia-greeter-session"}";
 
-    # Fallback preselection only (SDDM remembers last-used); Hyprland is the
-    # daily driver.
+    # Fallback preselection only (the greeter remembers last-used); Hyprland is
+    # the daily driver.
     services.displayManager.defaultSession = "hyprland";
 
     # ── XDG Portals ───────────────────────────────────────────────────────────────
@@ -95,8 +98,8 @@ in
     security.polkit.enable = true;
 
     # ── GNOME Keyring ─────────────────────────────────────────────────────────────
+    # Its PAM hook lands in `login`, which greetd's PAM includes, so it unlocks at the greeter.
     services.gnome.gnome-keyring.enable = true;
-    security.pam.services.sddm.enableGnomeKeyring = true;
 
     # ── Fonts ─────────────────────────────────────────────────────────────────────
     fonts = {

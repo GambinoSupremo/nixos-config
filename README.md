@@ -12,7 +12,7 @@ flake.nix                 # inputs + nixosConfigurations (desktop, vm)
 nixos/
   base/                   # every host (default.nix lists them):
                           #   core (nix/locale/GC), users, networking
-                          #   (+Mullvad), desktop (SDDM, Hyprland, optional
+                          #   (+Mullvad), desktop (greeter, Hyprland, optional
                           #   Mango/Niri, portals, fonts), audio, services
                           #   (keyd, bluetooth, ...), packages
   features/               # desktop PC extras:
@@ -31,7 +31,8 @@ home/                     # home-manager for gav (shared by all hosts):
 
 ## Sessions
 
-SDDM (Wayland greeter on kwin, qylock theme). **Hyprland is the only
+Noctalia Greeter on greetd (`noctalia msg greeter-sync` copies the wallpaper,
+colours and monitor layout to it). **Hyprland is the only
 session by default.** Mango and Niri are off but kept: flip
 `gav.sessions.mango` / `.niri` in nixos/base/desktop.nix to bring one
 back (dotfiles deploy, Noctalia seeds and Sunshine follow). Mango mirrors

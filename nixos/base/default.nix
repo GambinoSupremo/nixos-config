@@ -5,7 +5,7 @@
     ./core.nix # nix settings, locale, GC
     ./users.nix
     ./networking.nix # NetworkManager, firewall, Mullvad, resolved
-    ./desktop.nix # SDDM, Hyprland (+ optional Mango/Niri), portals, fonts
+    ./desktop.nix # greeter, Hyprland (+ optional Mango/Niri), portals, fonts
     ./audio.nix # PipeWire
     ./services.nix # keyd, bluetooth, gamemode, ...
     ./packages.nix # systemPackages
