@@ -24,9 +24,9 @@ from the separate dotfiles repo; see README.md for the repo map.
   port name. The DP-N numbering flips between boots.
 - keyd owns Super+Z/X/C/V (undo/cut/copy/paste), including with Shift, Ctrl
   or Alt held. Never bind Super with Z, X, C or V in niri or Hyprland.
-- The AW3423DW is in its own Creator/sRGB mode, so the compositors send plain
-  sRGB (`cm = "srgb"`). HDR is deliberately off until desktop HDR works with
-  Moonlight/Sunshine streaming. Don't turn it back on.
+- The AW3423DW runs always-on HDR (`cm = "hdr"` in dotfiles hypr/monitor.lua,
+  monitor in HDR 400 True Black). Don't add auto-HDR switching: mode switches
+  blank the screen. Stream outputs (SUNSHINE) stay SDR.
 
 ## Checking a change
 

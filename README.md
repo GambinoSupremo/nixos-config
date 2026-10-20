@@ -102,10 +102,10 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
   the RX 9070 XT don't get along: fullscreen VRR stuttered and flickered every
   game and logged amdgpu DMCUB errors. Monitor `vrr` changes only apply after
   Hyprland restarts (log out/in). Cap games at 175, the panel's refresh.
-- **Colour / HDR**: the AW3423DW runs in its own Creator mode with the sRGB
-  colour space (gamma 2.2), so it clamps to sRGB itself and the compositors
-  send plain sRGB (`cm = "srgb"` in dotfiles hypr/monitor.lua). HDR is
-  deliberately off until desktop HDR works with Moonlight/Sunshine streaming.
+- **Colour / HDR**: the AW3423DW runs always-on HDR (`cm = "hdr"`,
+  `sdrbrightness = 2.0` in dotfiles hypr/monitor.lua; monitor in HDR 400 True
+  Black). No auto-HDR switching, since SDR/HDR mode switches blank the screen.
+  HDR games need `PROTON_ENABLE_WAYLAND=1 PROTON_ENABLE_HDR=1`.
 - **keyd edit keys**: Super+Z/X/C/V become Ctrl+Z / Shift+Delete /
   Ctrl+Insert / Shift+Insert (undo, cut, copy, paste) at the kernel level for
   ALL sessions (base/services.nix). keyd keeps any other held modifier, so
