@@ -5,6 +5,14 @@
   services.xserver.videoDrivers = [ "amdgpu" ];
   hardware.amdgpu.initrd.enable = true; # early KMS: full-res boot and greeter
 
+  # LACT: fan curve, power limit and undervolt (tuned in its GUI, saved to /etc/lact).
+  services.lact.enable = true;
+  # Overdrive unlocks undervolting; the kernel default mask plus only the OD bit (0x4000).
+  hardware.amdgpu.overdrive = {
+    enable = true;
+    ppfeaturemask = "0xfff7ffff";
+  };
+
   # Mesa ships RADV (Vulkan) and radeonsi VA-API by default; no extraPackages.
   hardware.graphics.enable = true;
   hardware.graphics.enable32Bit = true; # 32-bit libs for Steam/Proton
