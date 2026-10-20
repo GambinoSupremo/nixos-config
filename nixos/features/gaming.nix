@@ -1,5 +1,5 @@
 # Gaming: Steam (+extest, protontricks), gamescope, gamemode tuning,
-# game-friendly sysctls, and the novpn launch-option wrapper.
+# game-friendly sysctls, and the novpn and hdr-game launch-option wrappers.
 {
   config,
   pkgs,
@@ -99,6 +99,14 @@ in
     # mullvad-exclude dies in Steam's nosuid sandbox; exec keeps the PID.
     (writeShellScriptBin "novpn" ''
       mullvad split-tunnel add $$ >/dev/null 2>&1 || true
+      exec "$@"
+    '')
+    # `hdr-game %command%`: native Wayland + HDR at the desk; Remote Play can't
+    # capture Wayland game windows, so streamed launches stay on XWayland.
+    (writeShellScriptBin "hdr-game" ''
+      if [ "''${SteamStreaming:-0}" != 1 ]; then
+        export PROTON_ENABLE_WAYLAND=1 PROTON_ENABLE_HDR=1
+      fi
       exec "$@"
     '')
     lutris
