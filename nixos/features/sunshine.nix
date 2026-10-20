@@ -39,7 +39,7 @@ let
     hyprctl clients -j | $jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and (.floating | not)) | "\(.address) \(.fullscreen)"' |
     while read -r a fs; do
       hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
-      [ "$fs" = 0 ] && hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
+      [ "$fs" = 0 ] && hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })'
     done
   '';
   # XWayland games sometimes map on the wrong workspace despite the ws-2 rule; pull them back.
@@ -66,7 +66,7 @@ let
       sleep 1
       hyprctl dispatch "hl.dsp.focus({ window = \"address:0x$a\" })"
       hyprctl clients -j | ${pkgs.jq}/bin/jq -e --arg a "0x$a" '.[] | select(.address == $a and .fullscreen == 0 and (.floating | not))' >/dev/null &&
-        hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen" })'
+        hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })'
     done
   '';
   # Kill whatever Steam is running (every process under its reaper), then back to Big Picture.

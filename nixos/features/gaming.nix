@@ -1,7 +1,30 @@
 # Gaming: Steam (+extest, protontricks), gamescope, gamemode tuning,
 # game-friendly sysctls, and the novpn launch-option wrapper.
-{ pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
+let
+  # Hyprland's fullscreen window rule is skipped when the window maps without initial
+  # focus (e.g. a ProtonFixes popup just closed), so make new game windows fullscreen here.
+  gameFullscreen = pkgs.writeShellScript "game-fullscreen" ''
+    jq=${pkgs.jq}/bin/jq
+    ${pkgs.socat}/bin/socat -U - UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" |
+    while IFS= read -r ev; do
+      case "$ev" in openwindow\>\>*) ;; *) continue ;; esac
+      IFS=, read -r a _ cls title <<< "''${ev#openwindow>>}"
+      case "$cls" in steam_app_*|*.exe) ;; *) continue ;; esac
+      case "$title" in Launcher|broken) continue ;; esac
+      sleep 1
+      hyprctl clients -j | $jq -e --arg a "0x$a" '.[] | select(.address == $a and .fullscreen == 0 and (.floating | not))' >/dev/null || continue
+      hyprctl dispatch "hl.dsp.focus({ window = \"address:0x$a\" })"
+      hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })'
+    done
+  '';
+in
 {
   # Millennium isn't in nixpkgs. Only its own build uses the flake's pinned
   # nixpkgs (bun FOD); the Steam FHS env is wrapped from current nixpkgs.
@@ -14,6 +37,18 @@
       };
     })
   ];
+
+  systemd.user.services.game-fullscreen = {
+    description = "Fullscreen new game windows on Hyprland";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    path = [ config.programs.hyprland.package ];
+    serviceConfig = {
+      ExecStart = gameFullscreen;
+      Restart = "on-failure";
+    };
+  };
 
   programs.steam = {
     enable = true;
