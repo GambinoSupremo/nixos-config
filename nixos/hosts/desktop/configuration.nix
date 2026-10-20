@@ -1,29 +1,5 @@
-{
-  pkgs,
-  lib,
-  inputs,
-  ...
-}:
+{ pkgs, ... }:
 
-let
-  qylockThemes = inputs.qylock.legacyPackages.${pkgs.stdenv.hostPlatform.system}.mkSddmThemes { };
-  # pixel-dusk-city with bg.mp4 transcoded to animated WebP (the greeter's video decode froze).
-  loginTheme =
-    pkgs.runCommand "sddm-theme-pixel-dusk-city-webp" { nativeBuildInputs = [ pkgs.ffmpeg-headless ]; }
-      ''
-          d=$out/share/sddm/themes/pixel-dusk-city-webp
-          mkdir -p $(dirname $d)
-          cp -r ${qylockThemes}/share/sddm/themes/pixel-dusk-city $d
-          chmod -R u+w $d
-          ffmpeg -v error -i $d/bg.mp4 -an -vf fps=30 -c:v libwebp -q:v 85 -compression_level 4 -loop 0 $d/bg.webp
-          rm $d/bg.mp4
-          cat > $d/BackgroundVideo.qml <<'QML'
-        import QtQuick
-        AnimatedImage { anchors.fill: parent; source: "bg.webp"; fillMode: Image.PreserveAspectCrop; smooth: false; playing: true; cache: false }
-        QML
-          sed -i 's|^Name=.*|Name=pixel-dusk-city-webp|' $d/metadata.desktop
-      '';
-in
 {
   # Import order is load-bearing: list options merge in order, so reordering
   # changes the system hash even with nothing functional changed.
@@ -35,30 +11,11 @@ in
     ../../features/sunshine.nix
     ../../features/tuning.nix
     ../../features/razer-white.nix
-    inputs.qylock.nixosModules.default
   ];
 
   # Zen kernel from nixpkgs (desktop-tuned, on cache.nixos.org). CachyOS tuning
   # stays in features/tuning.nix; see DECISIONS.md for why the kernel changed.
   boot.kernelPackages = pkgs.linuxPackages_zen;
-
-  programs.qylock = {
-    enable = true;
-    theme = "pixel-dusk-city";
-    quickshell.enable = false; # SDDM login theme only — Noctalia still owns the in-session lock
-  };
-
-  services.displayManager.sddm.theme = lib.mkForce "pixel-dusk-city-webp";
-  # qtimageformats provides the WebP decoder for the animated background.
-  services.displayManager.sddm.extraPackages = [ pkgs.qt6.qtimageformats ];
-  environment.systemPackages = [ loginTheme ];
-
-  # SDDM's Wayland greeter runs KWin as the `sddm` user, which never saw our
-  # layout; L+ re-links KWin 6's output config each boot (C/C+ never overwrite).
-  systemd.tmpfiles.rules = [
-    "d /var/lib/sddm/.config 0755 sddm sddm - -"
-    "L+ /var/lib/sddm/.config/kwinoutputconfig.json - - - - ${./sddm-kwinoutputconfig.json}"
-  ];
 
   # Plex webhooks for the Obsidian watch log (home/plex-log.nix); LAN interface only.
   networking.firewall.interfaces.enp7s0.allowedTCPPorts = [ 8765 ];

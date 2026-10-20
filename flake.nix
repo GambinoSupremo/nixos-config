@@ -17,12 +17,6 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # qylock — SDDM themes (login screen), "pixel-dusk-city" selected in desktop/configuration.nix
-    qylock = {
-      url = "github:Darkkal44/qylock";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Consumed as a plain source tree and built against the system Hyprland so
     # the plugin ABI matches (the repo's own flake targets Hyprland master).
     hyprland-scroll-overview = {
