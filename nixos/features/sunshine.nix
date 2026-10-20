@@ -231,6 +231,11 @@ in
     wantedBy = [ "graphical-session.target" ];
     partOf = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
+    # NixOS units get a minimal PATH; the stream scripts call hyprctl and setsid.
+    path = [
+      config.programs.hyprland.package
+      pkgs.util-linux
+    ];
     serviceConfig = {
       ExecStart = remotePlayWatch;
       Restart = "on-failure";
