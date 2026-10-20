@@ -50,7 +50,14 @@ in
             pkgs.symlinkJoin {
               name = "hyprland-single-session";
               paths = [ hl ];
-              postBuild = "rm $out/share/wayland-sessions/hyprland-uwsm.desktop";
+              # Also send Hyprland's console output (startup banner) to the journal:
+              # greetd runs the session on the visible VT, so it flashed on login.
+              postBuild = ''
+                rm $out/share/wayland-sessions/hyprland-uwsm.desktop
+                rm $out/share/wayland-sessions/hyprland.desktop
+                sed 's|^Exec=|Exec=${pkgs.systemd}/bin/systemd-cat -t hyprland |' \
+                  ${hl}/share/wayland-sessions/hyprland.desktop > $out/share/wayland-sessions/hyprland.desktop
+              '';
               inherit (hl) version meta;
               passthru = hl.passthru or { } // {
                 inherit (hl) man;
