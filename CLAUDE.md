@@ -29,6 +29,16 @@ see README.md for the repo map.
   monitor in HDR 400 True Black). Don't add auto-HDR switching: mode switches
   blank the screen. Stream outputs (SUNSHINE) stay SDR.
 
+## Branches and apply
+
+- `apply` lands exactly one waiting `cleanup/*` branch and deletes it
+  afterwards. Never leave two branches waiting; it refuses to run.
+- Once `apply` has landed a branch, don't reuse it. Start a fresh branch from
+  current `main` for any follow-up change.
+- Gavin may run `apply` while you're idle. Before editing, re-check the
+  current branch and whether `main` has moved (`git branch --show-current`,
+  `git log -1 main`).
+
 ## Checking a change
 
 - Build both hosts, every time:
