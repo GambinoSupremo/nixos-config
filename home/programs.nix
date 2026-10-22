@@ -179,7 +179,11 @@
         event = "commit-msg";
         command = "${pkgs.writeShellScript "strip-claude-attribution" ''
           sed=${lib.getExe pkgs.gnused}
-          $sed -i -E -e '/^[[:space:]]*Co-Authored-By:.*Claude/Id' -e '/Generated with \[?Claude Code/d' "$1"
+          # Whole trailer lines only, so prose that mentions them survives.
+          $sed -i -E \
+            -e '/^[[:space:]]*Co-Authored-By:.*\bClaude\b/Id' \
+            -e '/^[[:space:]]*(🤖[[:space:]]*)?Generated with \[Claude Code\]\([^)]*\)[[:space:]]*$/d' \
+            "$1"
           # Drop the blank lines the removed trailers leave at the end.
           $sed -i -e ':a' -e '/^\n*$/{$d;N;ba' -e '}' "$1"
         ''}";
