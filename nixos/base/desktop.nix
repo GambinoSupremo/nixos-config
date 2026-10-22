@@ -107,6 +107,13 @@ in
     # ── GNOME Keyring ─────────────────────────────────────────────────────────────
     # Its PAM hook lands in `login`, which greetd's PAM includes, so it unlocks at the greeter.
     services.gnome.gnome-keyring.enable = true;
+    # Hyprland isn't started by systemd, so it never sees gcr-ssh-agent's
+    # SSH_AUTH_SOCK in the user manager; export it at login instead.
+    environment.extraInit = ''
+      if [ -z "$SSH_AUTH_SOCK" ] && [ -n "$XDG_RUNTIME_DIR" ]; then
+        export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
+      fi
+    '';
 
     # ── Fonts ─────────────────────────────────────────────────────────────────────
     fonts = {
