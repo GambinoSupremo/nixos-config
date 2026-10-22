@@ -1,4 +1,4 @@
-# Per-app home-manager config: Zen, git, neovim (LazyVim link), OBS, Satty, mime
+# Per-app home-manager config: Zen, git, ssh, neovim (LazyVim link), OBS, Satty, mime
 # defaults, and desktop-entry overrides (Signal keyring pin, Vesktop VPN bypass).
 {
   inputs,
@@ -174,6 +174,19 @@
       user.email = "service.haiku882@passinbox.com";
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
+    };
+  };
+
+  # ── SSH ──────────────────────────────────────────────────────────────────────
+  # Only the hosts listed here; no HM catch-all defaults (GitHub uses ssh's own).
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+    settings."proxmox 10.0.0.117" = {
+      HostName = "10.0.0.117";
+      User = "root";
+      IdentityFile = "~/.ssh/id_ed25519_proxmox";
+      IdentitiesOnly = true;
     };
   };
 
