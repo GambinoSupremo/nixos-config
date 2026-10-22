@@ -83,15 +83,7 @@ in
   # qt block intentionally disabled: qt.style injects QT_STYLE_OVERRIDE=kvantum
   # session-wide (it black-screened plasmashell back when Plasma was installed).
 
-  # xdph share picker inherits QT_QPA_PLATFORMTHEME=kde, can't load it → stock white.
-  # Bare drop-in (not systemd.user.services) so the portal keeps the session PATH.
-  xdg.configFile."systemd/user/xdg-desktop-portal-hyprland.service.d/qt6ct.conf".text = ''
-    [Service]
-    Environment=QT_QPA_PLATFORMTHEME=qt6ct
-    Environment=QT_PLUGIN_PATH=${pkgs.qt6Packages.qt6ct}/lib/qt-6/plugins
-  '';
-
-  # Only apps launched with QT_QPA_PLATFORMTHEME=qt6ct read this (picker above + qbittorrent).
+  # Every Qt 6 app reads this: the dotfiles set QT_QPA_PLATFORMTHEME=qt6ct for the session.
   xdg.configFile."qt6ct/qt6ct.conf".text = ''
     [Appearance]
     style=Fusion

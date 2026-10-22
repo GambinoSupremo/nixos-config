@@ -35,7 +35,8 @@ KDE Plasma is not installed.
   When Plasma was installed, they made KDE's QML import "kvantum" and
   black-screened plasmashell. Plasma is gone now, but `qt.style` would still
   force `QT_STYLE_OVERRIDE` on every session. All compositors set
-  `QT_QPA_PLATFORMTHEME=kde`.
+  `QT_QPA_PLATFORMTHEME=qt6ct`, so Qt 6 apps get the Noctalia palette from
+  qt6ct.conf (home/theming.nix).
 - **Electron apps**: `NIXOS_OZONE_WL=1` (amd.nix) puts them on Wayland.
   Signal must launch with `--password-store=gnome-libsecret` everywhere or
   the keyring backend flips between sessions and loses the encryption key.

@@ -82,17 +82,7 @@
     nautilus
     gnome-disk-utility
     pavucontrol
-    # Can't load session's QT_QPA_PLATFORMTHEME=kde → stock white; use qt6ct (noctalia palette).
-    (symlinkJoin {
-      name = "qbittorrent-qt6ct";
-      paths = [ qbittorrent ];
-      nativeBuildInputs = [ makeWrapper ];
-      postBuild = ''
-        wrapProgram $out/bin/qbittorrent \
-          --set QT_QPA_PLATFORMTHEME qt6ct \
-          --prefix QT_PLUGIN_PATH : ${qt6Packages.qt6ct}/lib/qt-6/plugins
-      '';
-    })
+    qbittorrent
     matugen # material color generation from wallpaper
     firefox
 
