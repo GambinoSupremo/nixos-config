@@ -1,5 +1,5 @@
-# Proxmox VM — no GPU (software rendering), physical-hardware services
-# forced off. Used as a safe testbed for the shared modules.
+# Build-only target: checks the shared modules without the desktop's hardware
+# (no GPU, Bluetooth or gaming). No VM is deployed from it.
 { lib, ... }:
 
 {
@@ -11,10 +11,10 @@
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
 
-  # QEMU guest agent — graceful shutdown, snapshot integration with Proxmox
+  # QEMU guest agent, so the config stays bootable as a VM if ever deployed
   services.qemuGuest.enable = true;
 
-  # SPICE agent — clipboard passthrough + dynamic resolution in Proxmox console
+  # SPICE agent — clipboard passthrough + dynamic resolution in a VM console
   services.spice-vdagentd.enable = true;
 
   # virtio-gpu / llvmpipe is enough for the wlroots compositors; no GPU config here.

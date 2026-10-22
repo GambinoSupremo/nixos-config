@@ -82,7 +82,7 @@
     {
       nixosConfigurations = {
 
-        # Proxmox VM — primary target for now
+        # Build-only target for the shared modules (no VM deployed)
         vm = mkHost "vm" {
           hostName = "nix-vm";
           isVM = true;
