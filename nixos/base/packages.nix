@@ -58,7 +58,6 @@
     wtype
     wev
     playerctl
-    fuzzel
     xwayland-satellite # rootless Xwayland for pure-Wayland compositors
     xrandr
     # noctalia — v5, managed by the upstream HM module (programs.noctalia)
