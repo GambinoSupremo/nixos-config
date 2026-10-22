@@ -53,7 +53,7 @@
     icu
   ];
 
-  # Required for obsidian, vivaldi, steam, spotify, etc.
+  # Required for obsidian, steam, spotify, etc.
   nixpkgs.config.allowUnfree = true;
 
   # ── System version ────────────────────────────────────────────────────────────

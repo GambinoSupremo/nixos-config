@@ -49,10 +49,11 @@ deploy them. Unpushed edits: add `--override-input dotfiles path:$HOME/Projects/
 5. `rebuild` (or `update` if step 1 was skipped).
 6. Validate:
    ```bash
-   niri validate                       # parses ~/.config/niri/config.kdl
    hyprctl configerrors                # inside a Hyprland session
    systemctl --user status noctalia.service
-   ls /run/current-system/sw/share/wayland-sessions   # 2 wayland sessions present
+   niri validate                       # only if gav.sessions.niri is on
+   # registered sessions: hyprland (+ mango/niri when enabled)
+   ls "$(nix eval --raw ~/nixos-config#nixosConfigurations.desktop.config.services.displayManager.sessionData.desktops)/share/wayland-sessions"
    ```
 
 ## Fresh install

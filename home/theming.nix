@@ -80,8 +80,8 @@ in
     size = 24;
   };
 
-  # qt block intentionally disabled: qt.style injects QT_STYLE_OVERRIDE=kvantum,
-  # which black-screens plasmashell (Kirigami QML-imports it). Re-test per Plasma bump.
+  # qt block intentionally disabled: qt.style injects QT_STYLE_OVERRIDE=kvantum
+  # session-wide (it black-screened plasmashell back when Plasma was installed).
 
   # xdph share picker inherits QT_QPA_PLATFORMTHEME=kde, can't load it → stock white.
   # Bare drop-in (not systemd.user.services) so the portal keeps the session PATH.

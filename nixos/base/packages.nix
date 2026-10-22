@@ -70,8 +70,8 @@
     adw-gtk3 # was adw-gtk-theme
     qt6Packages.qt6ct # top-level qt6ct became a throw alias 2025-10-27
     kdePackages.breeze # was breeze
-    # kvantum intentionally NOT system-wide: Plasma's Kirigami QML-imports it and
-    # black-screens plasmashell. Want it elsewhere? Per-user + QT_STYLE_OVERRIDE.
+    # kvantum intentionally NOT system-wide (it black-screened plasmashell when
+    # Plasma was installed; see docs/decisions.md). Per-user + QT_STYLE_OVERRIDE if wanted.
 
     # ── Applications ─────────────────────────────────────────────────────────
     obsidian
@@ -124,7 +124,6 @@
     # matched); pkgs.mullvad (headless) lags and would shadow the CLI — keep out.
 
     # ── Misc ─────────────────────────────────────────────────────────────────
-    # ollama managed via services.ollama in services.nix
     # pipewire / wireplumber managed via services.pipewire in audio.nix
     # gamemode managed via programs.gamemode in services.nix
     # keyd managed via services.keyd in services.nix

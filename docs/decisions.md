@@ -35,6 +35,8 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
 ## Left alone
 - laptop host + amd.nix + nixos-hardware input: intentional unwired spare
   (per README); zero lock cost since nixos-hardware follows nixpkgs.
+  SUPERSEDED (2026-10-09): the condense removed the laptop host and
+  nixos-hardware; amd.nix is now the desktop's GPU module.
 - fish double-registration (system programs.fish + HM): system side is
   login-shell registration; both needed.
 - packages.nix "was X" Arch-provenance comments: kept — README tables were
@@ -118,6 +120,7 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   reasoned from keyd semantics + observed behavior, not live-tested yet.
   WRONG (2026-10-08, from keyd 2.6.0 source): a [meta] binding drops only
   Super and keeps other held modifiers, so SUPER+CTRL+V became Ctrl+Shift+Insert.
+  SUPERSEDED: the current rule is in .claude/CLAUDE.md and docs/notes.md.
 - Hyprland fresh-boot fallback path (broken lua → hyprland.conf) untested.
 - flake.lock path-input lastModified for dotfiles looks stale even when
   content is current — narHash is what matters; don't trust the date.

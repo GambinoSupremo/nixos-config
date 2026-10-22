@@ -31,10 +31,11 @@ KDE Plasma is not installed.
   Super+Shift+Z arrives as Ctrl+Shift+Z (redo) and no compositor bind on Super
   plus Z, X, C or V can ever fire. Ghostty maps Shift+Insert to clipboard paste
   and Shift+Delete to copy (dotfiles ghostty/config).
-- **kvantum / qt.style**: setting HM `qt.style` (or installing kvantum
-  system-wide) makes KDE's QML import "kvantum" and black-screens
-  plasmashell. All compositors use `QT_QPA_PLATFORMTHEME=kde`. Re-test on
-  Plasma major bumps.
+- **kvantum / qt.style**: HM `qt.style` and a system-wide kvantum stay off.
+  When Plasma was installed, they made KDE's QML import "kvantum" and
+  black-screened plasmashell. Plasma is gone now, but `qt.style` would still
+  force `QT_STYLE_OVERRIDE` on every session. All compositors set
+  `QT_QPA_PLATFORMTHEME=kde`.
 - **Electron apps**: `NIXOS_OZONE_WL=1` (amd.nix) puts them on Wayland.
   Signal must launch with `--password-store=gnome-libsecret` everywhere or
   the keyring backend flips between sessions and loses the encryption key.
@@ -51,8 +52,9 @@ KDE Plasma is not installed.
 
 ## Not in nixpkgs (checked during migration)
 
-keeper-password-manager, lunatask, cider, millennium, moondeckbuddy,
-opencode-bin, fluxer. Flatpak stays enabled as the escape hatch. The full
+keeper-password-manager, lunatask, moondeckbuddy, opencode-bin, fluxer.
+Since then cider arrived as `cider-2` and Millennium comes from its own flake
+input. Flatpak stays enabled as the escape hatch. The full
 CachyOS→nixpkgs name-mapping tables from the migration live in git history
 (README.md before 2026-07-14); the surviving decisions are inline comments
 in nixos/base/packages.nix.
