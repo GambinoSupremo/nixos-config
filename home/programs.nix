@@ -159,7 +159,7 @@
         "application/x-zerosize"
       ] (_: lib.mkForce [ "dev.zed.Zed.desktop" ])
       // {
-        # Folders (e.g. Steam "Browse local files") — otherwise falls back to kitty-open.
+        # Folders (e.g. Steam "Browse local files") open in Nautilus, not whatever claims the type.
         "inode/directory" = [ "org.gnome.Nautilus.desktop" ];
         "image/x-canon-cr2" = [ "org.nomacs.ImageLounge.desktop" ];
         "image/x-canon-cr3" = [ "org.nomacs.ImageLounge.desktop" ];

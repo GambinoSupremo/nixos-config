@@ -9,20 +9,15 @@
     # fish registered system-wide via programs.fish in users.nix
     # starship / bat / fzf / zoxide: HM-owned — home/shell.nix
     ghostty
-    kitty
-    tmux
     eza # stays: only aliased (no programs.eza) in home/shell.nix
     ripgrep
     fd
     tree
-    duf
     less
-    pv
     wget
     curl
 
     # ── File management ───────────────────────────────────────────────────────
-    stow
     rsync
     unrar
     unzip
@@ -31,7 +26,6 @@
     neovim
     vim
     nano
-    meld
     zed-editor
 
     # ── Dev tools ─────────────────────────────────────────────────────────────
@@ -49,15 +43,10 @@
 
     # ── System utilities ──────────────────────────────────────────────────────
     btop
-    glances
     fastfetch
     dmidecode
-    lsscsi
-    hdparm
     smartmontools
-    sg3_utils
     usbutils
-    hwinfo
 
     # ── Wayland tooling ───────────────────────────────────────────────────────
     # niri registered via programs.niri in desktop.nix
@@ -76,11 +65,8 @@
     #            in home/default.nix; runs as noctalia.service
 
     # ── Themes / Appearance ───────────────────────────────────────────────────
-    nwg-look
     bibata-cursors # was bibata-cursor-theme-bin (AUR)
     papirus-icon-theme
-    tela-icon-theme
-    nordzy-icon-theme # in nixpkgs (pkgs/by-name) despite old AUR-only note
     adw-gtk3 # was adw-gtk-theme
     qt6Packages.qt6ct # top-level qt6ct became a throw alias 2025-10-27
     kdePackages.breeze # was breeze
@@ -92,10 +78,8 @@
     pcloud # pCloud Drive (Electron); unfree
     signal-desktop
     vesktop # Discord
-    element-desktop
     # zen-browser moved to home-manager (home/zen.nix, programs.zen-browser)
     mpv
-    vlc # was vlc-plugins-all (plugins included)
     loupe # GNOME image viewer
     nomacs # RAW-capable viewer; default for CR2/CR3 (home/programs.nix)
     nautilus
