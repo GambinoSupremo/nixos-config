@@ -70,6 +70,8 @@ home/                     # home-manager for gav (shared by all hosts):
 docs/
   workflow.md             # rebuilding, apply/update, dotfiles, fresh install
   notes.md                # sessions, known constraints, not-in-nixpkgs list
+  decisions.md            # judgment calls from the 2026-07 cleanup
+.claude/CLAUDE.md         # instructions for Claude Code in this repo
 ```
 
 ## How I use it

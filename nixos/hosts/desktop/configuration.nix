@@ -14,7 +14,7 @@
   ];
 
   # Zen kernel from nixpkgs (desktop-tuned, on cache.nixos.org). CachyOS tuning
-  # stays in features/tuning.nix; see DECISIONS.md for why the kernel changed.
+  # stays in features/tuning.nix; see docs/decisions.md for why the kernel changed.
   boot.kernelPackages = pkgs.linuxPackages_zen;
 
   # Plex webhooks for the Obsidian watch log (home/plex-log.nix); LAN interface only.
