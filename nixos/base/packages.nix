@@ -78,8 +78,7 @@
     vesktop # Discord
     # zen-browser moved to home-manager (home/zen.nix, programs.zen-browser)
     mpv
-    loupe # GNOME image viewer
-    nomacs # RAW-capable viewer; default for CR2/CR3 (home/programs.nix)
+    nomacs # the image viewer, Canon RAW included; defaults in home/programs.nix
     nautilus
     gnome-disk-utility
     pavucontrol

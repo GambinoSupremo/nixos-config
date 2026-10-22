@@ -127,8 +127,8 @@
   };
 
   # ── Default apps (mime associations) ─────────────────────────────────────────
-  # Canon RAW opens in nomacs (loupe can't read it); declared here because
-  # nomacs' .desktop doesn't advertise the RAW mime types.
+  # nomacs is the only image viewer; its .desktop doesn't advertise Canon RAW,
+  # and satty claims png/jpeg, so the image defaults are pinned here.
   xdg.mimeApps = {
     enable = true;
     associations.added = {
@@ -161,9 +161,16 @@
       // {
         # Folders (e.g. Steam "Browse local files") open in Nautilus, not whatever claims the type.
         "inode/directory" = [ "org.gnome.Nautilus.desktop" ];
-        "image/x-canon-cr2" = [ "org.nomacs.ImageLounge.desktop" ];
-        "image/x-canon-cr3" = [ "org.nomacs.ImageLounge.desktop" ];
-      };
+      }
+      // lib.genAttrs [
+        "image/png"
+        "image/jpeg"
+        "image/webp"
+        "image/gif"
+        "image/tiff"
+        "image/x-canon-cr2"
+        "image/x-canon-cr3"
+      ] (_: [ "org.nomacs.ImageLounge.desktop" ]);
   };
 
   # ── Git ──────────────────────────────────────────────────────────────────────
