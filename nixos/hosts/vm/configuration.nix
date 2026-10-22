@@ -8,7 +8,6 @@
     ../../base
   ];
 
-  boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
 
   # QEMU guest agent, so the config stays bootable as a VM if ever deployed

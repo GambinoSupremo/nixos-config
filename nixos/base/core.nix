@@ -34,8 +34,6 @@
         "gav"
       ];
       warn-dirty = false;
-      # Default max-jobs of 1 makes rebuilds painfully sequential on this Ryzen.
-      max-jobs = "auto";
     };
     gc = {
       automatic = true;

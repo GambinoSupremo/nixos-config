@@ -5,10 +5,7 @@
 {
   # ── Bluetooth ─────────────────────────────────────────────────────────────────
   # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-  };
+  hardware.bluetooth.enable = true;
   services.blueman.enable = true; # system tray + pairing GUI
 
   # ── Key remapping ─────────────────────────────────────────────────────────────
@@ -67,7 +64,4 @@
   # ── Firmware updates ──────────────────────────────────────────────────────────
   # SSD/BIOS/peripheral firmware via LVFS: fwupdmgr get-updates && fwupdmgr update
   services.fwupd.enable = true;
-
-  # ── D-Bus ─────────────────────────────────────────────────────────────────────
-  services.dbus.enable = true;
 }

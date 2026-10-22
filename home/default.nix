@@ -18,8 +18,5 @@
     ./vesktop-mic.nix # vesktop-mic: mute Discord's mic stream during in-game push-to-talk
   ];
 
-  home.username = "gav";
-  home.homeDirectory = "/home/gav";
   home.stateVersion = "26.05";
-  programs.home-manager.enable = true;
 }
