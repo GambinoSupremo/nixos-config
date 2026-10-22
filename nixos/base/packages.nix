@@ -41,6 +41,12 @@
     nil # Nix language server — Zed's Nix extension shells out to it
     jq # JSON CLI; required by niri
     python3
+    # Keeper Commander CLI; not in nixpkgs. Pinned release, deps resolved as of its
+    # release date. Python 3.13 because keeper-mlkem has no 3.14 wheel yet.
+    (writeShellScriptBin "keeper" ''
+      exec ${uv}/bin/uv tool run --no-python-downloads --python ${python313}/bin/python3.13 \
+        --exclude-newer 2026-10-09T00:00:00Z --from keepercommander==18.1.8 keeper "$@"
+    '')
 
     # ── System utilities ──────────────────────────────────────────────────────
     btop
