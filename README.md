@@ -3,8 +3,10 @@
 My NixOS flake for a Hyprland gaming desktop, with dotfiles pulled in from a
 separate repo and patched for NixOS at build time.
 
-<!-- Screenshot placeholder: add docs/screenshot.png (Hyprland + Noctalia on the ultrawide). -->
+<!-- Screenshot: once docs/screenshot.png exists (Hyprland + Noctalia bar on the
+     AW3423DW ultrawide), uncomment the line below.
 ![Desktop screenshot](docs/screenshot.png)
+-->
 
 ## Highlights
 

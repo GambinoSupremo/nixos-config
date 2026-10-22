@@ -1,7 +1,8 @@
 # nixos-config
 
-NixOS flake for gavos (desktop) and nix-vm (Proxmox test VM). Dotfiles come
-from the separate dotfiles repo; see README.md for the repo map.
+NixOS flake for gavos (desktop) and nix-vm (build-only target for the shared
+modules; no VM is deployed). Dotfiles come from the separate dotfiles repo;
+see README.md for the repo map.
 
 ## Rules
 
