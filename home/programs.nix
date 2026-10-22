@@ -190,6 +190,10 @@
       # GNOME Keyring's agent, so shells without SSH_AUTH_SOCK can still use the key
       IdentityAgent = "/run/user/%i/gcr/ssh";
     };
+    settings."github.com" = {
+      IdentityFile = "~/.ssh/id_ed25519";
+      IdentitiesOnly = true;
+    };
   };
 
   # ── Neovim ───────────────────────────────────────────────────────────────────
