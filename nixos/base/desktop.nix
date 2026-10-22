@@ -33,6 +33,8 @@ in
 
     # Niri — nixpkgs module registers session + portal config.
     programs.niri.enable = cfg.niri;
+    # Niri's X11 support; the module doesn't install it.
+    environment.systemPackages = lib.mkIf cfg.niri [ pkgs.xwayland-satellite ];
 
     # Hyprland — primary/daily driver. Session env / noctalia startup driven by
     # hyprSessionBootstrap in home/dotfiles.nix (the bare target raced noctalia).
