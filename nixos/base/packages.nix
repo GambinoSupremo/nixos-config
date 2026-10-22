@@ -37,7 +37,6 @@
     # ── Dev tools ─────────────────────────────────────────────────────────────
     git
     github-cli
-    claude-code
     nil # Nix language server — Zed's Nix extension shells out to it
     jq # JSON CLI; required by niri
     python3
