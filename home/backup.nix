@@ -68,13 +68,17 @@ let
         pkgs.rclone
         pkgs.coreutils
         pkgs.libnotify
+        pkgs.curl
       ]
     }
-    fail() { notify-send -u critical "NAS backup failed" "$1 (journalctl --user -u nas-backup)"; exit 1; }
+    # healthchecks.io ping URL, kept outside the repo (mode 600); no file, no ping.
+    hc_url_file="$HOME/.config/nas-backup/healthchecks-url"
+    hc_ping() { if [[ -r $hc_url_file ]]; then curl -fsS -m 10 --retry 3 -o /dev/null "$(cat "$hc_url_file")$1" || true; fi; }
+    fail() { notify-send -u critical "NAS backup failed" "$1 (journalctl --user -u nas-backup)"; hc_ping /fail; exit 1; }
 
     if [[ $(rclone listremotes) != *pcloud-crypt:* ]]; then
       echo "Not set up yet; run nas-backup-setup."
-      exit 0
+      fail "Not set up yet; run nas-backup-setup"
     fi
     rclone sync nas:personal pcloud-crypt:current \
       --backup-dir "pcloud-crypt:changed/$(date +%F)" \
@@ -85,6 +89,7 @@ let
     { rclone lsf --dirs-only pcloud-crypt:changed 2>/dev/null || true; } | while read -r d; do
       if [[ ''${d%/} < $cutoff ]]; then rclone purge "pcloud-crypt:changed/''${d%/}"; fi
     done
+    hc_ping ""
   '';
 in
 lib.mkIf (!host.isVM) {
