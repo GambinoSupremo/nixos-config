@@ -187,6 +187,8 @@
       User = "root";
       IdentityFile = "~/.ssh/id_ed25519_proxmox";
       IdentitiesOnly = true;
+      # GNOME Keyring's agent, so shells without SSH_AUTH_SOCK can still use the key
+      IdentityAgent = "/run/user/%i/gcr/ssh";
     };
   };
 
