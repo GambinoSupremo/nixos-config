@@ -174,6 +174,16 @@
       user.email = "service.haiku882@passinbox.com";
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
+      # Config-based hook, so it runs in every repo alongside any .git/hooks ones.
+      hook.strip-claude-attribution = {
+        event = "commit-msg";
+        command = "${pkgs.writeShellScript "strip-claude-attribution" ''
+          sed=${lib.getExe pkgs.gnused}
+          $sed -i -E -e '/^[[:space:]]*Co-Authored-By:.*Claude/Id' -e '/Generated with \[?Claude Code/d' "$1"
+          # Drop the blank lines the removed trailers leave at the end.
+          $sed -i -e ':a' -e '/^\n*$/{$d;N;ba' -e '}' "$1"
+        ''}";
+      };
     };
   };
 
