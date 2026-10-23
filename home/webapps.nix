@@ -1,17 +1,44 @@
 # Web apps: sites in their own Firefox window (no URL bar or tabs) via PWAsForFirefox,
 # each with a launcher entry. Add a site with a fresh ULID; icons are Papirus names so
 # they match the rest of the launcher (Claude's is drawn in home/icons/).
-{ ... }:
+{ lib, pkgs, ... }:
 
+let
+  profile = ".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9";
+
+  # Signed XPIs from addons.mozilla.org, pinned (Firefox's auto-update is off below).
+  extensions = {
+    "sponsorBlocker@ajay.app" = {
+      url = "https://addons.mozilla.org/firefox/downloads/file/4897574/sponsorblock-6.1.7.xpi";
+      sha256 = "0d50e1632c6f15ee15a543e670e1c572974605a5c02622916e08e026803df83f";
+    };
+    "enhancerforyoutube@maximerf.addons.mozilla.org" = {
+      url = "https://addons.mozilla.org/firefox/downloads/file/4933627/enhancer_for_youtube-2.0.136.xpi";
+      sha256 = "38a0420804d08224fc44e838aec432e947eb688b1300f423eeecbb44d33037fa";
+    };
+    "addon@darkreader.org" = {
+      url = "https://addons.mozilla.org/firefox/downloads/file/5055786/darkreader-4.9.133.xpi";
+      sha256 = "eb06c5096d761616c7f1d954c11524ca4bff4fe7229044dc1fce288a8c0853ab";
+    };
+  };
+in
 {
-  # Hide Firefox's own title bar (close/min/max); Hyprland doesn't need it.
-  home.file.".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9/user.js".text = ''
-    user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
-  '';
-  home.file.".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9/chrome/userChrome.css".text =
-    ''
-      #navigator-toolbox { visibility: collapse !important; }
-    '';
+  home.file =
+    lib.mapAttrs' (
+      id: src: lib.nameValuePair "${profile}/extensions/${id}.xpi" { source = pkgs.fetchurl src; }
+    ) extensions
+    // {
+      # Hide Firefox's own title bar (close/min/max); Hyprland doesn't need it.
+      # Extensions dropped into the profile load enabled, and stay at the pinned versions.
+      "${profile}/user.js".text = ''
+        user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+        user_pref("extensions.autoDisableScopes", 0);
+        user_pref("extensions.update.enabled", false);
+      '';
+      "${profile}/chrome/userChrome.css".text = ''
+        #navigator-toolbox { visibility: collapse !important; }
+      '';
+    };
 
   # The package's own "firefoxpwa" entry just opens the bare runtime browser.
   xdg.dataFile."applications/firefoxpwa.desktop" = {
