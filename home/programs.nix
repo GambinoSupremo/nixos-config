@@ -307,10 +307,7 @@
   xdg.desktopEntries.claude-code = {
     name = "Claude Code";
     exec = "ghostty --class=com.claude.code -e fish -c claude";
-    icon = pkgs.fetchurl {
-      url = "https://raw.githubusercontent.com/selfhst/icons/1d65d45a42e6323b54b8096967b1ea4b65321f97/png/claude.png";
-      hash = "sha256-mtDbIBCo74V0HJKuDdiUUSb1zXOL+4TQd6YU8ZZ7vOc=";
-    };
+    icon = "${./icons/clawd.svg}"; # Clawd, so it doesn't match the Claude web app
     comment = "Claude Code in a terminal";
     categories = [ "Development" ];
   };
