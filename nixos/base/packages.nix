@@ -23,8 +23,7 @@
     unzip
 
     # ── Editors ───────────────────────────────────────────────────────────────
-    neovim
-    vim
+    neovim # `vim` runs nvim too (wrapper in home/programs.nix)
     nano
     zed-editor
 
