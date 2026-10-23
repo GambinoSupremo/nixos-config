@@ -302,6 +302,16 @@
     ];
   };
 
+  # ── Claude Code ──────────────────────────────────────────────────────────────
+  # Launcher entry; goes through fish so the claude function picks the directory.
+  xdg.desktopEntries.claude-code = {
+    name = "Claude Code";
+    exec = "ghostty --class=com.claude.code -e fish -c claude";
+    icon = "com.mitchellh.ghostty";
+    comment = "Claude Code in a terminal";
+    categories = [ "Development" ];
+  };
+
   # ── pCloud ───────────────────────────────────────────────────────────────────
   # pCloud writes its own launcher pointing at an old store path; hide it so only
   # the package's entry shows up.
