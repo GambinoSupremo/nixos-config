@@ -99,7 +99,7 @@
     name = "Zen Browser";
     genericName = "Web Browser";
     exec = "zen-beta --name zen-beta %U";
-    icon = "zen-browser";
+    icon = "${./icons/zen.svg}"; # Papirus's Zen icon, dark
     categories = [
       "Network"
       "WebBrowser"

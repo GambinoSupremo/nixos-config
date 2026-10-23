@@ -13,6 +13,12 @@
       #navigator-toolbox { visibility: collapse !important; }
     '';
 
+  # The package's own "firefoxpwa" entry just opens the bare runtime browser.
+  xdg.dataFile."applications/firefoxpwa.desktop" = {
+    force = true;
+    text = "[Desktop Entry]\nHidden=true\n";
+  };
+
   programs.firefoxpwa = {
     enable = true;
     # One shared profile, so web apps share logins with each other (not with Zen).
