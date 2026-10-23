@@ -115,7 +115,9 @@ nh_switch() {
 print_changes() {
   local changes
   changes=$(jq -rn --slurpfile a "$1" --slurpfile b "$2" '
-    def lock($l; $n): ($l.nodes[$l.nodes.root.inputs[$n]] // {}).locked // {};
+    # Inputs new in this run (or a follows path) have no node in the old lock.
+    def lock($l; $n): $l.nodes.root.inputs[$n] as $k
+      | if ($k | type) == "string" then ($l.nodes[$k] // {}).locked // {} else {} end;
     def short: (.rev // (.narHash // "-" | ltrimstr("sha256-")))[0:7];
     ($b[0].nodes.root.inputs | keys[]) as $n
     | lock($a[0]; $n) as $o | lock($b[0]; $n) as $w
