@@ -1,5 +1,6 @@
 # Web apps: sites in their own Firefox window (no URL bar or tabs) via PWAsForFirefox,
-# each with a launcher entry. Add a site with a fresh ULID; icons from dashboard-icons.
+# each with a launcher entry. Add a site with a fresh ULID; icons from dashboard-icons
+# (Claude's spark from selfh.st, dashboard-icons only has the Anthropic logo).
 { pkgs, ... }:
 
 let
@@ -9,6 +10,11 @@ let
       url = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/320c819da84048d5a3066e2578bfa83be9019fdf/png/${name}.png";
       inherit hash;
     };
+
+  claudeIcon = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/selfhst/icons/1d65d45a42e6323b54b8096967b1ea4b65321f97/png/claude.png";
+    hash = "sha256-mtDbIBCo74V0HJKuDdiUUSb1zXOL+4TQd6YU8ZZ7vOc=";
+  };
 in
 {
   # Hide Firefox's own title bar (close/min/max); Hyprland doesn't need it.
@@ -29,7 +35,7 @@ in
         name = "Claude";
         url = "https://claude.ai";
         desktopEntry = {
-          icon = icon "claude-ai" "sha256-76HQVfcmqUniwXKBC/E5DiaIdUMR0K3oVWA26HwSdfA=";
+          icon = claudeIcon;
           categories = [ "Network" ];
         };
       };
