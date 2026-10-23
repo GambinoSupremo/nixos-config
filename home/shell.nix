@@ -33,13 +33,21 @@ in
     interactiveShellInit = ''
       set fish_greeting ""
       fish_add_path -g ~/.local/bin  # user-installed CLIs
-      # 1 in 40 is shiny, marked with a small sparkle.
+      # A krabby Pokémon on each new shell; 1 in 40 is shiny, with a sparkle at its top right.
       if command -q krabby
-        if test (random 1 40) -eq 1
-          krabby random --no-title --shiny 2>/dev/null
-          set_color brblack; echo "  ✨"; set_color normal
-        else
-          krabby random --no-title 2>/dev/null
+        set -l shiny
+        test (random 1 40) -eq 1; and set shiny --shiny
+        set -l art (krabby random --no-title $shiny 2>/dev/null)
+        # Drop krabby's blank padding rows so the prompt sits close under the sprite.
+        while set -q art[1]; and test -z (string replace -ra '\e\[[0-9;]*m' "" -- $art[-1] | string trim)
+          set -e art[-1]
+        end
+        while set -q art[1]; and test -z (string replace -ra '\e\[[0-9;]*m' "" -- $art[1] | string trim)
+          set -e art[1]
+        end
+        if set -q art[1]
+          set -q shiny[1]; and set art[1] "$art[1]  ✨"
+          printf '%s\n' $art
         end
       end
     '';
