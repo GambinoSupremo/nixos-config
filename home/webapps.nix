@@ -11,6 +11,11 @@ let
     };
 in
 {
+  # Ctrl+Alt toggles the title/icon bar (Hyprland draws no titlebar anyway); state is remembered.
+  home.file.".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9/user.js".text = ''
+    user_pref("firefoxpwa.enableHidingIconBar", true);
+  '';
+
   programs.firefoxpwa = {
     enable = true;
     # One shared profile, so web apps share logins with each other (not with Zen).
