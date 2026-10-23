@@ -301,4 +301,12 @@
       "Network"
     ];
   };
+
+  # ── pCloud ───────────────────────────────────────────────────────────────────
+  # pCloud writes its own launcher pointing at an old store path; hide it so only
+  # the package's entry shows up.
+  xdg.dataFile."applications/appimagekit-pcloud.desktop" = {
+    force = true;
+    text = "[Desktop Entry]\nHidden=true\n";
+  };
 }
