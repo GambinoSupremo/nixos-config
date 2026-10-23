@@ -47,6 +47,17 @@ in
           categories = [ "Office" ];
         };
       };
+      sites."01M5K7BCQEJQ4BGRNA0T8WVXPA" = {
+        name = "YouTube";
+        url = "https://www.youtube.com";
+        desktopEntry = {
+          icon = icon "youtube" "sha256-IXEiZv0BxEfja0Rh/4YSRzXEg8iSElLAEfCkNUcDFVI=";
+          categories = [
+            "AudioVideo"
+            "Video"
+          ];
+        };
+      };
       sites."01M5K770R4K7SGG8XNF738Q2AD" = {
         name = "Proton Mail";
         url = "https://mail.proton.me";
