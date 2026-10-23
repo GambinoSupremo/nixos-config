@@ -22,9 +22,9 @@ let
   };
 in
 {
-  # pokemon-colorscripts: shown on every new shell — CachyOS parity.
+  # krabby: a Pokémon on every new shell (pokemon-colorscripts' sprites, plus Gen 9).
   home.packages = [
-    pkgs.pokemon-colorscripts
+    pkgs.krabby
   ];
 
   # ── Fish ─────────────────────────────────────────────────────────────────────
@@ -33,7 +33,15 @@ in
     interactiveShellInit = ''
       set fish_greeting ""
       fish_add_path -g ~/.local/bin  # user-installed CLIs
-      command -q pokemon-colorscripts; and pokemon-colorscripts --no-title -r 2>/dev/null || true
+      # 1 in 20 is shiny, marked with a small sparkle.
+      if command -q krabby
+        if test (random 1 20) -eq 1
+          krabby random --no-title --shiny 2>/dev/null
+          set_color brblack; echo "  ✨"; set_color normal
+        else
+          krabby random --no-title 2>/dev/null
+        end
+      end
     '';
     shellAliases = {
       ls = "eza --icons --group-directories-first";
