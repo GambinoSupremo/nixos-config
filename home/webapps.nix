@@ -11,10 +11,14 @@ let
     };
 in
 {
-  # Ctrl+Alt toggles the title/icon bar (Hyprland draws no titlebar anyway); state is remembered.
+  # Hide Firefox's own title bar (close/min/max); Hyprland doesn't need it.
   home.file.".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9/user.js".text = ''
-    user_pref("firefoxpwa.enableHidingIconBar", true);
+    user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
   '';
+  home.file.".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9/chrome/userChrome.css".text =
+    ''
+      #titlebar { display: none !important; }
+    '';
 
   programs.firefoxpwa = {
     enable = true;
