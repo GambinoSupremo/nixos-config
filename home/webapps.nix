@@ -33,6 +33,25 @@ in
           categories = [ "Network" ];
         };
       };
+      sites."01M5K770R4RKNSG5FN1DWH0N2M" = {
+        name = "Todoist";
+        url = "https://app.todoist.com";
+        desktopEntry = {
+          icon = icon "todoist" "sha256-bbbpabckSGzqGtbAmQ3/La/Ujnz1UlYlWD7c1sjhcxI=";
+          categories = [ "Office" ];
+        };
+      };
+      sites."01M5K770R4K7SGG8XNF738Q2AD" = {
+        name = "Proton Mail";
+        url = "https://mail.proton.me";
+        desktopEntry = {
+          icon = icon "proton-mail" "sha256-JPOsxYjYUXGB6QKr2uarhjlr87UI/cvYmx2SvgBNXos=";
+          categories = [
+            "Network"
+            "Email"
+          ];
+        };
+      };
     };
   };
 }
