@@ -28,15 +28,28 @@ in
       id: src: lib.nameValuePair "${profile}/extensions/${id}.xpi" { source = pkgs.fetchurl src; }
     ) extensions
     // {
-      # Hide Firefox's own title bar (close/min/max); Hyprland doesn't need it.
+      # Allow userChrome.css (toolbar below).
       # Extensions dropped into the profile load enabled, and stay at the pinned versions.
       "${profile}/user.js".text = ''
         user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
         user_pref("extensions.autoDisableScopes", 0);
         user_pref("extensions.update.enabled", false);
       '';
+      # Toolbar hides above the window; mouse at the top edge slides it over the page,
+      # and it stays while an extension popup or menu from it is open.
       "${profile}/chrome/userChrome.css".text = ''
-        #navigator-toolbox { visibility: collapse !important; }
+        #navigator-toolbox {
+          position: fixed !important;
+          top: 0; left: 0; right: 0;
+          z-index: 10 !important;
+          transform: translateY(calc(-100% + 3px));
+          transition: transform 120ms ease !important;
+        }
+        #navigator-toolbox:hover,
+        #navigator-toolbox:focus-within,
+        #navigator-toolbox:has([open="true"]) {
+          transform: none;
+        }
       '';
     };
 
