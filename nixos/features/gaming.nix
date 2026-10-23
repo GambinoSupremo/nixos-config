@@ -28,6 +28,14 @@ in
 {
   # Millennium isn't in nixpkgs. Only its own build uses the flake's pinned
   # nixpkgs (bun FOD); the Steam FHS env is wrapped from current nixpkgs.
+  # Upstream's binary cache for the Deadlock Mod Manager flake input.
+  nix.settings = {
+    substituters = [ "https://deadlock-mod-manager.cachix.org" ];
+    trusted-public-keys = [
+      "deadlock-mod-manager.cachix.org-1:wUjtzL6yN2i9zTq1YrXHBr0mx3LP7tBGsosk3N+/A/M="
+    ];
+  };
+
   nixpkgs.overlays = [
     (final: _prev: {
       millennium-steam = final.callPackage "${inputs.millennium}/steam.nix" {
@@ -111,7 +119,7 @@ in
     '')
     lutris
     mangohud
-    deadlock-mod-manager
+    inputs.deadlock-mod-manager.packages.${pkgs.stdenv.hostPlatform.system}.default
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
   ];
 }
