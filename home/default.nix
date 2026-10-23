@@ -16,6 +16,7 @@
     ./garmin-sync.nix # garmin-sync: Garmin steps/sleep/workouts → Obsidian daily notes (desktop)
     ./game-log.nix # game-log: Steam playtime → Obsidian daily notes (desktop)
     ./vesktop-mic.nix # vesktop-mic: mute Discord's mic stream during in-game push-to-talk
+    ./webapps.nix # Claude etc. as app-like Firefox windows (PWAsForFirefox)
   ];
 
   home.stateVersion = "26.05";
