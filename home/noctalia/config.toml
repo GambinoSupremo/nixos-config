@@ -107,7 +107,7 @@ offset_x = 8.0
 scale = 0.85000000521540642
 
 [shell]
-avatar_path = "/home/gav/Downloads/p.kagi.jpg"
+avatar_path = "/home/gav/.face"
 settings_show_advanced = true
 telemetry_enabled = false
 
