@@ -17,7 +17,7 @@ in
   '';
   home.file.".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9/chrome/userChrome.css".text =
     ''
-      #titlebar { display: none !important; }
+      #navigator-toolbox { visibility: collapse !important; }
     '';
 
   programs.firefoxpwa = {
