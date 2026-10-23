@@ -1,21 +1,8 @@
 # Web apps: sites in their own Firefox window (no URL bar or tabs) via PWAsForFirefox,
-# each with a launcher entry. Add a site with a fresh ULID; icons from dashboard-icons
-# (Claude's spark from selfh.st, dashboard-icons only has the Anthropic logo).
-{ pkgs, ... }:
+# each with a launcher entry. Add a site with a fresh ULID; icons are Papirus names so
+# they match the rest of the launcher (Claude's is drawn in home/icons/).
+{ ... }:
 
-let
-  icon =
-    name: hash:
-    pkgs.fetchurl {
-      url = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/320c819da84048d5a3066e2578bfa83be9019fdf/png/${name}.png";
-      inherit hash;
-    };
-
-  claudeIcon = pkgs.fetchurl {
-    url = "https://raw.githubusercontent.com/selfhst/icons/1d65d45a42e6323b54b8096967b1ea4b65321f97/png/claude.png";
-    hash = "sha256-mtDbIBCo74V0HJKuDdiUUSb1zXOL+4TQd6YU8ZZ7vOc=";
-  };
-in
 {
   # Hide Firefox's own title bar (close/min/max); Hyprland doesn't need it.
   home.file.".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9/user.js".text = ''
@@ -35,7 +22,7 @@ in
         name = "Claude";
         url = "https://claude.ai";
         desktopEntry = {
-          icon = claudeIcon;
+          icon = "${./icons/claude.svg}";
           categories = [ "Network" ];
         };
       };
@@ -43,7 +30,7 @@ in
         name = "Todoist";
         url = "https://app.todoist.com";
         desktopEntry = {
-          icon = icon "todoist" "sha256-bbbpabckSGzqGtbAmQ3/La/Ujnz1UlYlWD7c1sjhcxI=";
+          icon = "todoist";
           categories = [ "Office" ];
         };
       };
@@ -51,7 +38,7 @@ in
         name = "YouTube";
         url = "https://www.youtube.com";
         desktopEntry = {
-          icon = icon "youtube" "sha256-IXEiZv0BxEfja0Rh/4YSRzXEg8iSElLAEfCkNUcDFVI=";
+          icon = "youtube";
           categories = [
             "AudioVideo"
             "Video"
@@ -62,7 +49,7 @@ in
         name = "Proton Mail";
         url = "https://mail.proton.me";
         desktopEntry = {
-          icon = icon "proton-mail" "sha256-JPOsxYjYUXGB6QKr2uarhjlr87UI/cvYmx2SvgBNXos=";
+          icon = "proton-mail";
           categories = [
             "Network"
             "Email"
