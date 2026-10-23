@@ -33,9 +33,9 @@ in
     interactiveShellInit = ''
       set fish_greeting ""
       fish_add_path -g ~/.local/bin  # user-installed CLIs
-      # 1 in 20 is shiny, marked with a small sparkle.
+      # 1 in 40 is shiny, marked with a small sparkle.
       if command -q krabby
-        if test (random 1 20) -eq 1
+        if test (random 1 40) -eq 1
           krabby random --no-title --shiny 2>/dev/null
           set_color brblack; echo "  ✨"; set_color normal
         else
