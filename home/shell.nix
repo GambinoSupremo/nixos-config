@@ -68,11 +68,14 @@ in
       dotsync = "${nixosSync}/bin/nixos-sync dotsync";
       save = "${nixosSync}/bin/nixos-sync save";
 
-      # Claude Code won't persist trust for $HOME; launch from nixos-config instead.
+      # Claude Code won't persist trust for $HOME; ~/Projects is the hub instead.
       claude = ''
-        test "$PWD" = "$HOME"; and cd ~/nixos-config
+        test "$PWD" = "$HOME"; and cd ~/Projects
         command claude $argv
       '';
+      # Jump to a project and pick from its chats.
+      nx = "cd ~/nixos-config; and command claude -r $argv";
+      lab = "cd ~/Projects/homelab; and command claude -r $argv";
     };
   };
 
