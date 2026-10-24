@@ -35,11 +35,6 @@
       flake = false;
     };
 
-    # Millennium — Steam client theming/plugin patcher; not in nixpkgs.
-    # No nixpkgs.follows: Millennium pins its own nixpkgs on purpose because
-    # its bun FOD hash breaks on any bun version change (upstream comment).
-    millennium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
-
     # Deadlock Mod Manager from upstream, pinned to a release tag (nixpkgs lags at 1.1.0).
     # No nixpkgs.follows so the build matches their Cachix cache (gaming.nix).
     # Go back to pkgs.deadlock-mod-manager once nixpkgs catches up.

@@ -54,8 +54,8 @@ KDE Plasma is not installed.
 ## Not in nixpkgs (checked during migration)
 
 keeper-password-manager, lunatask, moondeckbuddy, opencode-bin, fluxer.
-Since then cider arrived as `cider-2` and Millennium comes from its own flake
-input. Flatpak stays enabled as the escape hatch. The full
+Since then cider arrived as `cider-2` (Millennium was added via its own flake
+input, then dropped 2026-10-24). Flatpak stays enabled as the escape hatch. The full
 CachyOS→nixpkgs name-mapping tables from the migration live in git history
 (README.md before 2026-07-14); the surviving decisions are inline comments
 in nixos/base/packages.nix.

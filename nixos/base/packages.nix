@@ -100,7 +100,6 @@
     # ── Gaming / Streaming ────────────────────────────────────────────────────
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
     protonplus
-    # millennium: via its own flake, wired as the Steam package in features/gaming.nix
 
     # ── Peripherals ───────────────────────────────────────────────────────────
     zmk-studio # runtime keymap editor for the Lily58 (firmware built in ~/Projects/zmk-config)

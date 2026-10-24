@@ -210,25 +210,11 @@ cmd_update() {
   print_changes "$backup" flake.lock
 
   section "Building ($host)"
-  local msg="flake: update inputs"
-  if ! nh_switch; then
-    # Millennium's bun hash often goes stale upstream; retry with it held back.
-    local q='.nodes.millennium.locked.rev'
-    [[ "$(jq -r "$q" flake.lock)" != "$(jq -r "$q" "$backup")" ]] ||
-      restore_and_die "Switch failed."
-    warn "Switch failed. Retrying with Millennium held at its previous rev."
-    cp "$backup" flake.lock
-    local -a others
-    mapfile -t others < <(jq -r '.nodes.root.inputs | keys[] | select(. != "millennium")' flake.lock)
-    quiet nix flake update "${others[@]}" --flake "$flake_dir" || restore_and_die "nix flake update failed."
-    print_changes "$backup" flake.lock
-    nh_switch || restore_and_die "Switch failed with Millennium held back too."
-    msg="flake: update inputs (Millennium held back)"
-  fi
+  nh_switch || restore_and_die "Switch failed."
   ok "Switched to the new system"
 
   section "Wrapping up"
-  commit_lock "$msg" && push_lock
+  commit_lock "flake: update inputs" && push_lock
   after_switch
 }
 

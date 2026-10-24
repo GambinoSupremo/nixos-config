@@ -26,8 +26,6 @@ let
   '';
 in
 {
-  # Millennium isn't in nixpkgs. Only its own build uses the flake's pinned
-  # nixpkgs (bun FOD); the Steam FHS env is wrapped from current nixpkgs.
   # Upstream's binary cache for the Deadlock Mod Manager flake input.
   nix.settings = {
     substituters = [ "https://deadlock-mod-manager.cachix.org" ];
@@ -35,16 +33,6 @@ in
       "deadlock-mod-manager.cachix.org-1:wUjtzL6yN2i9zTq1YrXHBr0mx3LP7tBGsosk3N+/A/M="
     ];
   };
-
-  nixpkgs.overlays = [
-    (final: _prev: {
-      millennium-steam = final.callPackage "${inputs.millennium}/steam.nix" {
-        inherit (inputs.millennium.packages.${final.stdenv.hostPlatform.system}) millennium;
-        # Steam guesses UI scale from the X11 primary at launch; Sunshine's 0mm virtual output made it huge.
-        extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1";
-      };
-    })
-  ];
 
   systemd.user.services.game-fullscreen = {
     description = "Fullscreen new game windows on Hyprland";
@@ -60,7 +48,8 @@ in
 
   programs.steam = {
     enable = true;
-    package = pkgs.millennium-steam;
+    # Steam guesses UI scale from the X11 primary at launch; Sunshine's 0mm virtual output made it huge.
+    package = pkgs.steam.override { extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1"; };
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
     extraCompatPackages = with pkgs; [ proton-ge-bin ];

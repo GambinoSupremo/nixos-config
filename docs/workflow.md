@@ -17,8 +17,8 @@ save      # build-check, then commit tracked changes as-is (no switch, no push)
 Each first makes sure ~/nixos-config is on an up-to-date `main`: it switches to
 `main` only from a clean tree, then `git pull --ff-only`, and stops with a
 message if either fails. `update` and `dotsync` also need a clean tree. If the
-update or rebuild fails, flake.lock is restored and nothing is committed;
-`update` retries once with Millennium held back first. On success `update`
+update or rebuild fails, flake.lock is restored and nothing is committed.
+On success `update`
 commits **only flake.lock** ("flake: update inputs") and pushes, then says if a
 reboot is needed (kernel or modules changed) and lists failed system and user
 units.
