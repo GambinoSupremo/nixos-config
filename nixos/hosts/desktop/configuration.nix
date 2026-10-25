@@ -25,9 +25,6 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # systemd initrd: faster boot, cleaner Plymouth, better error reporting.
-  boot.initrd.systemd.enable = true;
-
   # ── Quiet, pretty boot ────────────────────────────────────────────────────────
   boot.loader.systemd-boot.configurationLimit = 20;
   # Memtest86+ entry in the boot menu (RAM stability checks after BIOS changes).
@@ -45,7 +42,6 @@
 
   # Silence the console text Plymouth would otherwise paint over.
   boot.consoleLogLevel = 3;
-  boot.initrd.verbose = false;
   boot.kernelParams = [
     "quiet"
     "udev.log_priority=3"
