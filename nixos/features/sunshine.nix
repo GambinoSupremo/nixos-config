@@ -209,7 +209,7 @@ let
       case "$line" in
       *"Streaming started to "*)
         # Skip if a Moonlight stream already owns SUNSHINE.
-        hyprctl monitors -j | ${pkgs.jq}/bin/jq -e 'any(.[]; .name == "SUNSHINE")' >/dev/null && continue
+        ${pkgs.wlr-randr}/bin/wlr-randr --json | ${pkgs.jq}/bin/jq -e 'any(.[]; .name == "SUNSHINE")' >/dev/null && continue
         touch "$flag"
         SUNSHINE_CLIENT_WIDTH=2560 SUNSHINE_CLIENT_HEIGHT=1440 SUNSHINE_CLIENT_FPS=120 ${streamDisplay} start
         ;;
