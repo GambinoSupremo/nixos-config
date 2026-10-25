@@ -124,8 +124,8 @@ let
     ${pkgs.wlr-randr}/bin/wlr-randr --output SUNSHINE \
       --custom-mode "''${SUNSHINE_CLIENT_WIDTH:-1920}x''${SUNSHINE_CLIENT_HEIGHT:-1080}@''${SUNSHINE_CLIENT_FPS:-60}Hz"
     # Runtime rules (later wins over rule.conf) so new Steam windows open on the stream.
-    ${mmsg} dispatch 'setoption,windowrule,tags:2,monitor:SUNSHINE,appid:^steam$'
-    ${mmsg} dispatch 'setoption,windowrule,tags:2,monitor:SUNSHINE,appid:^steam_app_'
+    ${mmsg} dispatch 'setoption,window_rule,tags:2,monitor:SUNSHINE,app_id:^steam$'
+    ${mmsg} dispatch 'setoption,window_rule,tags:2,monitor:SUNSHINE,app_id:^steam_app_'
     ${mmsg} get all-clients | $jq -r '.clients[] | select((${isSteam}) and .monitor != "SUNSHINE") | .id' |
     while read -r id; do
       ${mmsg} dispatch tagmon,SUNSHINE,1 "client,$id"

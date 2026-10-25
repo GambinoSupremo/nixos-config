@@ -148,8 +148,8 @@ let
     ${lib.optionalString sessions.mango ''
       # ── mango ────────────────────────────────────────────────────────────
       mustSed $out/mango/autostart.conf \
-        '^exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP MANGO_INSTANCE_SIGNATURE$' \
-        's|^exec-once=systemctl --user import-environment .*$|exec-once=${mangoSessionBootstrap}|'
+        '^exec_once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP MANGO_INSTANCE_SIGNATURE$' \
+        's|^exec_once=systemctl --user import-environment .*$|exec_once=${mangoSessionBootstrap}|'
       rm $out/mango/noctalia.conf
       # Mango silently truncates config values at 255 chars.
       if grep -rn '.\{256,\}' $out/mango; then

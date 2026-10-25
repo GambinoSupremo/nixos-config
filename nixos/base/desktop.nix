@@ -22,7 +22,7 @@ in
     # ── Compositors ───────────────────────────────────────────────────────────────
     # Flip either to true to bring that session back on the login screen.
     gav.sessions = {
-      mango = false;
+      mango = true;
       niri = false;
     };
 
