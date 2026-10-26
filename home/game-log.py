@@ -68,11 +68,18 @@ def name(app, names):
 
 
 def daily_path(d):
-    """Daily note path from Obsidian's own daily-notes setting."""
+    """Today's daily note: an existing YYYY-MM-DD note anywhere in the daily folder, else
+    where Obsidian's daily-notes format would put it (e.g. YYYY/MM MMMM/[Week] WW/YYYY-MM-DD)."""
     cfg = json.load(open(os.path.join(VAULT, ".obsidian", "daily-notes.json")))
-    tokens = {"YYYY": "%Y", "MMMM": "%B", "MM": "%m", "DD": "%d", "dddd": "%A"}
-    fmt = re.sub("YYYY|MMMM|MM|DD|dddd", lambda m: tokens[m.group(0)], cfg.get("format") or "YYYY-MM-DD")
-    return os.path.join(VAULT, cfg.get("folder", ""), d.strftime(fmt) + ".md")
+    folder = os.path.join(VAULT, cfg.get("folder", ""))
+    for root, _, files in os.walk(folder):
+        if f"{d:%Y-%m-%d}.md" in files:
+            return os.path.join(root, f"{d:%Y-%m-%d}.md")
+    tokens = {"YYYY": "%Y", "MMMM": "%B", "MM": "%m", "DD": "%d", "dddd": "%A", "WW": "%V"}
+    fmt = re.sub(r"\[([^\]]*)\]|YYYY|MMMM|MM|DD|dddd|WW",
+                 lambda m: m.group(1).replace("%", "%%") if m.group(1) is not None else tokens[m.group(0)],
+                 cfg.get("format") or "YYYY-MM-DD")
+    return os.path.join(folder, d.strftime(fmt) + ".md")
 
 
 def link(title):
