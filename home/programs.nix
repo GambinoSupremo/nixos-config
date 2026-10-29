@@ -233,6 +233,7 @@
     # nvim-treesitter (main branch) compiles parsers with these.
     pkgs.gcc
     pkgs.tree-sitter
+    pkgs.codex # OpenAI's coding agent CLI (Codex web app is in webapps.nix)
   ];
 
   # ── OBS Studio ───────────────────────────────────────────────────────────────
