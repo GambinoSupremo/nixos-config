@@ -1,6 +1,6 @@
 # Web apps: sites in their own Firefox window (no URL bar or tabs) via PWAsForFirefox,
 # each with a launcher entry. Add a site with a fresh ULID; icons are Papirus names so
-# they match the rest of the launcher (Claude's is drawn in home/icons/).
+# they match the rest of the launcher (Claude's and Codex's are drawn in home/icons/).
 { lib, pkgs, ... }:
 
 let
@@ -70,6 +70,14 @@ in
         desktopEntry = {
           icon = "${./icons/claude.svg}";
           categories = [ "Network" ];
+        };
+      };
+      sites."01M5KF5QYTFMSHY6FSZVTEG8A7" = {
+        name = "Codex";
+        url = "https://chatgpt.com/codex";
+        desktopEntry = {
+          icon = "${./icons/codex.svg}";
+          categories = [ "Development" ];
         };
       };
       sites."01M5K770R4RKNSG5FN1DWH0N2M" = {
