@@ -2,6 +2,16 @@
 # force-disables the physical-hardware ones (nixos/hosts/vm).
 { pkgs, ... }:
 
+let
+  # Modifier combos must live in a layer named after the modifier:
+  # [main] can't bind "super+c". Unlisted keys fall through with Super held.
+  meta = {
+    z = "C-z";
+    x = "S-delete";
+    c = "C-insert";
+    v = "S-insert";
+  };
+in
 {
   # ── Bluetooth ─────────────────────────────────────────────────────────────────
   # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
@@ -14,20 +24,44 @@
   # must never bind Super with these letters.
   services.keyd = {
     enable = true;
-    keyboards.default = {
-      ids = [ "*" ];
-      settings = {
-        # Modifier combos must live in a layer named after the modifier —
-        # [main] can't bind "super+c". Unlisted keys fall through with Super held.
-        meta = {
-          z = "C-z";
-          x = "S-delete";
-          c = "C-insert";
-          v = "S-insert";
+    keyboards = {
+      # Caps Lock = push-to-talk. Sends Numpad 0 so game binds and the Hyprland
+      # vesktop-mic bind (code:90) keep working.
+      default = {
+        ids = [ "*" ]; # devices listed below get their own config instead
+        settings = {
+          main.capslock = "kp0";
+          inherit meta;
+        };
+      };
+      # QK75 (wired, 2.4G): same as default, plus knob press = Numpad 3 (Discord mute).
+      # Stock SONiX firmware has no VIA, so the remap lives here.
+      qk75 = {
+        ids = [ "k:0c45:8017" "k:05ac:024f" ];
+        settings = {
+          main = {
+            capslock = "kp0";
+            mute = "kp3";
+          };
+          inherit meta;
+        };
+      };
+      # Basilisk's keyboard keys (clutch, front side button, edge, tilt, top button)
+      # switched off so it only uses the buttons the Vaxee NP-01 Ergo has.
+      basilisk = {
+        ids = [ "k:1532:00e3" ];
+        settings.main = {
+          kp0 = "noop";
+          kp1 = "noop";
+          kp2 = "noop";
+          kp3 = "noop";
+          left = "noop";
+          right = "noop";
         };
       };
     };
   };
+  environment.systemPackages = [ pkgs.keyd ]; # `sudo keyd monitor`
 
   # ── GameMode ──────────────────────────────────────────────────────────────────
   # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
