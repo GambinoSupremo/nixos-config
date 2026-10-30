@@ -12,6 +12,8 @@
 
 let
   inherit (host) isVM;
+  # Off until the plugin supports Hyprland 0.57 (upstream PR #87); flip back to true then.
+  scrollOverviewOn = !isVM && false;
   sessions = osConfig.gav.sessions; # nixos/base/desktop.nix
   configDirs = [
     "hypr"
@@ -87,7 +89,7 @@ let
       windowrule = match:class ^(vesktop)$, opacity 0.95 0.90
       windowrule = match:class ^(obsidian)$, opacity 0.95 0.90
     ''
-    + lib.optionalString (!isVM) (
+    + lib.optionalString scrollOverviewOn (
       "\n"
       + ''
         # ── scroll-overview plugin ───────────────────────────────────────────────────
@@ -165,7 +167,7 @@ let
     # ── hypr ─────────────────────────────────────────────────────────────
     # hyprland.lua is the effective config; hyprland.conf is only a fallback.
     cp ${hyprFallbackConf} $out/hypr/hyprland.conf
-    ${lib.optionalString (!isVM) "cp ${hyprNixosLua} $out/hypr/nixos.lua"}
+    ${lib.optionalString scrollOverviewOn "cp ${hyprNixosLua} $out/hypr/nixos.lua"}
     # Replace the async env-import exec_cmds with the sequential bootstrap.
     mustSed $out/hypr/autostart.lua \
       'hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")' \
