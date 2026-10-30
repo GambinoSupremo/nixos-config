@@ -95,6 +95,22 @@ in
   # First use: flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
   services.flatpak.enable = true;
 
+  # ── Printing ──────────────────────────────────────────────────────────────────
+  # Brother HL-L2340D at its reserved IP; driverless IPP Everywhere, no Brother driver.
+  services.printing.enable = true;
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "Brother";
+        description = "Brother HL-L2340D";
+        deviceUri = "ipp://10.0.0.63/ipp/print";
+        model = "everywhere";
+        ppdOptions.PageSize = "Letter";
+      }
+    ];
+    ensureDefaultPrinter = "Brother";
+  };
+
   # ── Firmware updates ──────────────────────────────────────────────────────────
   # SSD/BIOS/peripheral firmware via LVFS: fwupdmgr get-updates && fwupdmgr update
   services.fwupd.enable = true;
