@@ -1,5 +1,5 @@
-# Claude Code and its system policy. Managed settings outrank
-# ~/.claude/settings.json, which Claude Code still writes to.
+# Claude Code and its system policy (MCP servers: home/claude-code.nix). Managed
+# settings outrank ~/.claude/settings.json, which Claude Code still writes to.
 { pkgs, ... }:
 
 {

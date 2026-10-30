@@ -67,6 +67,8 @@ home/                     # home-manager for gav (shared by all hosts):
                           #   (the apply/update helper), plus small desktop-only
                           #   timers that log Steam, Plex, Kobo and Garmin data
                           #   into Obsidian and back up the NAS
+                          #   claude-code.nix: MCP servers via HM's claude-code
+                          #   module (mcp-nixos); settings.json stays hand-managed
 docs/
   workflow.md             # rebuilding, apply/update, dotfiles, fresh install
   notes.md                # sessions, known constraints, not-in-nixpkgs list

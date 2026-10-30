@@ -17,6 +17,7 @@
     ./game-log.nix # game-log: Steam playtime → Obsidian daily notes (desktop)
     ./vesktop-mic.nix # vesktop-mic: mute Discord's mic stream during in-game push-to-talk
     ./webapps.nix # Claude etc. as app-like Firefox windows (PWAsForFirefox)
+    ./claude-code.nix # Claude Code MCP servers (mcp-nixos)
     ./deadlock-fov.nix # re-adds r_aspectratio when gameinfo.gi gets rewritten (desktop)
   ];
 
