@@ -3,10 +3,10 @@
 ## Sessions
 
 Noctalia Greeter on greetd (`noctalia msg greeter-sync` copies the wallpaper,
-colours and monitor layout to it). **Hyprland is the only
-session by default.** Mango and Niri are off but kept: flip
-`gav.sessions.mango` / `.niri` in nixos/base/desktop.nix to bring one
-back (dotfiles deploy, Noctalia seeds and Sunshine follow). Mango mirrors
+colours and monitor layout to it). **Hyprland is the default
+session; Mango is also on** (re-enabled 2026-10 for a retest). Niri is off
+but kept: flip `gav.sessions.mango` / `.niri` in nixos/base/desktop.nix to
+toggle one (dotfiles deploy, Noctalia seeds and Sunshine follow). Mango mirrors
 Hyprland's binds/rules and streams to Moonlight the same way; Niri gets the
 ultrawide on Moonlight (no virtual output).
 Noctalia v5 is the bar/shell, run as `noctalia.service` (upstream HM module).
