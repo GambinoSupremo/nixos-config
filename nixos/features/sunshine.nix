@@ -53,6 +53,12 @@ let
         ${lendWs2}
         continue
       fi
+      # Hyprland 0.57: the steam-games monitor rule pulls ws 2 back to the Alienware when a game maps.
+      case "$ev" in
+      moveworkspacev2\>\>2,*)
+        [ "''${ev##*,}" = SUNSHINE ] || hyprctl dispatch 'hl.dsp.workspace.move({ workspace = 2, monitor = "SUNSHINE" })'
+        continue ;;
+      esac
       case "$ev" in openwindow\>\>*|movewindowv2\>\>*) ;; *) continue ;; esac
       hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and .workspace.name != "2") | .address' |
       while read -r a; do
