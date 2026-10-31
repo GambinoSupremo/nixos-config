@@ -75,7 +75,7 @@ let
       monitor = desc:Philips Consumer Electronics Company PHL 278E1 0x0000065F, 3840x2160@60, 3440x0, 1.5
       monitor = , preferred, auto, 1
       misc {
-          vrr = 2    # fullscreen-only (always-on gamma-flickers the QD-OLED)
+          vrr = 0    # off: stutters on the RX 9070 XT, same as hyprland.lua
       }
       exec-once = systemctl --user start noctalia.service
       exec-once = sleep 5 && mullvad-exclude vesktop

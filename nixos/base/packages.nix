@@ -53,6 +53,8 @@
     grim
     slurp
     wl-clipboard
+    hyprshutdown # Hyprland Ctrl+Alt+Delete (clean logout)
+    glib.bin # gsettings, for the dark-mode line in compositor autostarts
     wlr-randr
     wtype
     wev
