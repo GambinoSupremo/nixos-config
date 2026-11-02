@@ -12,8 +12,7 @@
 
 let
   inherit (host) isVM;
-  # Off until the plugin supports Hyprland 0.57 (upstream PR #87); flip back to true then.
-  scrollOverviewOn = !isVM && false;
+  scrollOverviewOn = !isVM;
   sessions = osConfig.gav.sessions; # nixos/base/desktop.nix
   configDirs = [
     "hypr"
