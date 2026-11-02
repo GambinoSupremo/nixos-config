@@ -88,6 +88,12 @@ let
       --filter "- {backups,tests}/**" --filter "+ CLAUDE.md" \
       --filter "+ **/.claude/settings.json" --filter "- **" -v \
       || fail "Copying Claude's project files to the NAS didn't finish"
+    # Hand-managed Claude config: settings, hooks, status line, own skills (synced/ is claude.ai's, the link is home-manager's).
+    rclone sync "$HOME/.claude" nas:personal/Claude/config \
+      --filter "- /skills/synced/**" --filter "- /skills/claude-code-home-manager" \
+      --filter "+ /{CLAUDE.md,settings.json,settings.local.json,statusline.py}" \
+      --filter "+ /hooks/*.py" --filter "+ /skills/**" --filter "- **" -v \
+      || fail "Copying Claude's config to the NAS didn't finish"
     rclone sync nas:personal pcloud-crypt:current \
       --backup-dir "pcloud-crypt:changed/$(date +%F)" \
       --max-delete 1000 -v || fail "Copying to pCloud didn't finish"
