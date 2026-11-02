@@ -74,7 +74,7 @@ in
       };
       sites."01M5KF5QYTFMSHY6FSZVTEG8A7" = {
         name = "Codex";
-        url = "https://chatgpt.com/codex";
+        url = "https://chatgpt.com/codex/cloud";
         desktopEntry = {
           icon = "${./icons/codex.svg}";
           categories = [ "Development" ];
