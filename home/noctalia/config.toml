@@ -57,6 +57,11 @@ type = "nightlight"
 [[control_center.shortcuts]]
 type = "notification"
 
+[location]
+custom_schedule = true
+sunrise = "06:45"
+sunset = "21:45"
+
 [lockscreen_widgets]
 enabled = false
 schema_version = 2
@@ -100,6 +105,9 @@ widget_order = [ "lockscreen-login-box@DP-4", "lockscreen-login-box@DP-3" ]
         input_opacity = 1.0
         input_radius = 6.0
         show_login_button = true
+
+[nightlight]
+enabled = true
 
 [osd]
 background_opacity = 0.89999997988343239
