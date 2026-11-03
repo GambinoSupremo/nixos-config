@@ -3,11 +3,6 @@
 My NixOS flake for a Hyprland gaming desktop, with dotfiles pulled in from a
 separate repo and patched for NixOS at build time.
 
-<!-- Screenshot: once docs/screenshot.png exists (Hyprland + Noctalia bar on the
-     AW3423DW ultrawide), uncomment the line below.
-![Desktop screenshot](docs/screenshot.png)
--->
-
 ## Highlights
 
 - **Dotfiles as a pinned input.** The [dotfiles](https://github.com/GambinoSupremo/dotfiles)
@@ -41,40 +36,34 @@ Both track nixos-unstable.
   without the desktop's hardware (no GPU, Bluetooth or gaming) and is built
   alongside desktop on every change.
 
-## Repo map
+## Where to edit
 
-```
-flake.nix                 # inputs + nixosConfigurations (desktop, vm)
-nixos/
-  base/                   # every host (default.nix lists them):
-                          #   core (nix/locale/GC), users, networking
-                          #   (+Mullvad), desktop (greeter, Hyprland, optional
-                          #   Mango/Niri, portals, fonts), audio, services
-                          #   (keyd, bluetooth, ...), packages, claude-code
-  features/               # desktop PC extras:
-    amd.nix               #   amdgpu/Mesa + Wayland env
-    gaming.nix            #   Steam/gamescope/gamemode/novpn
-    sunshine.nix          #   Moonlight host + virtual stream display
-    tuning.nix            #   zram, ananicy, sysctls (borrowed from CachyOS)
-    razer-white.nix       #   static white lighting for the Basilisk V4 Pro
-  hosts/
-    desktop/              # gavos: the physical machine
-    vm/                   # nix-vm: build-only target
-home/                     # home-manager for gav (shared by all hosts):
-                          #   dotfiles.nix (dotfile patching/deployment, the
-                          #   heart of the repo), shell, theming, programs
-                          #   (incl. Zen), services, noctalia/, nixos-sync.sh
-                          #   (the apply/update helper), plus small desktop-only
-                          #   timers that log Steam, Plex, Kobo and Garmin data
-                          #   into Obsidian and back up the NAS
-                          #   claude-code.nix: MCP servers via HM's claude-code
-                          #   module (mcp-nixos); settings.json stays hand-managed
-docs/
-  workflow.md             # rebuilding, apply/update, dotfiles, fresh install
-  notes.md                # sessions, known constraints, not-in-nixpkgs list
-  decisions.md            # judgment calls from the 2026-07 cleanup
-.claude/CLAUDE.md         # instructions for Claude Code in this repo
-```
+| Change | File |
+|---|---|
+| Inputs, host definitions, formatter | `flake.nix` |
+| Kernel, boot, desktop hardware | `nixos/hosts/desktop/` |
+| Login screen, sessions, portals, fonts | `nixos/base/desktop.nix` |
+| Installed applications | `nixos/base/packages.nix` |
+| Keyboard remapping, Bluetooth, printer | `nixos/base/services.nix` |
+| VPN and DNS | `nixos/base/networking.nix` |
+| Steam and game launch wrappers | `nixos/features/gaming.nix` |
+| Streaming and virtual display | `nixos/features/sunshine.nix` |
+| GPU and system tuning | `nixos/features/amd.nix`, `tuning.nix` |
+| Browser, search, privacy | `home/zen.nix` |
+| Git and SSH | `home/development.nix` |
+| Neovim and editing tools | `home/editors.nix` |
+| Default apps, launchers, screenshots | `home/programs.nix` |
+| Shell aliases and prompt | `home/shell.nix` |
+| Dotfile deployment and overview toggle | `home/dotfiles.nix` |
+| GTK, Qt, cursor, live music themes | `home/theming.nix` |
+| Noctalia defaults for a new install | `home/noctalia/config.toml` |
+| Backup and activity logs | `home/backup.nix`, `home/*-log.nix`, `home/*-sync.nix` |
+| Rebuild workflow | `home/nixos-sync.sh`, [workflow](docs/workflow.md) |
+
+`home/default.nix` and `nixos/base/default.nix` list the imported modules.
+Compositor binds, rules, layouts and monitors live in `~/Projects/dotfiles`.
+See [editing](docs/editing.md) for editor setup and validation commands,
+and [notes](docs/notes.md) before changing hardware or session behavior.
 
 ## How I use it
 

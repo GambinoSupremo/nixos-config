@@ -8,7 +8,10 @@
     ./dotfiles.nix # compositor plumbing, dotfile patching, activation scripts
     ./shell.nix # fish, starship, fzf, zoxide, bat
     ./theming.nix # gtk, cursor
-    ./programs.nix # zen, git, neovim, obs, satty, signal, vesktop
+    ./zen.nix # browser, search, privacy, live colors
+    ./development.nix # git and SSH
+    ./editors.nix # Neovim and shared editing tools
+    ./programs.nix # default apps, launchers, OBS, screenshots
     ./services.nix # mullvad-gui user service
     ./backup.nix # nightly encrypted NAS Personal → pCloud backup (desktop)
     ./plex-log.nix # Plex webhooks → Obsidian Movies/TV notes (desktop)

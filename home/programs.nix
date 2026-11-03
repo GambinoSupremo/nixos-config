@@ -1,7 +1,5 @@
-# Per-app home-manager config: Zen, git, ssh, neovim (LazyVim link), OBS, Satty, mime
-# defaults, and desktop-entry overrides (Signal keyring pin, Vesktop VPN bypass).
+# Default applications, desktop launchers, OBS, and screenshots.
 {
-  inputs,
   config,
   pkgs,
   lib,
@@ -9,122 +7,7 @@
 }:
 
 {
-  imports = [ inputs.zen-browser.homeModules.beta ];
-
-  # ── Zen Browser ──────────────────────────────────────────────────────────────
-  # Firefox Sync owns extensions, bookmarks and logins (fresh machine: install
-  # Keeper first, it holds the Sync password). Nix sets what Sync doesn't carry.
-  programs.zen-browser = {
-    enable = true;
-    setAsDefaultBrowser = true;
-    profiles.default = {
-      # force: HM owns search.json.mozlz4, so hand-added engines don't survive rebuilds.
-      search = {
-        force = true;
-        default = "kagi";
-        engines = {
-          kagi = {
-            name = "Kagi";
-            urls = [
-              { template = "https://kagi.com/search?q={searchTerms}"; }
-              {
-                template = "https://kagi.com/api/autosuggest?q={searchTerms}";
-                type = "application/x-suggestions+json";
-              }
-            ];
-            icon = "https://kagi.com/favicon.ico";
-            definedAliases = [ "@k" ];
-          };
-        }
-        # The Kagi extension's duplicate engine plus built-ins we never use.
-        //
-          lib.genAttrs
-            [
-              "search@kagi.comdefault"
-              "google"
-              "bing"
-              "amazondotcom-us"
-              "ebay"
-              "perplexity"
-            ]
-            (_: {
-              metaData.hidden = true;
-            });
-      };
-
-      settings = {
-        "zen.welcome-screen.seen" = true;
-        # Each window stands alone instead of mirroring tabs into new ones.
-        "zen.window-sync.enabled" = false;
-        # Noctalia theming: userChrome.css imports its colors, Pywalfox needs themes on.
-        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-        "zen.theme.disable-lightweight" = false;
-        # Mullvad owns DNS; Zen's DoH stalls on-VPN and hangs Keeper's login.
-        "network.trr.mode" = 5;
-        "doh-rollout.disable-heuristics" = true;
-
-        # Privacy: strict tracking protection, GPC + DNT, HTTPS-only.
-        "browser.contentblocking.category" = "strict";
-        "privacy.globalprivacycontrol.enabled" = true;
-        "privacy.donottrackheader.enabled" = true;
-        "dom.security.https_only_mode" = true;
-        # Keeper fills logins and forms, not Zen.
-        "signon.rememberSignons" = false;
-        "browser.formfill.enable" = false;
-        # No sponsored suggestions, Pocket, studies or default-browser nag.
-        "browser.urlbar.suggest.quicksuggest.sponsored" = false;
-        "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
-        "browser.newtabpage.activity-stream.showSponsored" = false;
-        "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
-        "extensions.pocket.enabled" = false;
-        "app.shield.optoutstudies.enabled" = false;
-        "browser.shell.checkDefaultBrowser" = false;
-      };
-    };
-  };
-
-  # Live Noctalia colors: zen-live.css maps Noctalia's Zen CSS onto Pywalfox's vars.
-  # Noctalia rewrites userChrome.css but keeps extra lines, so append the import once.
-  home.file.".config/zen/default/chrome/zen-live.css".source = ./noctalia/zen-live.css;
-  home.activation.zenLiveImport = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    chrome="${config.home.homeDirectory}/.config/zen/default/chrome/userChrome.css"
-    if ! grep -qs 'zen-live.css' "$chrome"; then
-      run mkdir -p "$(dirname "$chrome")"
-      run sh -c "echo '@import \"zen-live.css\";' >> '$chrome'"
-    fi
-  '';
-
-  # Same id as the package's entry (~/.local/share wins), minus "(Beta)" in the name.
-  xdg.desktopEntries.zen-beta = {
-    name = "Zen Browser";
-    genericName = "Web Browser";
-    exec = "zen-beta --name zen-beta %U";
-    icon = "${./icons/zen.svg}"; # Papirus's Zen icon, dark
-    categories = [
-      "Network"
-      "WebBrowser"
-    ];
-    mimeType = [
-      "text/html"
-      "x-scheme-handler/http"
-      "x-scheme-handler/https"
-    ];
-    startupNotify = true;
-    settings.StartupWMClass = "zen-beta";
-    actions.new-private-window = {
-      name = "New Private Window";
-      exec = "zen-beta --private-window %U";
-    };
-  };
-
-  # Pywalfox's native host for Zen, without programs.firefox pulling in Firefox.
-  home.file.".mozilla/native-messaging-hosts/pywalfox.json".text = builtins.toJSON {
-    name = "pywalfox";
-    description = "Pywalfox native app";
-    path = "${pkgs.pywalfox-native}/bin/pywalfox";
-    type = "stdio";
-    allowed_extensions = [ "pywalfox@frewacom.org" ];
-  };
+  home.packages = [ pkgs.codex ];
 
   # ── Default apps (mime associations) ─────────────────────────────────────────
   # nomacs is the only image viewer; its .desktop doesn't advertise Canon RAW,
@@ -172,69 +55,6 @@
         "image/x-canon-cr3"
       ] (_: [ "org.nomacs.ImageLounge.desktop" ]);
   };
-
-  # ── Git ──────────────────────────────────────────────────────────────────────
-  programs.git = {
-    enable = true;
-    settings = {
-      user.name = "Gavin";
-      user.email = "service.haiku882@passinbox.com";
-      init.defaultBranch = "main";
-      push.autoSetupRemote = true;
-      # Config-based hook, so it runs in every repo alongside any .git/hooks ones.
-      hook.strip-claude-attribution = {
-        event = "commit-msg";
-        command = "${pkgs.writeShellScript "strip-claude-attribution" ''
-          sed=${lib.getExe pkgs.gnused}
-          # Whole trailer lines only, so prose that mentions them survives.
-          $sed -i -E \
-            -e '/^[[:space:]]*Co-Authored-By:.*\bClaude\b/Id' \
-            -e '/^[[:space:]]*(🤖[[:space:]]*)?Generated with \[Claude Code\]\([^)]*\)[[:space:]]*$/d' \
-            "$1"
-          # Drop the blank lines the removed trailers leave at the end.
-          $sed -i -e ':a' -e '/^\n*$/{$d;N;ba' -e '}' "$1"
-        ''}";
-      };
-    };
-  };
-
-  # ── SSH ──────────────────────────────────────────────────────────────────────
-  # Only the hosts listed here; no HM catch-all defaults (GitHub uses ssh's own).
-  programs.ssh = {
-    enable = true;
-    enableDefaultConfig = false;
-    settings."proxmox 10.0.0.117" = {
-      HostName = "10.0.0.117";
-      User = "root";
-      IdentityFile = "~/.ssh/id_ed25519_proxmox";
-      IdentitiesOnly = true;
-      # GNOME Keyring's agent, so shells without SSH_AUTH_SOCK can still use the key
-      IdentityAgent = "/run/user/%i/gcr/ssh";
-    };
-    settings."github.com" = {
-      IdentityFile = "~/.ssh/id_ed25519";
-      IdentitiesOnly = true;
-    };
-  };
-
-  # ── Neovim ───────────────────────────────────────────────────────────────────
-  # LazyVim config linked live from the dotfiles checkout (not the pinned input)
-  # so lazy.nvim can write lazy-lock.json. neovim itself is in systemPackages.
-  # nvim runs in Ghostty; the package's "Neovim wrapper" launcher entry isn't needed.
-  xdg.dataFile."applications/nvim.desktop" = {
-    force = true;
-    text = "[Desktop Entry]\nHidden=true\n";
-  };
-  xdg.configFile."nvim".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Projects/dotfiles/nvim";
-  home.sessionVariables.EDITOR = "nvim";
-  home.packages = [
-    (pkgs.writeShellScriptBin "vim" ''exec nvim "$@"'')
-    # nvim-treesitter (main branch) compiles parsers with these.
-    pkgs.gcc
-    pkgs.tree-sitter
-    pkgs.codex # OpenAI's coding agent CLI (Codex web app is in webapps.nix)
-  ];
 
   # ── OBS Studio ───────────────────────────────────────────────────────────────
   # obs-vaapi → VA-API encoding; obs-vkcapture → GPU-side game capture.

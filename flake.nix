@@ -44,8 +44,7 @@
   outputs =
     { nixpkgs, home-manager, ... }@inputs:
     let
-      # Shared home-manager config block applied to every host. (A commonOverlay
-      # of throw-alias shims was removed 2026-07-14 — git history has it.)
+      # Shared home-manager config applied to every host.
       hmModule =
         { host, ... }:
         {
@@ -80,6 +79,8 @@
         };
     in
     {
+      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
+
       nixosConfigurations = {
 
         # Build-only target for the shared modules (no VM deployed)

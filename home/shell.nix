@@ -60,7 +60,7 @@ in
       grep = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${host.name}";
     };
-    # apply: land Claude's branches, switch, push. update: main + clean + pull,
+    # apply: land cleanup branches, switch, push. update: main + clean + pull,
     # update all inputs, switch, commit only flake.lock and push.
     functions = {
       apply = "${nixosSync}/bin/nixos-sync apply";

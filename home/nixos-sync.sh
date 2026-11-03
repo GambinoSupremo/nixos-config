@@ -230,14 +230,14 @@ land_branch() {
     [[ "$(git cherry main "$b")" != *+* ]] || pending+=("$b")
   done
   case ${#pending[@]} in
-    0) ok "No new branch from Claude" ;;
+    0) ok "No pending cleanup branch" ;;
     1)
       quiet git merge --ff-only "${pending[0]}" ||
-        die "main moved on since '${pending[0]}' was made. Ask Claude to rebase it."
+        die "Cannot fast-forward '${pending[0]}'. Rebase it onto main, then retry."
       landed=${pending[0]}
       ok "Merged $landed"
       ;;
-    *) die "More than one branch waiting (${pending[*]}). Ask Claude to sort them out." ;;
+    *) die "More than one branch waiting (${pending[*]}). Consolidate them into one cleanup branch." ;;
   esac
 }
 
@@ -260,7 +260,7 @@ prune_branches() {
   done
 }
 
-# Everything Claude left: land its branch in each repo, push dotfiles,
+# Land the cleanup branch in each repo, push dotfiles,
 # refresh the dotfiles pin, switch, then push nixos-config.
 cmd_apply() {
   start_log apply
@@ -296,7 +296,7 @@ cmd_apply() {
   section "Building ($host)"
   if ! nh_switch; then
     git reset -q --hard "$before"
-    die "Build failed. Your system didn't change and ~/nixos-config is back where it was. Show Claude this."
+    die "Apply failed. ~/nixos-config was restored. Check the log before retrying."
   fi
   ok "Switched to the new system"
 

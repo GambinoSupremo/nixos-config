@@ -3,7 +3,7 @@
 ## Rebuild
 
 ```bash
-apply     # land Claude's cleanup/* branches, push dotfiles, refresh the pin, switch, push
+apply     # land cleanup/* branches, push dotfiles, refresh the pin, switch, push
 rebuild   # alias: sudo nixos-rebuild switch --flake ~/nixos-config#<host> (desktop or vm, set per host)
 update    # update all inputs, switch, commit flake.lock, push
 dotsync   # update only the dotfiles pin, switch, commit flake.lock, push
@@ -23,7 +23,7 @@ commits **only flake.lock** ("flake: update inputs") and pushes, then says if a
 reboot is needed (kernel or modules changed) and lists failed system and user
 units.
 
-`apply` is the one to run after Claude makes a change. In each repo it
+`apply` is the one to run after committing a change on a cleanup branch. In each repo it
 fast-forwards `main` to the single `cleanup/*` branch that has commits `main`
 lacks (it stops if there are several, or if the branch needs a rebase), then
 pushes dotfiles, refreshes the dotfiles pin and switches. If the build fails it
