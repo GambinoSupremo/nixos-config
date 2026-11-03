@@ -13,6 +13,12 @@
     ../../features/razer-white.nix
   ];
 
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly";
+    fileSystems = [ "/" ];
+  };
+
   # Zen kernel from nixpkgs (desktop-tuned, on cache.nixos.org). CachyOS tuning
   # stays in features/tuning.nix; see docs/decisions.md for why the kernel changed.
   boot.kernelPackages = pkgs.linuxPackages_zen;
