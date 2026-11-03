@@ -1,5 +1,4 @@
-# Nightly encrypted copy of the NAS "personal" share to pCloud (desktop only),
-# plus Claude Code's notes, copied into the share first.
+# Nightly encrypted copy of the NAS "personal" share to pCloud (desktop only).
 # rclone remotes live in ~/.config/rclone/rclone.conf; nas-backup-setup makes them once.
 {
   pkgs,
@@ -81,19 +80,6 @@ let
       echo "Not set up yet; run nas-backup-setup."
       fail "Not set up yet; run nas-backup-setup"
     fi
-    # Claude Code's notes and project instructions only live on this PC; copy them into the share first.
-    rclone sync "$HOME/.claude/projects/-home-gav/memory" nas:personal/Claude/memory -v \
-      || fail "Copying Claude's notes to the NAS didn't finish"
-    rclone sync "$HOME/Projects" nas:personal/Claude/projects \
-      --filter "- {backups,tests}/**" --filter "+ CLAUDE.md" \
-      --filter "+ **/.claude/settings.json" --filter "- **" -v \
-      || fail "Copying Claude's project files to the NAS didn't finish"
-    # Hand-managed Claude config: settings, hooks, status line, own skills (synced/ is claude.ai's, the link is home-manager's).
-    rclone sync "$HOME/.claude" nas:personal/Claude/config \
-      --filter "- /skills/synced/**" --filter "- /skills/claude-code-home-manager" \
-      --filter "+ /{CLAUDE.md,settings.json,settings.local.json,statusline.py}" \
-      --filter "+ /hooks/*.py" --filter "+ /skills/**" --filter "- **" -v \
-      || fail "Copying Claude's config to the NAS didn't finish"
     rclone sync nas:personal pcloud-crypt:current \
       --backup-dir "pcloud-crypt:changed/$(date +%F)" \
       --max-delete 1000 -v || fail "Copying to pCloud didn't finish"

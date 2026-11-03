@@ -43,8 +43,7 @@
   };
 
   # ── nix-ld ────────────────────────────────────────────────────────────────────
-  # Lets prebuilt dynamically-linked binaries (e.g. the Claude Code agent SDK
-  # that Zed downloads via npx) find a libc/loader outside the Nix store.
+  # Lets prebuilt developer tools find a loader outside the Nix store.
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     stdenv.cc.cc.lib

@@ -120,7 +120,7 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   reasoned from keyd semantics + observed behavior, not live-tested yet.
   WRONG (2026-10-08, from keyd 2.6.0 source): a [meta] binding drops only
   Super and keeps other held modifiers, so SUPER+CTRL+V became Ctrl+Shift+Insert.
-  SUPERSEDED: the current rule is in .claude/CLAUDE.md and docs/notes.md.
+  SUPERSEDED: see docs/notes.md.
 - Hyprland fresh-boot fallback path (broken lua → hyprland.conf) untested.
 - flake.lock path-input lastModified for dotfiles looks stale even when
   content is current — narHash is what matters; don't trust the date.

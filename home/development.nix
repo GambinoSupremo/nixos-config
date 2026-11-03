@@ -1,5 +1,5 @@
 # Git identity, commit hooks, and SSH hosts.
-{ pkgs, lib, ... }:
+{ ... }:
 
 {
   # ── Git ──────────────────────────────────────────────────────────────────────
@@ -10,20 +10,6 @@
       user.email = "service.haiku882@passinbox.com";
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
-      # Config-based hook, so it runs in every repo alongside any .git/hooks ones.
-      hook.strip-claude-attribution = {
-        event = "commit-msg";
-        command = "${pkgs.writeShellScript "strip-claude-attribution" ''
-          sed=${lib.getExe pkgs.gnused}
-          # Whole trailer lines only, so prose that mentions them survives.
-          $sed -i -E \
-            -e '/^[[:space:]]*Co-Authored-By:.*\bClaude\b/Id' \
-            -e '/^[[:space:]]*(🤖[[:space:]]*)?Generated with \[Claude Code\]\([^)]*\)[[:space:]]*$/d' \
-            "$1"
-          # Drop the blank lines the removed trailers leave at the end.
-          $sed -i -e ':a' -e '/^\n*$/{$d;N;ba' -e '}' "$1"
-        ''}";
-      };
     };
   };
 

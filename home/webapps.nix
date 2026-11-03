@@ -1,6 +1,5 @@
 # Web apps: sites in their own Firefox window (no URL bar or tabs) via PWAsForFirefox,
-# each with a launcher entry. Add a site with a fresh ULID; icons are Papirus names so
-# they match the rest of the launcher (Claude's and Codex's are drawn in home/icons/).
+# each with a launcher entry. Add a site with a fresh ULID and a Papirus icon.
 { lib, pkgs, ... }:
 
 let
@@ -64,22 +63,6 @@ in
     # One shared profile, so web apps share logins with each other (not with Zen).
     profiles."01M5K68BBWCK8J79CEY7C3DDT9" = {
       name = "Web apps";
-      sites."01M5K68BBWV98B2389D1RX2FW8" = {
-        name = "Claude";
-        url = "https://claude.ai";
-        desktopEntry = {
-          icon = "${./icons/claude.svg}";
-          categories = [ "Network" ];
-        };
-      };
-      sites."01M5KF5QYTFMSHY6FSZVTEG8A7" = {
-        name = "Codex";
-        url = "https://chatgpt.com/codex/cloud";
-        desktopEntry = {
-          icon = "${./icons/codex.svg}";
-          categories = [ "Development" ];
-        };
-      };
       sites."01M5K770R4RKNSG5FN1DWH0N2M" = {
         name = "Todoist";
         url = "https://app.todoist.com";

@@ -9,6 +9,5 @@
     ./audio.nix # PipeWire
     ./services.nix # keyd, bluetooth, gamemode, ...
     ./packages.nix # systemPackages
-    ./claude-code.nix # package + managed settings
   ];
 }

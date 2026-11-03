@@ -7,8 +7,6 @@
 }:
 
 {
-  home.packages = [ pkgs.codex ];
-
   # ── Default apps (mime associations) ─────────────────────────────────────────
   # nomacs is the only image viewer; its .desktop doesn't advertise Canon RAW,
   # and satty claims png/jpeg, so the image defaults are pinned here.
@@ -126,16 +124,6 @@
       "RemoteAccess"
       "Network"
     ];
-  };
-
-  # ── Claude Code ──────────────────────────────────────────────────────────────
-  # Launcher entry; goes through fish so the claude function picks the directory.
-  xdg.desktopEntries.claude-code = {
-    name = "Claude Code";
-    exec = "ghostty --class=com.claude.code -e fish -c claude";
-    icon = "${./icons/clawd.svg}"; # Clawd, so it doesn't match the Claude web app
-    comment = "Claude Code in a terminal";
-    categories = [ "Development" ];
   };
 
   # ── pCloud ───────────────────────────────────────────────────────────────────
