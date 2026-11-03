@@ -33,8 +33,9 @@ cleanup branches that are fully on `main`.
 
 The helper is packaged in the active system generation. When changing
 `home/nixos-sync.sh`, the first `apply` still runs the currently installed
-version. Before that first run, build both hosts with the local dotfiles
-checkout so a failed build cannot publish it:
+version. Before that first run, check out the pending cleanup branches, build
+both hosts with the local dotfiles checkout, then return both repos to clean
+`main`:
 
 ```sh
 nix build ~/nixos-config#nixosConfigurations.desktop.config.system.build.toplevel \
