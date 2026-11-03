@@ -123,6 +123,21 @@
         "type": "github"
       }
     },
+    "private": {
+      "locked": {
+        "lastModified": 1793725602,
+        "narHash": "sha256-1PqRODIUppKTXmS8kG+owydHQQqQCwDuDmJSKv9ziFs=",
+        "ref": "refs/heads/main",
+        "rev": "f4cfe2202c6f2b8b448025b611807b305c17c3d6",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://git@github.com/GambinoSupremo/nixos-private"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/GambinoSupremo/nixos-private"
+      }
+    },
     "root": {
       "inputs": {
         "deadlock-mod-manager": "deadlock-mod-manager",
@@ -130,6 +145,7 @@
         "home-manager": "home-manager",
         "hyprland-scroll-overview": "hyprland-scroll-overview",
         "nixpkgs": "nixpkgs_2",
+        "private": "private",
         "wallpapers": "wallpapers",
         "zen-browser": "zen-browser"
       }

@@ -60,7 +60,8 @@ build_system() {
   local -a frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
   local -a cmd=(nix build --no-link --print-out-paths --log-format raw)
   if [[ -n "$dotfiles_dir" ]]; then
-    cmd+=(--override-input dotfiles "path:$dotfiles_dir")
+    # git+file, not path: builds the committed tree, so it matches the pin after pushing.
+    cmd+=(--override-input dotfiles "git+file://$dotfiles_dir")
   fi
   cmd+=("$attr")
   blog=$(mktemp) out=$(mktemp)
@@ -126,7 +127,17 @@ nh_switch() {
   section "Changes"
   show_diff
   section "Activating"
-  live nh os switch "$new_system" --no-nom --diff never -q
+  live nh os switch "$new_system" --no-nom --diff never -q && return
+  # A unit failing during activation still leaves the new system live.
+  [[ "$(readlink -f /run/current-system)" != "$new_system" ]] || return 2
+  return 1
+}
+
+# nh_switch returned 2: keep things local so the repo matches what is running.
+live_with_errors() {
+  warn "The new system is live, but activation reported errors (see above). $1"
+  after_switch
+  exit 1
 }
 
 # One line per changed root input: name, old → new short rev, date of the new one.
@@ -229,7 +240,13 @@ cmd_update() {
   print_changes "$backup" flake.lock
 
   section "Building ($host)"
-  nh_switch || restore_and_die "Switch failed."
+  local rc=0
+  nh_switch || rc=$?
+  if ((rc == 2)); then
+    commit_lock "flake: update inputs" || true
+    live_with_errors "Not pushed."
+  fi
+  ((rc == 0)) || restore_and_die "Switch failed."
   ok "Switched to the new system"
 
   section "Wrapping up"
@@ -242,27 +259,30 @@ cmd_update() {
   after_switch
 }
 
-# Fast-forward main to the one cleanup/* branch with commits main lacks.
-# Sets landed to its name, or empty when there was nothing to land.
-landed=""
-land_branch() {
+# The one cleanup/* branch in $PWD with commits main lacks, or empty. Checked in
+# both repos before merging either, so a refusal leaves both mains untouched.
+pending=""
+find_pending() {
   local b
-  local -a branches pending=()
-  landed=""
+  local -a branches found=()
   mapfile -t branches < <(git for-each-ref --format='%(refname:short)' refs/heads/cleanup/)
   for b in "${branches[@]}"; do
-    [[ "$(git cherry main "$b")" != *+* ]] || pending+=("$b")
+    [[ "$(git cherry main "$b")" != *+* ]] || found+=("$b")
   done
-  case ${#pending[@]} in
-    0) ok "No pending cleanup branch" ;;
-    1)
-      quiet git merge --ff-only "${pending[0]}" ||
-        die "Cannot fast-forward '${pending[0]}'. Rebase it onto main, then retry."
-      landed=${pending[0]}
-      ok "Merged $landed"
-      ;;
-    *) die "More than one branch waiting (${pending[*]}). Consolidate them into one cleanup branch." ;;
-  esac
+  ((${#found[@]} <= 1)) ||
+    die "More than one branch waiting in $PWD (${found[*]}). Consolidate them into one cleanup branch."
+  pending=${found[0]:-}
+  [[ -z "$pending" ]] || git merge-base --is-ancestor main "$pending" ||
+    die "Cannot fast-forward '$pending' in $PWD. Rebase it onto main, then retry."
+}
+
+land_branch() {
+  if [[ -z "$1" ]]; then
+    ok "No pending cleanup branch"
+    return
+  fi
+  quiet git merge --ff-only "$1" || die "Couldn't fast-forward main to '$1'."
+  ok "Merged $1"
 }
 
 # Delete cleanup/* branches, local and on origin, that are fully on main.
@@ -287,7 +307,7 @@ prune_branches() {
 # Validate both hosts before publishing or pruning cleanup branches.
 cmd_apply() {
   start_log apply
-  local before dot_before="" dot_dir="$HOME/Projects/dotfiles" dotfiles_override="" has_dotfiles=false
+  local before dot_before="" dot_dir="$HOME/Projects/dotfiles" dotfiles_override="" nix_branch dot_branch="" rc=0
   section "Checking ~/nixos-config"
   preflight
   require_clean
@@ -296,7 +316,6 @@ cmd_apply() {
   cp flake.lock "$backup"
 
   if [[ -d "$dot_dir/.git" ]]; then
-    has_dotfiles=true
     dotfiles_override="$dot_dir"
     section "Checking ~/Projects/dotfiles"
     preflight "$dot_dir"
@@ -305,25 +324,28 @@ cmd_apply() {
   fi
 
   cd "$flake_dir"
-  land_branch
-  if [[ "$has_dotfiles" == true ]]; then
+  find_pending
+  nix_branch=$pending
+  if [[ -n "$dotfiles_override" ]]; then
     cd "$dot_dir"
-    land_branch
+    find_pending
+    dot_branch=$pending
+    land_branch "$dot_branch"
     cd "$flake_dir"
   fi
+  land_branch "$nix_branch"
 
   section "Validating and activating ($host)"
-  if ! nh_switch "$dotfiles_override"; then
+  nh_switch "$dotfiles_override" || rc=$?
+  ((rc != 2)) || live_with_errors "Nothing pushed; run apply again once fixed to publish."
+  if ((rc != 0)); then
     git reset -q --hard "$before"
-    if [[ "$has_dotfiles" == true ]]; then
-      git -C "$dot_dir" reset -q --hard "$dot_before"
-    fi
-    cp "$backup" flake.lock
+    [[ -z "$dotfiles_override" ]] || git -C "$dot_dir" reset -q --hard "$dot_before"
     die "Validation or activation failed. Local main branches were restored; cleanup branches remain."
   fi
-  ok "Both hosts validated and the desktop activated"
+  ok "Both hosts validated and $host activated"
 
-  if [[ "$has_dotfiles" == true && -n "$(git -C "$dot_dir" rev-list origin/main..main)" ]]; then
+  if [[ -n "$dotfiles_override" && -n "$(git -C "$dot_dir" rev-list origin/main..main)" ]]; then
     if ! quiet git -C "$dot_dir" push; then
       warn "System activated; dotfiles push failed. Local commits and cleanup branches were kept."
       after_switch
@@ -341,16 +363,10 @@ cmd_apply() {
   print_changes "$backup" flake.lock
 
   section "Publishing nixos-config"
-  if git diff --quiet -- flake.lock; then
-    ok "flake.lock unchanged, nothing to commit"
-  elif ! commit_lock "flake: update dotfiles"; then
-    warn "System activated, but flake.lock could not be committed."
-    after_switch
-    return 1
-  fi
+  commit_lock "flake: update dotfiles" || true
   if quiet git push; then
     ok "Pushed nixos-config"
-    if [[ "$has_dotfiles" == true ]]; then
+    if [[ -n "$dotfiles_override" ]]; then
       cd "$dot_dir"
       prune_branches
       cd "$flake_dir"
@@ -378,7 +394,13 @@ cmd_dotsync() {
   print_changes "$backup" flake.lock
 
   section "Building ($host)"
-  nh_switch || restore_and_die "Switch failed."
+  local rc=0
+  nh_switch || rc=$?
+  if ((rc == 2)); then
+    commit_lock "flake: update dotfiles" || true
+    live_with_errors "Not pushed."
+  fi
+  ((rc == 0)) || restore_and_die "Switch failed."
   ok "Switched to the new system"
 
   section "Wrapping up"

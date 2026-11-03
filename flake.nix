@@ -39,6 +39,9 @@
     # No nixpkgs.follows so the build matches their Cachix cache (gaming.nix).
     # Go back to pkgs.deadlock-mod-manager once nixpkgs catches up.
     deadlock-mod-manager.url = "github:deadlock-mod-manager/deadlock-mod-manager/v2.1.1";
+
+    # Personal modules kept out of this public repo (private; fetched over SSH).
+    private.url = "git+ssh://git@github.com/GambinoSupremo/nixos-private";
   };
 
   outputs =
@@ -52,7 +55,10 @@
             useGlobalPkgs = true;
             useUserPackages = true;
             extraSpecialArgs = { inherit inputs host; };
-            users.gav = import ./home/default.nix;
+            users.gav.imports = [
+              ./home/default.nix
+              inputs.private.homeModules.default
+            ];
             # Pre-existing files that home-manager would clobber are moved aside
             # as *.hm-bak instead of aborting the activation.
             backupFileExtension = "hm-bak";
@@ -75,6 +81,7 @@
             { networking.hostName = hostName; }
             home-manager.nixosModules.home-manager
             hmModule
+            inputs.private.nixosModules.default
           ];
         };
     in

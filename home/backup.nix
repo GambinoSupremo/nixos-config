@@ -80,6 +80,10 @@ let
       echo "Not set up yet; run nas-backup-setup."
       fail "Not set up yet; run nas-backup-setup"
     fi
+    # Optional hook from other modules: copies extra local files into the share first.
+    pre_sync="$HOME/.config/nas-backup/pre-sync"
+    if [[ -x $pre_sync ]]; then "$pre_sync" || fail "The pre-sync step didn't finish"; fi
+
     rclone sync nas:personal pcloud-crypt:current \
       --backup-dir "pcloud-crypt:changed/$(date +%F)" \
       --max-delete 1000 -v || fail "Copying to pCloud didn't finish"

@@ -24,27 +24,20 @@ reboot is needed (kernel or modules changed) and lists failed system and user
 units.
 
 `apply` is the one to run after committing a change on a cleanup branch. It
-fast-forwards each repo's `main` to its single pending `cleanup/*` branch
-(stopping if there are several or a rebase is needed), then builds desktop and
-VM using the local dotfiles checkout. A failed build restores both local `main`
-branches and keeps the cleanup branches. After a successful activation it
-pushes dotfiles, refreshes the pin, commits and pushes `flake.lock`, then prunes
+checks both repos for a single pending `cleanup/*` branch that fast-forwards
+(stopping before either `main` moves if not), fast-forwards both, then builds
+desktop and VM against the committed local dotfiles checkout. A failed build
+restores both local `main` branches and keeps the cleanup branches. If the new
+system goes live but activation reports errors, nothing is reset or pushed;
+fix it and run `apply` again to publish. After a clean activation it pushes
+dotfiles, refreshes the pin, commits and pushes `flake.lock`, then prunes
 cleanup branches that are fully on `main`.
 
-The helper is packaged in the active system generation. When changing
-`home/nixos-sync.sh`, the first `apply` still runs the currently installed
-version. Before that first run, check out the pending cleanup branches, build
-both hosts with the local dotfiles checkout, then return both repos to clean
-`main`:
+The helper is packaged in the active system, so after changing
+`home/nixos-sync.sh` the first `apply` still runs the old version.
 
-```sh
-nix build ~/nixos-config#nixosConfigurations.desktop.config.system.build.toplevel \
-  --override-input dotfiles path:/home/gav/Projects/dotfiles --no-link
-nix build ~/nixos-config#nixosConfigurations.vm.config.system.build.toplevel \
-  --override-input dotfiles path:/home/gav/Projects/dotfiles --no-link
-```
-
-Later runs use the updated ordering.
+The `private` input is a private GitHub repo fetched over SSH, so building
+needs GitHub SSH access.
 
 ## Dotfiles
 
