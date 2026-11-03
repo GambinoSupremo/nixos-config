@@ -54,11 +54,17 @@ live() {
 
 # Build behind a one-line spinner; the build output only goes to the log.
 build_system() {
-  local attr="$flake_dir#nixosConfigurations.$host.config.system.build.toplevel"
+  local target_host="${1:-$host}" dotfiles_dir="${2:-}"
+  local attr="$flake_dir#nixosConfigurations.$target_host.config.system.build.toplevel"
   local blog out pid rc=0 start=$SECONDS i=0 total started cur status
   local -a frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+  local -a cmd=(nix build --no-link --print-out-paths --log-format raw)
+  if [[ -n "$dotfiles_dir" ]]; then
+    cmd+=(--override-input dotfiles "path:$dotfiles_dir")
+  fi
+  cmd+=("$attr")
   blog=$(mktemp) out=$(mktemp)
-  nix build --no-link --print-out-paths --log-format raw "$attr" >"$out" 2>"$blog" &
+  "${cmd[@]}" >"$out" 2>"$blog" &
   pid=$!
   while kill -0 "$pid" 2>/dev/null; do
     if [[ -t 1 ]]; then
@@ -78,7 +84,7 @@ build_system() {
   done
   wait "$pid" || rc=$?
   [[ ! -t 1 ]] || printf '\r\e[K'
-  { printf '$ nix build %s\n' "$attr"; cat "$blog"; } >>"$log"
+  { printf '$'; printf ' %q' "${cmd[@]}"; printf '\n'; cat "$blog"; } >>"$log"
   if ((rc == 0)); then
     new_system=$(tail -n 1 "$out")
     total=$(sed -nE 's/^these ([0-9]+) derivations will be built:$/\1/p; s/^this derivation will be built:$/1/p' "$blog" | tail -1)
@@ -104,7 +110,19 @@ show_diff() {
 
 new_system=""
 nh_switch() {
-  build_system || return
+  local dotfiles_dir="${1:-}"
+  local desktop_system vm_system
+  section "Building desktop"
+  build_system desktop "$dotfiles_dir" || return
+  desktop_system="$new_system"
+  section "Building VM validation target"
+  build_system vm "$dotfiles_dir" || return
+  vm_system="$new_system"
+  if [[ "$host" == desktop ]]; then
+    new_system="$desktop_system"
+  else
+    new_system="$vm_system"
+  fi
   section "Changes"
   show_diff
   section "Activating"
@@ -260,53 +278,74 @@ prune_branches() {
   done
 }
 
-# Land the cleanup branch in each repo, push dotfiles,
-# refresh the dotfiles pin, switch, then push nixos-config.
+# Validate both hosts before publishing or pruning cleanup branches.
 cmd_apply() {
   start_log apply
-  local before dot_dir="$HOME/Projects/dotfiles"
+  local before dot_before="" dot_dir="$HOME/Projects/dotfiles" dotfiles_override="" has_dotfiles=false
   section "Checking ~/nixos-config"
   preflight
   require_clean
   before=$(git rev-parse HEAD)
   backup=$(mktemp)
   cp flake.lock "$backup"
-  land_branch
 
   if [[ -d "$dot_dir/.git" ]]; then
+    has_dotfiles=true
+    dotfiles_override="$dot_dir"
     section "Checking ~/Projects/dotfiles"
     preflight "$dot_dir"
     require_clean
+    dot_before=$(git -C "$dot_dir" rev-parse HEAD)
+  fi
+
+  cd "$flake_dir"
+  land_branch
+  if [[ "$has_dotfiles" == true ]]; then
+    cd "$dot_dir"
     land_branch
-    if [[ -n "$(git rev-list origin/main..main)" ]]; then
-      quiet git push || die "Couldn't push dotfiles. Nothing else was changed."
-      ok "Pushed dotfiles"
-    fi
-    prune_branches
     cd "$flake_dir"
   fi
 
-  section "Updating dotfiles pin"
-  quiet nix flake update dotfiles --refresh --flake "$flake_dir" || {
+  section "Validating and activating ($host)"
+  if ! nh_switch "$dotfiles_override"; then
     git reset -q --hard "$before"
-    die "Dotfiles update failed. ~/nixos-config is back where it was."
-  }
+    if [[ "$has_dotfiles" == true ]]; then
+      git -C "$dot_dir" reset -q --hard "$dot_before"
+    fi
+    cp "$backup" flake.lock
+    die "Validation or activation failed. Local main branches were restored; cleanup branches remain."
+  fi
+  ok "Both hosts validated and the desktop activated"
+
+  if [[ "$has_dotfiles" == true && -n "$(git -C "$dot_dir" rev-list origin/main..main)" ]]; then
+    if ! quiet git -C "$dot_dir" push; then
+      warn "System activated; dotfiles push failed. Local commits and cleanup branches were kept."
+      after_switch
+      return
+    fi
+    ok "Pushed dotfiles after validation"
+  fi
+
+  section "Refreshing the dotfiles pin"
+  if ! quiet nix flake update dotfiles --refresh --flake "$flake_dir"; then
+    warn "System activated, but the dotfiles pin refresh failed. Run dotsync to finish."
+    after_switch
+    return
+  fi
   print_changes "$backup" flake.lock
 
-  section "Building ($host)"
-  if ! nh_switch; then
-    git reset -q --hard "$before"
-    die "Apply failed. ~/nixos-config was restored. Check the log before retrying."
-  fi
-  ok "Switched to the new system"
-
-  section "Wrapping up"
+  section "Publishing nixos-config"
   commit_lock "flake: update dotfiles" || true
   if quiet git push; then
-    ok "Pushed to origin/main"
+    ok "Pushed nixos-config"
+    if [[ "$has_dotfiles" == true ]]; then
+      cd "$dot_dir"
+      prune_branches
+      cd "$flake_dir"
+    fi
     prune_branches
   else
-    warn "Push failed (commits are local; run git push)"
+    warn "System activated; nixos-config push failed. Local commits and cleanup branches were kept."
   fi
   after_switch
 }

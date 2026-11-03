@@ -60,22 +60,13 @@ in
       grep = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${host.name}";
     };
-    # apply: land cleanup branches, switch, push. update: main + clean + pull,
-    # update all inputs, switch, commit only flake.lock and push.
+    # apply: validate both hosts, switch, then publish. update: refresh, validate, switch.
     functions = {
       apply = "${nixosSync}/bin/nixos-sync apply";
       update = "${nixosSync}/bin/nixos-sync update";
       dotsync = "${nixosSync}/bin/nixos-sync dotsync";
       save = "${nixosSync}/bin/nixos-sync save";
 
-      # Claude Code won't persist trust for $HOME; ~/Projects is the hub instead.
-      claude = ''
-        test "$PWD" = "$HOME"; and cd ~/Projects
-        command claude $argv
-      '';
-      # Jump to a project and pick from its chats.
-      nx = "cd ~/nixos-config; and command claude -r $argv";
-      lab = "cd ~/Projects/homelab; and command claude -r $argv";
     };
   };
 

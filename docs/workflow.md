@@ -3,10 +3,10 @@
 ## Rebuild
 
 ```bash
-apply     # land cleanup/* branches, push dotfiles, refresh the pin, switch, push
+apply     # validate both hosts, switch, then publish landed cleanup branches
 rebuild   # alias: sudo nixos-rebuild switch --flake ~/nixos-config#<host> (desktop or vm, set per host)
-update    # update all inputs, switch, commit flake.lock, push
-dotsync   # update only the dotfiles pin, switch, commit flake.lock, push
+update    # update all inputs, validate both hosts, switch, commit flake.lock, push
+dotsync   # update the dotfiles pin, validate both hosts, switch, commit and push
 save      # build-check, then commit tracked changes as-is (no switch, no push)
 ```
 
@@ -23,13 +23,27 @@ commits **only flake.lock** ("flake: update inputs") and pushes, then says if a
 reboot is needed (kernel or modules changed) and lists failed system and user
 units.
 
-`apply` is the one to run after committing a change on a cleanup branch. In each repo it
-fast-forwards `main` to the single `cleanup/*` branch that has commits `main`
-lacks (it stops if there are several, or if the branch needs a rebase), then
-pushes dotfiles, refreshes the dotfiles pin and switches. If the build fails it
-resets nixos-config to where it was, so nothing is pushed. On success it pushes
-nixos-config and deletes `cleanup/*` branches (local and on GitHub) that are
-fully on `main`.
+`apply` is the one to run after committing a change on a cleanup branch. It
+fast-forwards each repo's `main` to its single pending `cleanup/*` branch
+(stopping if there are several or a rebase is needed), then builds desktop and
+VM using the local dotfiles checkout. A failed build restores both local `main`
+branches and keeps the cleanup branches. After a successful activation it
+pushes dotfiles, refreshes the pin, commits and pushes `flake.lock`, then prunes
+cleanup branches that are fully on `main`.
+
+The helper is packaged in the active system generation. When changing
+`home/nixos-sync.sh`, the first `apply` still runs the currently installed
+version. Before that first run, build both hosts with the local dotfiles
+checkout so a failed build cannot publish it:
+
+```sh
+nix build ~/nixos-config#nixosConfigurations.desktop.config.system.build.toplevel \
+  --override-input dotfiles path:/home/gav/Projects/dotfiles --no-link
+nix build ~/nixos-config#nixosConfigurations.vm.config.system.build.toplevel \
+  --override-input dotfiles path:/home/gav/Projects/dotfiles --no-link
+```
+
+Later runs use the updated ordering.
 
 ## Dotfiles
 

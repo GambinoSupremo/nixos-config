@@ -15,8 +15,8 @@ separate repo and patched for NixOS at build time.
   wrapper so games can skip Mullvad.
 - **Game streaming.** Sunshine streams to Moonlight through a virtual display
   sized for the client.
-- **One-command upkeep.** `apply` and `update` build, switch, commit
-  flake.lock and push, and roll back if the build fails.
+- **One-command upkeep.** `apply`, `update` and `dotsync` build both hosts;
+  `apply` validates before publishing and keeps cleanup branches on failure.
 
 ## Hardware
 
@@ -30,7 +30,8 @@ separate repo and patched for NixOS at build time.
 
 ## Hosts
 
-Both track nixos-unstable.
+Both track nixos-unstable. `apply`, `update` and `dotsync` build both outputs;
+only the desktop output is activated on gavos.
 
 - **desktop** (`gavos`): the machine above.
 - **vm** (`nix-vm`): a build-only target. It evaluates the shared modules
@@ -71,8 +72,8 @@ and how to compare gaming settings.
 ## How I use it
 
 Changes go on a `cleanup/*` branch, and `apply` lands it: it fast-forwards
-`main`, pushes the dotfiles, refreshes their pin, switches, and pushes this
-repo only if the build succeeded. Every couple of weeks `update` bumps all
-inputs the same way. Dotfile edits only reach the system after they're pushed
+`main`, builds against the local dotfiles checkout, activates only after both
+hosts build, then publishes dotfiles and refreshes the pin. Every couple of
+weeks `update` bumps all inputs the same way. Dotfile edits only reach the system after they're pushed
 and the pin is updated. The details are in [docs/workflow.md](docs/workflow.md),
 and the hard-won gotchas are in [docs/notes.md](docs/notes.md).
