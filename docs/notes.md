@@ -21,10 +21,10 @@ KDE Plasma is not installed.
   the RX 9070 XT don't get along: fullscreen VRR stuttered and flickered every
   game and logged amdgpu DMCUB errors. Monitor `vrr` changes only apply after
   Hyprland restarts (log out/in). Cap games at 175, the panel's refresh.
-- **Colour / HDR**: the AW3423DW runs always-on HDR (`cm = "hdr"`,
-  `sdrbrightness = 2.0` in dotfiles hypr/monitor.lua; monitor in HDR 400 True
-  Black). No auto-HDR switching, since SDR/HDR mode switches blank the screen.
-  HDR games need `PROTON_ENABLE_WAYLAND=1 PROTON_ENABLE_HDR=1`.
+- **Colour / HDR**: Hyprland keeps the AW3423DW in sRGB for desktop use and
+  switches to HDR for fullscreen HDR content. The mode switch can briefly blank
+  the screen. The SUNSHINE virtual output, Mango and Niri stay SDR. Local HDR
+  games use `PROTON_ENABLE_WAYLAND=1 PROTON_ENABLE_HDR=1` via `hdr-game`.
 - **keyd edit keys**: Super+Z/X/C/V become Ctrl+Z / Shift+Delete /
   Ctrl+Insert / Shift+Insert (undo, cut, copy, paste) at the kernel level for
   ALL sessions (base/services.nix). keyd keeps any other held modifier, so
