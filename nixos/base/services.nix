@@ -37,7 +37,10 @@ in
       # QK75 (wired, 2.4G): same as default, plus knob press = Numpad 3 (Discord mute).
       # Stock SONiX firmware has no VIA, so the remap lives here.
       qk75 = {
-        ids = [ "k:0c45:8017" "k:05ac:024f" ];
+        ids = [
+          "k:0c45:8017"
+          "k:05ac:024f"
+        ];
         settings = {
           main = {
             capslock = "kp0";
@@ -80,7 +83,7 @@ in
   services.locate = {
     enable = true;
     package = pkgs.plocate;
-    interval = "hourly";
+    interval = "daily"; # Avoid hourly tree scans; locate results may be a day behind.
   };
 
   # ── Power profiles daemon ─────────────────────────────────────────────────────

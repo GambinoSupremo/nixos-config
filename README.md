@@ -64,6 +64,8 @@ Both track nixos-unstable.
 Compositor binds, rules, layouts and monitors live in `~/Projects/dotfiles`.
 See [editing](docs/editing.md) for editor setup and validation commands,
 and [notes](docs/notes.md) before changing hardware or session behavior.
+[Performance](docs/performance.md) covers build concurrency, background work,
+and how to compare gaming settings.
 
 ## How I use it
 
