@@ -12,7 +12,8 @@
 
 let
   inherit (host) isVM;
-  scrollOverviewOn = !isVM;
+  # off: broke Hyprland startup on 0.57, 2026-11-03
+  scrollOverviewOn = !isVM && false;
   sessions = osConfig.gav.sessions; # nixos/base/desktop.nix
   configDirs = [
     "hypr"
