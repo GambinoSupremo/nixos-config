@@ -184,7 +184,7 @@ commit_lock() {
     ok "flake.lock unchanged, nothing to commit"
     return 1
   fi
-  git commit -q -m "$1" -- flake.lock
+  git commit -q -m "$1" -- flake.lock || die "Couldn't commit flake.lock."
   ok "Committed: $1"
 }
 
@@ -193,6 +193,7 @@ push_lock() {
     ok "Pushed to origin/main"
   else
     warn "Push failed (commit is local; run git push)"
+    return 1
   fi
 }
 
@@ -232,7 +233,12 @@ cmd_update() {
   ok "Switched to the new system"
 
   section "Wrapping up"
-  commit_lock "flake: update inputs" && push_lock
+  if commit_lock "flake: update inputs"; then
+    if ! push_lock; then
+      after_switch
+      return 1
+    fi
+  fi
   after_switch
 }
 
@@ -321,7 +327,7 @@ cmd_apply() {
     if ! quiet git -C "$dot_dir" push; then
       warn "System activated; dotfiles push failed. Local commits and cleanup branches were kept."
       after_switch
-      return
+      return 1
     fi
     ok "Pushed dotfiles after validation"
   fi
@@ -330,12 +336,18 @@ cmd_apply() {
   if ! quiet nix flake update dotfiles --refresh --flake "$flake_dir"; then
     warn "System activated, but the dotfiles pin refresh failed. Run dotsync to finish."
     after_switch
-    return
+    return 1
   fi
   print_changes "$backup" flake.lock
 
   section "Publishing nixos-config"
-  commit_lock "flake: update dotfiles" || true
+  if git diff --quiet -- flake.lock; then
+    ok "flake.lock unchanged, nothing to commit"
+  elif ! commit_lock "flake: update dotfiles"; then
+    warn "System activated, but flake.lock could not be committed."
+    after_switch
+    return 1
+  fi
   if quiet git push; then
     ok "Pushed nixos-config"
     if [[ "$has_dotfiles" == true ]]; then
@@ -346,6 +358,8 @@ cmd_apply() {
     prune_branches
   else
     warn "System activated; nixos-config push failed. Local commits and cleanup branches were kept."
+    after_switch
+    return 1
   fi
   after_switch
 }
@@ -368,7 +382,12 @@ cmd_dotsync() {
   ok "Switched to the new system"
 
   section "Wrapping up"
-  commit_lock "flake: update dotfiles" && push_lock
+  if commit_lock "flake: update dotfiles"; then
+    if ! push_lock; then
+      after_switch
+      return 1
+    fi
+  fi
   after_switch
 }
 
@@ -376,7 +395,7 @@ cmd_dotsync() {
 cmd_save() {
   start_log save
   preflight
-  nixos-rebuild build --flake "$flake_dir#$host" || die "Build failed. Nothing committed."
+  live nixos-rebuild build --flake "$flake_dir#$host" || die "Build failed. Nothing committed."
   if git diff --quiet && git diff --cached --quiet; then
     ok "Nothing to commit"
     return
