@@ -91,6 +91,9 @@ in
   # Proton games trip it constantly (huge stutter). No untrusted tenants: off.
   boot.kernel.sysctl."kernel.split_lock_mitigate" = 0;
 
+  # Lutris's sandbox still bundles gtk2, which nixpkgs now marks broken (removed by 27.05).
+  nixpkgs.config.problems.handlers."gtk+".broken = "ignore";
+
   environment.systemPackages = with pkgs; [
     # `novpn %command%`: game outside the Mullvad tunnel via daemon RPC — setuid
     # mullvad-exclude dies in Steam's nosuid sandbox; exec keeps the PID.
