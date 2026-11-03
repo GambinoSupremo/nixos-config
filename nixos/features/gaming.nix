@@ -110,6 +110,7 @@ in
       exec "$@"
     '')
     lutris
+    faugus-launcher # trying it alongside Lutris for WoW + other non-Steam games
     mangohud
     inputs.deadlock-mod-manager.packages.${pkgs.stdenv.hostPlatform.system}.default
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
