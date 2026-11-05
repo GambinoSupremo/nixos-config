@@ -110,6 +110,7 @@ in
       exec "$@"
     '')
     lutris
+    wowup-cf # WoW addon manager (CurseForge, Wago, GitHub)
     mangohud
     inputs.deadlock-mod-manager.packages.${pkgs.stdenv.hostPlatform.system}.default
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
