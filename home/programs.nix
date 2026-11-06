@@ -113,6 +113,26 @@
     mimeType = [ "x-scheme-handler/discord" ];
   };
 
+  # ── Sone ─────────────────────────────────────────────────────────────────────
+  # Same id as the package entry (SONE.desktop) so it replaces it; findable as "Tidal".
+  xdg.desktopEntries.SONE = {
+    name = "Sone";
+    genericName = "Tidal";
+    exec = "sone";
+    icon = "sone";
+    comment = "TIDAL music player";
+    categories = [
+      "AudioVideo"
+      "Audio"
+      "Music"
+    ];
+    mimeType = [ "x-scheme-handler/tidal" ];
+    settings = {
+      Keywords = "tidal;music;";
+      StartupWMClass = "sone";
+    };
+  };
+
   # ── Sunshine ─────────────────────────────────────────────────────────────────
   # Runs as a user service; the menu entry opens the web UI instead of a 2nd copy.
   xdg.desktopEntries."dev.lizardbyte.app.Sunshine" = {
