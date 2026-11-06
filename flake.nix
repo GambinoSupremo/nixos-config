@@ -24,6 +24,9 @@
       flake = false;
     };
 
+    # Cached upstream compositor build; keep its own nixpkgs for cache compatibility.
+    umbriel.url = "github:noctalia-dev/umbriel/cachix";
+
     # Dotfiles deployed declaratively via home-manager (see home/default.nix)
     dotfiles = {
       url = "github:GambinoSupremo/dotfiles";

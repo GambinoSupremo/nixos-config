@@ -5,6 +5,7 @@
 {
   imports = [
     # One concern per file (noctalia: HM's native module with nixpkgs' package)
+    ./umbriel.nix
     ./dotfiles.nix # compositor plumbing, dotfile patching, activation scripts
     ./shell.nix # fish, starship, fzf, zoxide, bat
     ./theming.nix # gtk, cursor

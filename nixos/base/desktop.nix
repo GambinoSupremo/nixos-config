@@ -4,6 +4,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
@@ -11,9 +12,12 @@ let
   cfg = config.gav.sessions;
 in
 {
+  imports = [ inputs.umbriel.nixosModules.default ];
+
   # Spare compositors. Off by default; their configs stay in the dotfiles, and
   # home-manager and Sunshine follow these too.
   options.gav.sessions = {
+    umbriel = lib.mkEnableOption "the Umbriel trial session";
     mango = lib.mkEnableOption "the Mango session";
     niri = lib.mkEnableOption "the niri session";
   };
@@ -22,8 +26,17 @@ in
     # ── Compositors ───────────────────────────────────────────────────────────────
     # Flip either to true to bring that session back on the login screen.
     gav.sessions = {
+      umbriel = true;
       mango = true;
       niri = false;
+    };
+
+    # Umbriel — upstream flake module (session, portal); its Cachix matches the
+    # flake's own nixpkgs, so no follows.
+    programs.umbriel.enable = cfg.umbriel;
+    nix.settings = lib.mkIf cfg.umbriel {
+      substituters = [ "https://umbriel.cachix.org" ];
+      trusted-public-keys = [ "umbriel.cachix.org-1:JfNq/2yg2S6D6z4Z2dVSZrZlDPQTKtexB6GAVLD98nw=" ];
     };
 
     # Mango — nixpkgs module registers the session + wlr portal config. Its
@@ -83,7 +96,8 @@ in
       };
     };
     # greetd doesn't set XDG_DATA_DIRS, which is where the greeter looks for sessions.
-    services.greetd.settings.default_session.command = lib.mkForce "env XDG_DATA_DIRS=${config.services.displayManager.sessionData.desktops}/share ${lib.getExe' config.services.displayManager.noctalia-greeter.package "noctalia-greeter-session"}";
+    services.greetd.settings.default_session.command =
+      lib.mkForce "env XDG_DATA_DIRS=${config.services.displayManager.sessionData.desktops}/share ${lib.getExe' config.services.displayManager.noctalia-greeter.package "noctalia-greeter-session"}";
 
     # Fallback preselection only (the greeter remembers last-used); Hyprland is
     # the daily driver.
@@ -96,6 +110,8 @@ in
       extraPortals = [ pkgs.xdg-desktop-portal-gtk ]; # file dialogs everywhere
       config = {
         common.default = [ "gtk" ];
+        # Upstream sets umbriel;gtk only; keep the keyring Secret portal like Mango.
+        umbriel = lib.mkIf cfg.umbriel { "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ]; };
       };
     };
 

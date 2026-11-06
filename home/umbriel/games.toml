@@ -1,0 +1,34 @@
+# Steam and game placement. Sunshine's stream.toml (included after this) overrides it while streaming.
+[general]
+xwayland_primary_output = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH"
+
+[[window_rule]]
+match.app_id = "^steam$"
+default_output = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH"
+default_workspace = 2
+default_focused = false
+
+[[window_rule]]
+match.app_id = "^steam$"
+match.title = "^(?!Steam$)"
+default_floating = true
+
+[[window_rule]]
+match.app_id = "^(steam_app_.*|.*\\.exe)$"
+default_output = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH"
+default_workspace = 2
+default_focused = false
+default_floating = false
+confine_pointer = true
+
+[[window_rule]]
+match.app_id = "^(steam_app_.*|.*\\.exe)$"
+match.title = "^(Launcher|broken)$"
+default_floating = true
+confine_pointer = false
+
+[[window_rule]]
+match.app_id = "^steam_app_default$"
+match.title = "^Battle\\.net"
+default_floating = true
+confine_pointer = false
