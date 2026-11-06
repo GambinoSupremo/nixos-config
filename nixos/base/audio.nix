@@ -11,5 +11,10 @@ _:
     alsa.support32Bit = true; # required for 32-bit apps and Steam (lib32-pipewire)
     pulse.enable = true; # PulseAudio compatibility shim
     # jack.enable = true;        # enable if you use JACK audio apps
+
+    # x11-bell module segfaults PipeWire when Xwayland exits (kills Vesktop audio)
+    extraConfig.pipewire."99-no-x11-bell" = {
+      "context.properties"."module.x11.bell" = false;
+    };
   };
 }
