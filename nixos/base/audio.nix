@@ -16,5 +16,17 @@ _:
     extraConfig.pipewire."99-no-x11-bell" = {
       "context.properties"."module.x11.bell" = false;
     };
+
+    # let the graph switch to the stream's native rate instead of resampling to 48k
+    extraConfig.pipewire."99-sample-rates" = {
+      "context.properties"."default.clock.allowed-rates" = [
+        44100
+        48000
+        88200
+        96000
+        176400
+        192000
+      ];
+    };
   };
 }
