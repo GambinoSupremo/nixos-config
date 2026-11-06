@@ -218,6 +218,27 @@ let
     match.title = "^(Launcher|broken)$"
     default_fullscreen = false
   '';
+  # Pull stray games onto SUNSHINE, then focus + fullscreen each one once (running ones
+  # included) so Big Picture doesn't keep the controller, like gameWatch.
+  umbrielGameWatch = pkgs.writeShellScript "sunshine-umbriel-game-watch" ''
+    jq=${pkgs.jq}/bin/jq
+    seen=" "
+    ${umbriel} subscribe windows | while IFS= read -r ev; do
+      while read -r id out; do
+        [ -n "$id" ] || continue
+        if [ "$out" != SUNSHINE ]; then
+          ${umbriel} msg window-focus "$id" >/dev/null
+          ${umbriel} msg window-move-to-workspace-silent 1 --output SUNSHINE >/dev/null
+        fi
+        case "$seen" in *" $id "*) continue ;; esac
+        seen="$seen$id "
+        sleep 1
+        ${umbriel} msg window-focus "$id" >/dev/null
+        ${umbriel} windows --json | $jq -e --arg id "$id" '.[] | select((.id | tostring) == $id and (.fullscreen or .floating | not))' >/dev/null &&
+          ${umbriel} msg window-toggle-fullscreen >/dev/null
+      done <<< "$(echo "$ev" | $jq -r '.data[]? | select(.app_id | test("^steam_app_|[.]exe$")) | "\(.id) \(.output)"')"
+    done
+  '';
   umbrielStream = pkgs.writeShellScript "sunshine-umbriel-stream" ''
     jq=${pkgs.jq}/bin/jq
     cfg="$HOME/.config/umbriel/stream.toml"
@@ -237,8 +258,11 @@ let
       ${umbriel} msg config-reload >/dev/null
       moveAll off 1 SUNSHINE
       ${umbriel} msg workspace-switch 1 --output SUNSHINE >/dev/null
+      [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null
+      setsid ${umbrielGameWatch} >/dev/null 2>&1 < /dev/null & echo $! > "${watchPid}"
       ;;
     stop)
+      [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null; rm -f "${watchPid}"
       rm -f "$cfg"
       ${umbriel} msg config-reload >/dev/null
       aw=$(${pkgs.wlr-randr}/bin/wlr-randr --json | $jq -r '.[] | select(.model == "Dell AW3423DW") | .name')

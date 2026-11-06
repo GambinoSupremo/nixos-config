@@ -95,16 +95,16 @@ On start:
 2. Writes `stream.toml`, which sends new Steam/game windows to `SUNSHINE` workspace 1, focused, with games fullscreen. Launcher windows are excluded, and `SUNSHINE` becomes the X11 primary.
 3. Reloads the config.
 4. Moves windows that are already open there.
+5. Starts a game watcher, as on Hyprland and Mango. It pulls games that land elsewhere back to `SUNSHINE`, and focuses and fullscreens each game once, including ones already running. That keeps Big Picture from holding the controller.
 
 On stop:
-1. Removes `stream.toml` and reloads.
+1. Stops the watcher, removes `stream.toml` and reloads.
 2. Moves the Steam/game windows back to the Alienware's workspace 2.
 3. Destroys the output.
 
-Steam Remote Play uses the same path. If a stream crashes, the session bootstrap clears a leftover `stream.toml` at the next login.
+Steam Remote Play uses the same path at 2560x1440@120. The session bootstrap restarts `remoteplay-watch` so it sees Umbriel's environment. If a stream crashes, the session bootstrap clears a leftover `stream.toml` at the next login.
 
 Differences from Hyprland:
-- No game watcher: rules handle new windows.
 - Noctalia's palette reloads don't reset the mode.
 
 ## Known gaps
@@ -127,4 +127,5 @@ Differences from Hyprland:
 - [ ] Audio works, including the media keys.
 - [ ] The Noctalia bar, palette and clipboard work.
 - [ ] A Moonlight stream starts and stops cleanly, and games return to the Alienware.
+- [ ] A Steam Remote Play session (puck off, game launched mid-session) streams the game, the controller reaches it, and games return to the Alienware afterwards.
 - [ ] Logging out and picking Hyprland or Mango still works.
