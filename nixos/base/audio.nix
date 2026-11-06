@@ -26,7 +26,17 @@ _:
         96000
         176400
         192000
+        352800
+        384000
       ];
+    };
+
+    # best-quality resampler for when streams at different rates share the DAC (default 4)
+    extraConfig.client."99-resample-quality" = {
+      "stream.properties"."resample.quality" = 10;
+    };
+    extraConfig.pipewire-pulse."99-resample-quality" = {
+      "stream.properties"."resample.quality" = 10;
     };
   };
 }
