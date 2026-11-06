@@ -42,4 +42,7 @@ in
       Install.WantedBy = [ "graphical-session.target" ];
     }
   );
+
+  # Blueman toasts on every BT connect/disconnect (Lily58 flaps); keep the applet, drop the toasts.
+  dconf.settings."org/blueman/general".plugin-list = lib.mkIf (!isVM) [ "!ConnectionNotifier" ];
 }
