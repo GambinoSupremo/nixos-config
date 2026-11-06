@@ -89,14 +89,7 @@
 
     # ── Media ────────────────────────────────────────────────────────────────
     spotify # was spotify-launcher (AUR downloader wrapper)
-    # "gray screen" = its gpuRasterization flag crashing the GPU process on Wayland.
-    # Localhost DevTools port lets tidal-live-theme (home/theming.nix) recolor it live.
-    (symlinkJoin {
-      name = "tidal-hifi-devtools";
-      paths = [ tidal-hifi ];
-      nativeBuildInputs = [ makeWrapper ];
-      postBuild = "wrapProgram $out/bin/tidal-hifi --add-flags '--remote-debugging-port=9233 --remote-debugging-address=127.0.0.1'";
-    })
+    sone # TIDAL; plays each track at its native sample rate
     cider-2 # Apple Music (cider.sh 4.x); plain `cider` is the dead 1.x fork
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────

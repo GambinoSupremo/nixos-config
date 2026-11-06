@@ -181,11 +181,6 @@ source = "wallpaper"
     ]
 
     # App themes Noctalia has no community template for.
-    [theme.templates.user.tidal-hifi]
-    input_path = "~/.config/noctalia/templates/tidal-hifi.css"
-    output_path = "~/.config/tidal-hifi/themes/noctalia.css"
-    post_hook = "/etc/profiles/per-user/gav/bin/tidal-live-theme"
-
     [theme.templates.user.cider]
     input_path = "~/.config/noctalia/templates/cider.scss"
     output_path = "~/.config/sh.cider.genten/themes/noctalia/noctalia.scss"

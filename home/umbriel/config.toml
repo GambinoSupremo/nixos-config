@@ -9,7 +9,7 @@ QT_QPA_PLATFORMTHEME = "qt6ct"
 [general]
 show_cheatsheet = false
 focus_on_activate = false
-autostart = ["@BOOTSTRAP@", "gsettings set org.gnome.desktop.interface color-scheme prefer-dark", "wl-paste --watch cliphist store", "sleep 5 && mullvad-exclude vesktop", "sleep 5 && signal-desktop --password-store=gnome-libsecret", "sleep 5 && tidal-hifi"]
+autostart = ["@BOOTSTRAP@", "gsettings set org.gnome.desktop.interface color-scheme prefer-dark", "wl-paste --watch cliphist store", "sleep 5 && mullvad-exclude vesktop", "sleep 5 && signal-desktop --password-store=gnome-libsecret", "sleep 5 && sone"]
 
 [appearance]
 border_width = 2
@@ -168,7 +168,7 @@ name = "stash"
 "Mod+Shift+e" = "spawn nautilus"
 "Mod+Shift+d" = "spawn mullvad-exclude vesktop"
 "Mod+Shift+o" = "spawn obsidian"
-"Mod+Shift+m" = "spawn tidal-hifi"
+"Mod+Shift+m" = "spawn sone"
 "Mod+Shift+Alt+b" = "spawn zen-beta --private-window"
 "Mod+Shift+i" = "spawn zeditor"
 "Mod+backslash" = "spawn noctalia msg panel-toggle control-center audio"
@@ -286,18 +286,18 @@ default_floating = true
 default_floating_size_px = { width = 1020, height = 900 }
 
 [[window_rule]]
-match.app_id = "^(vesktop|signal|Signal|tidal-hifi)$"
+match.app_id = "^(vesktop|signal|Signal|sone)$"
 default_output = "Philips Consumer Electronics Company PHL 278E1 0x0000065F"
 default_workspace = 2
 default_focused = false
 
 [[window_rule]]
-match.app_id = "^(signal|vesktop|tidal-hifi|cider|obsidian)$"
+match.app_id = "^(signal|vesktop|sone|cider|obsidian)$"
 match.is_focused = false
 opacity = 0.9
 
 [[window_rule]]
-match.app_id = "^(signal|vesktop|tidal-hifi|cider|obsidian)$"
+match.app_id = "^(signal|vesktop|sone|cider|obsidian)$"
 match.is_focused = true
 opacity = 0.95
 

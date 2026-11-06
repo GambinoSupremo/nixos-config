@@ -40,8 +40,6 @@ KDE Plasma is not installed.
 - **Electron apps**: `NIXOS_OZONE_WL=1` (amd.nix) puts them on Wayland.
   Signal must launch with `--password-store=gnome-libsecret` everywhere or
   the keyring backend flips between sessions and loses the encryption key.
-  tidal-hifi: never re-enable its gpuRasterization flag (GPU-process crash
-  on Wayland; fix lives in ~/.config/tidal-hifi/config.json).
 - **Mullvad**: the GUI user service polls the system daemon with a BOUNDED
   wait (home/services.nix) — an unbounded loop hung activation during
   rebuilds. `mullvad-exclude` is setuid and dies in Steam's nosuid sandbox;
