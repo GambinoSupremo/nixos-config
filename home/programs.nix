@@ -103,7 +103,7 @@
   xdg.desktopEntries.vesktop = {
     name = "Vesktop";
     exec = "mullvad-exclude vesktop %U";
-    icon = "vesktop";
+    icon = "discord"; # Papirus round icon; its vesktop.svg is the rainbow Vencord logo
     comment = "Vesktop — Discord via Mullvad split tunnel";
     categories = [
       "Network"
