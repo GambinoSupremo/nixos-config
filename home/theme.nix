@@ -20,7 +20,6 @@ let
       Ayu|builtin|Ayu|themes/ayu
       Eldritch|builtin|Eldritch|themes/eldritch
       Solarized|community|Solarized|themes/solarized'
-      themes=$(sed 's/^ *//' <<<"$themes")
       state="''${XDG_STATE_HOME:-$HOME/.local/state}/theme-current"
 
       current() { cat "$state" 2>/dev/null || echo Wallpaper; }
