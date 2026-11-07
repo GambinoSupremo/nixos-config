@@ -223,11 +223,11 @@
     "wallpapers": {
       "flake": false,
       "locked": {
-        "lastModified": 1792794938,
-        "narHash": "sha256-1ofX0JsVXEsZF6COb8M1LwDbNRxHA/eZiFWObSxjdYg=",
+        "lastModified": 1794018583,
+        "narHash": "sha256-h0ZRPYHAbKji6xr+Dr6GITYNR2BA4n5VtB4Y21gerns=",
         "owner": "GambinoSupremo",
         "repo": "wallpapers",
-        "rev": "a7f6f5d83e54847dc062abd77a7415dcf8b670a7",
+        "rev": "52692e3054ba54fbaf81452fcf2880842256564c",
         "type": "github"
       },
       "original": {
