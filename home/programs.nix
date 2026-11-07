@@ -64,6 +64,16 @@
     ];
   };
 
+  # ── btop ─────────────────────────────────────────────────────────────────────
+  # Uses the theme Noctalia writes to ~/.config/btop/themes/noctalia.theme.
+  programs.btop = {
+    enable = true;
+    settings = {
+      color_theme = "noctalia";
+      theme_background = false;
+    };
+  };
+
   # ── Satty ────────────────────────────────────────────────────────────────────
   # Noctalia pipes region screenshots here (shell.screenshot in noctalia config.toml).
   # Enter copies + exits, Ctrl+S saves to output-filename.

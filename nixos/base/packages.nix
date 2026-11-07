@@ -41,7 +41,6 @@
     '')
 
     # ── System utilities ──────────────────────────────────────────────────────
-    btop
     fastfetch
     dmidecode
     smartmontools
