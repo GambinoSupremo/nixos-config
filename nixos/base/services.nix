@@ -17,6 +17,8 @@ in
   # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
   hardware.bluetooth.enable = true;
   services.blueman.enable = true; # system tray + pairing GUI
+  # Intel AX210 USB autosuspend drops BLE links (Lily58 reconnect loops).
+  boot.extraModprobeConfig = "options btusb enable_autosuspend=0";
 
   # ── Key remapping ─────────────────────────────────────────────────────────────
   # keyd — Mac-style edit keys in every app and terminal: Super+Z/X/C/V →
