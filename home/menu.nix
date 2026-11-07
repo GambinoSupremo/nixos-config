@@ -80,8 +80,10 @@ let
       }
 
       style() {
-        case $(pick Style Wallpaper "Random wallpaper" "Noctalia settings") in
+        case $(pick Style Theme Wallpaper "Random wallpaper" "Light/dark" "Noctalia settings") in
+          Theme) theme ;;
           Wallpaper) n panel-open wallpaper ;;
+          "Light/dark") n theme-mode-toggle ;;
           "Random wallpaper") n wallpaper-random ;;
           "Noctalia settings") n settings-open ;;
         esac
