@@ -22,6 +22,7 @@
     ./vesktop-mic.nix # vesktop-mic: mute Discord's mic stream during in-game push-to-talk
     ./webapps.nix # app-like Firefox windows (PWAsForFirefox)
     ./menu.nix # sysmenu + keybinds: system menu and bind cheatsheet in Noctalia
+    ./theme.nix # theme: named looks (palette + matching wallpapers)
     ./deadlock-fov.nix # re-adds r_aspectratio when gameinfo.gi gets rewritten (desktop)
   ];
 
