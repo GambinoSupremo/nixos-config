@@ -13,6 +13,9 @@
     };
   };
 
+  # Colours come from Noctalia's lazygit template, which owns config.yml; keep settings empty.
+  programs.lazygit.enable = true;
+
   # ── SSH ──────────────────────────────────────────────────────────────────────
   # Only the hosts listed here; no HM catch-all defaults (GitHub uses ssh's own).
   programs.ssh = {
