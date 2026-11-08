@@ -46,6 +46,7 @@
     smartmontools
     usbutils
     ddcutil # monitor settings over DDC/CI; needs hardware.i2c in services.nix
+    dnsutils # dig, nslookup
 
     # ── Wayland tooling ───────────────────────────────────────────────────────
     # niri registered via programs.niri in desktop.nix
