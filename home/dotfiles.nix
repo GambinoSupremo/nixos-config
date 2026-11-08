@@ -252,8 +252,7 @@ in
   };
 
   # ── Wallpapers ───────────────────────────────────────────────────────────────
-  # Noctalia reads these from [wallpaper] directory and the theme command; read-only is fine.
-  home.file."Pictures/backgrounds".source = "${inputs.wallpapers}/backgrounds";
+  # Noctalia reads this from [wallpaper] directory and the theme command; read-only is fine.
   home.file."Pictures/themes".source = "${inputs.wallpapers}/themes";
 
   # ── Noctalia runtime seed ─────────────────────────────────────────────────────
