@@ -56,8 +56,11 @@ let
       # Hyprland 0.57: the steam-games monitor rule pulls ws 2 back to the Alienware when a game maps.
       case "$ev" in
       moveworkspacev2\>\>2,*)
-        # Full lend, not a bare move: a fullscreen game blocks the move and strands ws 2.
-        [ "''${ev##*,}" = SUNSHINE ] || ${lendWs2}
+        [ "''${ev##*,}" = SUNSHINE ] && continue
+        hyprctl dispatch 'hl.dsp.workspace.move({ workspace = 2, monitor = "SUNSHINE" })'
+        sleep 0.2
+        # A fullscreen game can block the move and strand ws 2.
+        hyprctl workspaces -j | ${pkgs.jq}/bin/jq -e 'any(.[]; .name == "2" and .monitor == "SUNSHINE")' >/dev/null || ${lendWs2}
         continue ;;
       esac
       case "$ev" in openwindow\>\>*|movewindowv2\>\>*) ;; *) continue ;; esac
@@ -110,6 +113,19 @@ let
       fi
       ${pkgs.coreutils}/bin/sleep 1
     done
+    # WoW can draw its menus and scene misaligned on the stream until its window changes size.
+    (
+      for _ in $(${pkgs.coreutils}/bin/seq 300); do
+        a=$(hyprctl clients -j | ${pkgs.jq}/bin/jq -r 'first(.[] | select(.title == "World of Warcraft") | .address) // empty')
+        [ -n "$a" ] && break
+        ${pkgs.coreutils}/bin/sleep 1
+      done
+      [ -n "$a" ] || exit 0
+      ${pkgs.coreutils}/bin/sleep 20
+      hyprctl dispatch "hl.dsp.window.fullscreen_state({ internal = 0, client = 0, window = \"address:$a\" })"
+      ${pkgs.coreutils}/bin/sleep 4
+      hyprctl dispatch "hl.dsp.window.fullscreen_state({ internal = 2, client = 2, window = \"address:$a\" })"
+    ) >/dev/null 2>&1 &
     exec ${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/6
   '';
   # Kill whatever Steam is running (every process under its reaper), then back to Big Picture.
