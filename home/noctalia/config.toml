@@ -185,6 +185,11 @@ source = "wallpaper"
     input_path = "~/.config/noctalia/templates/cider.scss"
     output_path = "~/.config/sh.cider.genten/themes/noctalia/noctalia.scss"
 
+    [theme.templates.user.papirus]
+    input_path = "~/.config/noctalia/templates/papirus-accent"
+    output_path = "~/.cache/noctalia/papirus-accent"
+    post_hook = "papirus-accent"
+
 [wallpaper]
 directory = "/home/gav/Pictures/backgrounds"
 
