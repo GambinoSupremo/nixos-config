@@ -223,17 +223,18 @@
     "wallpapers": {
       "flake": false,
       "locked": {
-        "lastModified": 1794161752,
-        "narHash": "sha256-k610xLnnUVwlMyw7mAu5LoX8bdBcIF8myRWwfEWrmsI=",
-        "owner": "GambinoSupremo",
-        "repo": "wallpapers",
-        "rev": "5bf723c41555e9f28217e499dfd054a22258b8cd",
-        "type": "github"
+        "lastModified": 1794164071,
+        "narHash": "sha256-bvfnxAfq1pMpDenkx29S6Z7MwpVLkyzH4/ZYBXcjUp8=",
+        "ref": "refs/heads/main",
+        "rev": "a2cba79995abfeaa7b2a695a7c18ef64504276a5",
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/GambinoSupremo/wallpapers"
       },
       "original": {
-        "owner": "GambinoSupremo",
-        "repo": "wallpapers",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/GambinoSupremo/wallpapers"
       }
     },
     "xdg-desktop-portal-umbriel": {
