@@ -9,6 +9,28 @@
 
 let
   inherit (host) isVM;
+  signIn = pkgs.writeShellApplication {
+    name = "battlenet-signin";
+    bashOptions = [ ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      findutils
+      gawk
+      gnugrep
+      procps
+      systemd
+    ];
+    text = builtins.readFile ./battlenet-signin.sh;
+  };
+  # WoW asks for the password unless Battle.net has signed in first.
+  wowForever = pkgs.writeShellScript "wow-forever" ''
+    ${pkgs.procps}/bin/pgrep -x Wow.exe >/dev/null && exit 0
+    if ! ${pkgs.systemd}/bin/systemctl --user start battlenet-signin.service; then
+      ${pkgs.libnotify}/bin/notify-send "WoW Forever" "Battle.net didn't sign in. WoW wasn't started."
+      exit 1
+    fi
+    exec ${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/6
+  '';
 in
 {
   # ── Mullvad VPN GUI ───────────────────────────────────────────────────────────
@@ -52,7 +74,10 @@ in
     Unit = {
       Description = "Battle.net background login";
       PartOf = [ "graphical-session.target" ];
+      Wants = [ "battlenet-signin.service" ];
       ConditionPathExists = "%h/.local/share/lutris/games/battlenet-1793150466.yml";
+      # A restart would close Battle.net, and WoW with it.
+      X-SwitchMethod = "keep-old";
     };
     Service = {
       Type = "simple";
@@ -94,5 +119,32 @@ in
       ExecStart = "${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/1";
       Restart = "no";
     };
+  };
+
+  # Callers share one run: systemctl start joins a run already in progress.
+  systemd.user.services.battlenet-signin = lib.mkIf (!isVM) {
+    Unit = {
+      Description = "Restart Battle.net if its sign-in stalls";
+      PartOf = [ "graphical-session.target" ];
+      ConditionPathExists = "%h/.local/share/lutris/games/battlenet-1793150466.yml";
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = lib.getExe signIn;
+      TimeoutStartSec = "15min";
+    };
+  };
+
+  # Replaces the shortcut Lutris made, which started WoW without waiting for sign-in.
+  xdg.dataFile."applications/net.lutris.world-of-warcraft-forever-6.desktop" = lib.mkIf (!isVM) {
+    force = true;
+    text = ''
+      [Desktop Entry]
+      Type=Application
+      Name=World of Warcraft: Forever
+      Icon=lutris_world-of-warcraft-forever
+      Exec=${wowForever}
+      Categories=Game
+    '';
   };
 }

@@ -6,12 +6,15 @@ The existing stream display setup, game watcher, audio and controller setup
 also apply to this app. Battle.net may appear briefly during startup.
 
 Battle.net only hands WoW a sign-in if it has finished logging in, otherwise
-WoW asks for the password. So the app waits up to 3 minutes for that login,
-starting Battle.net if it isn't running, and only then launches WoW. The login
-window can stall until it's resized, so for the first minute the app resizes it
-every 5 seconds. Battle.net
-stays running in the background afterwards (game launch behavior `3`; `2` exits
-the client) so later launches are instant.
+WoW asks for the password. So the app and the PC shortcut both run
+`battlenet-signin.service` first, which starts Battle.net if needed and waits for
+that login. Battle.net often stalls before it tries to sign in (cause unknown),
+so the service restarts it, up to 6 tries, when its log has stopped short of
+sign-in and its main thread is busy. A window waiting for a password
+should not match that and is left open. If the service gives up, a notification
+appears and WoW isn't started. Battle.net stays running in the background
+afterwards (game launch behavior `3`; `2` exits the client) so later launches are
+instant. Logs: `journalctl --user -u battlenet-signin`.
 
 WoW can draw its menus and 3D scene misaligned on the stream. Taking its window
 out of fullscreen and back fixes that, so the app does this once, 20 seconds

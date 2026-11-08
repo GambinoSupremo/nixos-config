@@ -82,37 +82,32 @@ let
     done
   '';
   # Battle.net gives WoW no sign-in token until it has logged in, and WoW then asks for the
-  # password. Wait for this client's login; past the deadline, launch anyway.
+  # password. The sign-in service restarts a stalled client; if it gives up, don't launch.
   wowLaunch = pkgs.writeShellScript "sunshine-wow-launch" ''
-    logs="$HOME/Games/battlenet/drive_c/users/steamuser/AppData/Local/Battle.net/Logs"
-    pgrep=${pkgs.procps}/bin/pgrep
-    # Anchored on the Windows path: launcher shells keep Battle.net.exe in their args after it exits,
-    # and the client's process name is CrBrowserMain.
-    client='^C:.*Battle[.]net[.]exe'
-    signed_in() {
-      pid=$($pgrep -of "$client") || return 1
-      since=$(( $(${pkgs.coreutils}/bin/date +%s) - $(${pkgs.procps}/bin/ps -o etimes= -p "$pid") ))
-      ${pkgs.findutils}/bin/find "$logs" -name 'battle.net-*.log' -newermt "@$since" \
-        -exec ${pkgs.gnugrep}/bin/grep -l 'Logged into Battle.net successfully' {} + | ${pkgs.gnugrep}/bin/grep -q .
-    }
     # Reopening the stream onto a running game: gameWatch already put it on the stream.
-    $pgrep -x Wow.exe >/dev/null && exit 0
-    $pgrep -f "$client" >/dev/null || ${pkgs.systemd}/bin/systemctl --user start --no-block battlenet-background.service
-    for i in $(${pkgs.coreutils}/bin/seq 180); do
-      signed_in && break
-      # The stream can sit on an empty workspace, hiding the sign-in window.
-      hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })' >/dev/null
-      # The login window can stall until it's resized. Stop after a minute so a real password prompt can be used.
-      if [ "$i" -le 60 ] && [ $(( i % 5 )) -eq 0 ]; then
-        a=$(hyprctl clients -j | ${pkgs.jq}/bin/jq -r 'first(.[] | select(.class == "steam_app_default" and .title == "Battle.net Login") | .address) // empty')
+    ${pkgs.procps}/bin/pgrep -x Wow.exe >/dev/null && exit 0
+    (
+      while :; do
+        # The stream can sit on an empty workspace, hiding the sign-in window.
+        hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })'
+        # Keep a real password prompt usable on the stream.
+        a=$(hyprctl clients -j | ${pkgs.jq}/bin/jq -r 'first(.[] | select(.class == "steam_app_default" and .title == "Battle.net Login" and (.floating | not)) | .address) // empty')
         if [ -n "$a" ]; then
-          hyprctl dispatch "hl.dsp.window.float({ action = \"enable\", window = \"address:$a\" })" >/dev/null
-          hyprctl dispatch "hl.dsp.window.resize({ x = $(( 600 + i % 2 * 20 )), y = 700, window = \"address:$a\" })" >/dev/null
-          hyprctl dispatch "hl.dsp.window.center({ window = \"address:$a\" })" >/dev/null
+          hyprctl dispatch "hl.dsp.window.float({ action = \"enable\", window = \"address:$a\" })"
+          hyprctl dispatch "hl.dsp.window.resize({ x = 600, y = 700, window = \"address:$a\" })"
+          hyprctl dispatch "hl.dsp.window.center({ window = \"address:$a\" })"
         fi
-      fi
-      ${pkgs.coreutils}/bin/sleep 1
-    done
+        ${pkgs.coreutils}/bin/sleep 1
+      done
+    ) >/dev/null 2>&1 &
+    keep_visible=$!
+    ${pkgs.systemd}/bin/systemctl --user start battlenet-signin.service
+    rc=$?
+    kill "$keep_visible"
+    if [ "$rc" -ne 0 ]; then
+      ${pkgs.libnotify}/bin/notify-send "WoW Forever" "Battle.net didn't sign in. WoW wasn't started."
+      exit 1
+    fi
     # WoW can draw its menus and scene misaligned on the stream until its window changes size.
     (
       for _ in $(${pkgs.coreutils}/bin/seq 300); do
