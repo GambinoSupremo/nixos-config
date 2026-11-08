@@ -11,7 +11,7 @@ let
     ];
     text = ''
       # name|source|palette|wallpaper folder (relative to ~/Pictures)
-      themes='Wallpaper|wallpaper|m3-content|backgrounds
+      themes='Wallpaper|wallpaper|m3-content|themes
       Gruvbox|builtin|Gruvbox|themes/gruvbox
       Everforest|community|Everforest|themes/everforest
       Nord|builtin|Nord|themes/nord

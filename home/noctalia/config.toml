@@ -191,7 +191,7 @@ source = "wallpaper"
     post_hook = "papirus-accent"
 
 [wallpaper]
-directory = "/home/gav/Pictures/backgrounds"
+directory = "/home/gav/Pictures/themes"
 
     [wallpaper.automation]
     enabled = true
@@ -199,25 +199,25 @@ directory = "/home/gav/Pictures/backgrounds"
     recursive = true         # images live in subfolders
 
     [wallpaper.default]
-    path = "/home/gav/Pictures/backgrounds/other/monochrome/a_black_and_white_building_with_a_fire_escape.jpg"
+    path = "/home/gav/Pictures/themes/gruvbox/a_painting_of_a_man_with_a_dripping_face.jpg"
 
     [wallpaper.last]
-    path = "/home/gav/Pictures/backgrounds/other/monochrome/a_black_and_white_building_with_a_fire_escape.jpg"
+    path = "/home/gav/Pictures/themes/gruvbox/a_painting_of_a_man_with_a_dripping_face.jpg"
 
     [wallpaper.monitors.DP-1]
-    path = "/home/gav/Pictures/backgrounds/other/abstract/a_painting_of_a_man_with_a_dripping_face.jpg"
+    path = "/home/gav/Pictures/themes/gruvbox/a_painting_of_a_man_with_a_dripping_face.jpg"
 
     [wallpaper.monitors.DP-2]
-    path = "/home/gav/Pictures/backgrounds/other/abstract/a_painting_of_a_man_with_a_dripping_face.jpg"
+    path = "/home/gav/Pictures/themes/gruvbox/a_painting_of_a_man_with_a_dripping_face.jpg"
 
     [wallpaper.monitors.DP-3]
-    path = "/home/gav/Pictures/backgrounds/other/monochrome/a_black_and_white_building_with_a_fire_escape.jpg"
+    path = "/home/gav/Pictures/themes/gruvbox/a_painting_of_a_man_with_a_dripping_face.jpg"
 
     [wallpaper.monitors.DP-4]
-    path = "/home/gav/Pictures/backgrounds/other/monochrome/a_black_and_white_building_with_a_fire_escape.jpg"
+    path = "/home/gav/Pictures/themes/gruvbox/a_painting_of_a_man_with_a_dripping_face.jpg"
 
     [wallpaper.monitors.WAYLAND-1]
-    path = "/home/gav/Pictures/backgrounds/other/dreamcore/a_building_on_a_foggy_day.jpg"
+    path = "/home/gav/Pictures/themes/gruvbox/a_painting_of_a_man_with_a_dripping_face.jpg"
 
 [weather]
 address = "Kirkland, WA"
