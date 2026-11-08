@@ -7,7 +7,9 @@ also apply to this app. Battle.net may appear briefly during startup.
 
 Battle.net only hands WoW a sign-in if it has finished logging in, otherwise
 WoW asks for the password. So the app waits up to 3 minutes for that login,
-starting Battle.net if it isn't running, and only then launches WoW. Battle.net
+starting Battle.net if it isn't running, and only then launches WoW. The login
+window can stall until it's resized, so for the first minute the app resizes it
+every 5 seconds. Battle.net
 stays running in the background afterwards (game launch behavior `3`; `2` exits
 the client) so later launches are instant.
 
