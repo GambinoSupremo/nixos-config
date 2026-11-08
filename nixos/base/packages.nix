@@ -45,6 +45,7 @@
     dmidecode
     smartmontools
     usbutils
+    pciutils # lspci
     ddcutil # monitor settings over DDC/CI; needs hardware.i2c in services.nix
     dnsutils # dig, nslookup
 
