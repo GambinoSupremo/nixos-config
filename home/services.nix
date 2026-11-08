@@ -66,11 +66,11 @@ in
           settings = Path.home() / "Games/battlenet/drive_c/users/steamuser/AppData/Roaming/Battle.net"
           for path in settings.glob("*.config"):
               data = json.loads(path.read_text())
-              # Keep the client available for subsequent game launch requests.
+              # 3 closes the window but stays signed in for later launches; 2 exits the client.
               client = data.get("Client") if path.name == "Battle.net.config" else data.get("User", {}).get("Client")
               if not isinstance(client, dict):
                   continue
-              key, value = ("GameLaunchWindowBehavior", "2") if path.name == "Battle.net.config" else ("MinimizedOnStartup", "true")
+              key, value = ("GameLaunchWindowBehavior", "3") if path.name == "Battle.net.config" else ("MinimizedOnStartup", "true")
               if client.get(key) == value:
                   continue
               backup = path.with_suffix(".config.before-background-login")

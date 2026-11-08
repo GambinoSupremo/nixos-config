@@ -36,7 +36,7 @@ let
     hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })'
     sleep 0.5
     # Focus a running game (fullscreen) so Big Picture doesn't keep the controller on reconnect.
-    hyprctl clients -j | $jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and (.floating | not)) | "\(.address) \(.fullscreen)"' |
+    hyprctl clients -j | $jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and (.floating | not) and (.title | test("^Battle[.]net") | not)) | "\(.address) \(.fullscreen)"' |
     while read -r a fs; do
       hyprctl dispatch "hl.dsp.focus({ window = \"address:$a\" })"
       [ "$fs" = 0 ] && hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })'
@@ -56,7 +56,8 @@ let
       # Hyprland 0.57: the steam-games monitor rule pulls ws 2 back to the Alienware when a game maps.
       case "$ev" in
       moveworkspacev2\>\>2,*)
-        [ "''${ev##*,}" = SUNSHINE ] || hyprctl dispatch 'hl.dsp.workspace.move({ workspace = 2, monitor = "SUNSHINE" })'
+        # Full lend, not a bare move: a fullscreen game blocks the move and strands ws 2.
+        [ "''${ev##*,}" = SUNSHINE ] || ${lendWs2}
         continue ;;
       esac
       case "$ev" in openwindow\>\>*|movewindowv2\>\>*) ;; *) continue ;; esac
@@ -70,10 +71,37 @@ let
       IFS=, read -r a _ cls _ <<< "''${ev#openwindow>>}"
       case "$cls" in steam_app_*|*.exe) ;; *) continue ;; esac
       sleep 1
+      # Battle.net shares WoW's class but isn't a game; its title arrives after it opens.
+      hyprctl clients -j | ${pkgs.jq}/bin/jq -e --arg a "0x$a" '.[] | select(.address == $a and (.title | test("^Battle[.]net")))' >/dev/null && continue
       hyprctl dispatch "hl.dsp.focus({ window = \"address:0x$a\" })"
       hyprctl clients -j | ${pkgs.jq}/bin/jq -e --arg a "0x$a" '.[] | select(.address == $a and .fullscreen == 0 and (.floating | not))' >/dev/null &&
         hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })'
     done
+  '';
+  # Battle.net gives WoW no sign-in token until it has logged in, and WoW then asks for the
+  # password. Wait for this client's login; past the deadline, launch anyway.
+  wowLaunch = pkgs.writeShellScript "sunshine-wow-launch" ''
+    logs="$HOME/Games/battlenet/drive_c/users/steamuser/AppData/Local/Battle.net/Logs"
+    pgrep=${pkgs.procps}/bin/pgrep
+    # Anchored on the Windows path: launcher shells keep Battle.net.exe in their args after it exits,
+    # and the client's process name is CrBrowserMain.
+    client='^C:.*Battle[.]net[.]exe'
+    signed_in() {
+      pid=$($pgrep -of "$client") || return 1
+      since=$(( $(${pkgs.coreutils}/bin/date +%s) - $(${pkgs.procps}/bin/ps -o etimes= -p "$pid") ))
+      ${pkgs.findutils}/bin/find "$logs" -name 'battle.net-*.log' -newermt "@$since" \
+        -exec ${pkgs.gnugrep}/bin/grep -l 'Logged into Battle.net successfully' {} + | ${pkgs.gnugrep}/bin/grep -q .
+    }
+    # Reopening the stream onto a running game: gameWatch already put it on the stream.
+    $pgrep -x Wow.exe >/dev/null && exit 0
+    $pgrep -f "$client" >/dev/null || ${pkgs.systemd}/bin/systemctl --user start --no-block battlenet-background.service
+    for _ in $(${pkgs.coreutils}/bin/seq 180); do
+      signed_in && break
+      # The stream can sit on an empty workspace, hiding the sign-in window.
+      hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })' >/dev/null
+      ${pkgs.coreutils}/bin/sleep 1
+    done
+    exec ${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/6
   '';
   # Kill whatever Steam is running (every process under its reaper), then back to Big Picture.
   closeGame = pkgs.writeShellScript "sunshine-close-game" ''
@@ -348,10 +376,7 @@ in
     applications.apps = [
       {
         name = "WoW Forever";
-        # Reuse the Lutris entry that authenticates and launches through Battle.net.
-        detached = [
-          "${pkgs.util-linux}/bin/setsid ${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/6"
-        ];
+        detached = [ "${pkgs.util-linux}/bin/setsid ${wowLaunch}" ];
       }
       {
         name = "Steam Big Picture";
