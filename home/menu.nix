@@ -117,8 +117,21 @@ let
         esac
       }
 
+      # Optional extra top-level entries, one "Label<tab>command" per line.
+      declare -A extras=()
+      extra_labels=()
+      extra_file=$HOME/.config/sysmenu/extra
+      if [ -r "$extra_file" ]; then
+        while IFS=$'\t' read -r label command; do
+          extras[$label]=$command
+          extra_labels+=("$label")
+        done <"$extra_file"
+      fi
+
       # `sysmenu <section>` opens a section directly.
-      case "''${1:-$(pick Menu Apps Learn Capture Toggle Style Setup Update System)}" in
+      choice=''${1:-$(pick Menu Apps "''${extra_labels[@]}" Learn Capture Toggle Style Setup Update System)}
+      case "$choice" in
+        "") ;;
         Apps | apps) n panel-open launcher ;;
         Learn | learn) learn ;;
         Capture | capture) capture ;;
@@ -127,6 +140,7 @@ let
         Setup | setup) setup ;;
         Update | update) update ;;
         System | system) system ;;
+        *) [ -z "''${extras[$choice]:-}" ] || exec sh -c "''${extras[$choice]}" ;;
       esac
     '';
   };
