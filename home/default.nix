@@ -23,6 +23,7 @@
     ./webapps.nix # app-like Firefox windows (PWAsForFirefox)
     ./menu.nix # sysmenu + keybinds: system menu and bind cheatsheet in Noctalia
     ./theme.nix # theme: named looks (palette + matching wallpapers)
+    ./papirus.nix # Papirus folder colors follow the accent
     ./deadlock-fov.nix # re-adds r_aspectratio when gameinfo.gi gets rewritten (desktop)
   ];
 
