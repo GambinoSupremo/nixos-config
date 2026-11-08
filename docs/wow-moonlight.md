@@ -5,6 +5,12 @@ launches Battle.net with `--exec="launch WoWF"`, preserving automatic login.
 The existing stream display setup, game watcher, audio and controller setup
 also apply to this app. Battle.net may appear briefly during startup.
 
+Battle.net only hands WoW a sign-in if it has finished logging in, otherwise
+WoW asks for the password. So the app waits up to 3 minutes for that login,
+starting Battle.net if it isn't running, and only then launches WoW. Battle.net
+stays running in the background afterwards (game launch behavior `3`; `2` exits
+the client) so later launches are instant.
+
 Run `apply` on Gavos after landing this change. Then refresh Gavos's app list
 in Moonlight on the already-paired Steam Machine and test `WoW Forever`.
 
