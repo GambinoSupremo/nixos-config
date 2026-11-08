@@ -43,11 +43,11 @@ the Steam Machine's `~/.local/share/applications/`, then use Steam's
 Add a Non-Steam Game dialog to add `WoW Forever`.
 
 Gavos must be awake with its desktop session logged in. This uses the
-existing Moonlight pairing and streaming preferences. Exit WoW before
-ending the stream; avoid moving a running fullscreen game across a stream
-disconnect/reconnect (see the existing Hyprland streaming notes).
+existing Moonlight pairing and streaming preferences.
 
 The Sunshine entry is detached so launcher process handoffs do not end the
-stream. Exit the Moonlight session after leaving WoW to return to SteamOS.
-Closing Moonlight alone may leave the Sunshine session running, depending
-on the client's quit-after-session setting.
+stream, which also means leaving WoW doesn't end it. Close the Moonlight
+session after leaving WoW to return to SteamOS. Closing it removes the virtual
+display and returns workspace 2 to the Alienware. A game still running is taken
+out of fullscreen for the move and put back afterwards. If a stream ends without
+that cleanup (e.g. a network drop), the next stream clears the leftover display.

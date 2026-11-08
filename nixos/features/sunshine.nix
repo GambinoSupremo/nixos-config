@@ -162,13 +162,25 @@ let
       ;;
     stop)
       [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null; rm -f "${watchPid}"
-      hyprctl dispatch 'hl.dsp.workspace.move({ workspace = "2", monitor = "desc:${alienware}" })'
+      # A fullscreen game can block the move, so drop fullscreen until the output is gone.
+      full=$(hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select(.workspace.id == 2 and .fullscreen != 0) | "\(.address) \(.fullscreen) \(.fullscreenClient)"')
+      while read -r a _; do
+        [ -n "$a" ] && hyprctl dispatch "hl.dsp.window.fullscreen_state({ internal = 0, client = 0, window = \"address:$a\" })"
+      done <<< "$full"
+      for _ in $(seq 25); do
+        hyprctl dispatch 'hl.dsp.workspace.move({ workspace = "2", monitor = "desc:${alienware}" })'
+        hyprctl workspaces -j | ${pkgs.jq}/bin/jq -e 'any(.[]; .id == 2 and .monitor == "SUNSHINE") | not' >/dev/null && break
+        sleep 0.2
+      done
       hyprctl output destroy SUNSHINE
       aw=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.model == "Dell AW3423DW") | .name')
       [ -n "$aw" ] && ${pkgs.xrandr}/bin/xrandr --output "$aw" --primary
       # Re-enable and pick up any theme changes made during the stream.
       hyprctl eval 'hl.config({ misc = { disable_autoreload = false } })'
       hyprctl reload
+      while read -r a i c; do
+        [ -n "$a" ] && hyprctl dispatch "hl.dsp.window.fullscreen_state({ internal = $i, client = $c, window = \"address:$a\" })"
+      done <<< "$full"
       ;;
     esac
   '';
