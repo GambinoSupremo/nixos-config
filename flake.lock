@@ -206,11 +206,11 @@
         "xdg-desktop-portal-umbriel": "xdg-desktop-portal-umbriel"
       },
       "locked": {
-        "lastModified": 1794044742,
-        "narHash": "sha256-GhAcD8DgxAv0oP/yt8u/ZA8NB0ndlTXlUjxtsRy3Ezk=",
+        "lastModified": 1794066163,
+        "narHash": "sha256-qeoOmVGV8bpEuq/dxHhMX0jrLSy4T6LrU7OKXt54/lA=",
         "owner": "noctalia-dev",
         "repo": "umbriel",
-        "rev": "f5dd36b0d4cf1019170d736f1c256361fa361cf0",
+        "rev": "ad46c7d14ca1f59f2874f3df74773f781fb39c80",
         "type": "github"
       },
       "original": {
@@ -223,11 +223,11 @@
     "wallpapers": {
       "flake": false,
       "locked": {
-        "lastModified": 1794018583,
-        "narHash": "sha256-h0ZRPYHAbKji6xr+Dr6GITYNR2BA4n5VtB4Y21gerns=",
+        "lastModified": 1794099156,
+        "narHash": "sha256-JSoWFMEEIlKoqGqA8GjGhbIf40oc0T67PVu2nJD6R7A=",
         "owner": "GambinoSupremo",
         "repo": "wallpapers",
-        "rev": "52692e3054ba54fbaf81452fcf2880842256564c",
+        "rev": "27ee4e967c11231bf515496aa69bc588ba604d50",
         "type": "github"
       },
       "original": {
@@ -267,11 +267,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793999934,
-        "narHash": "sha256-2VbZROa77YEzzuUyRStmHdkrjV89YALYL566Ssij0Fk=",
+        "lastModified": 1794113319,
+        "narHash": "sha256-zQgtR/G5j0eZayjrb6fpBVmy1fkOGlCHyLxW4Tboy2M=",
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "37ba4a650eaeeb5a086114da3a2cdf7593967d12",
+        "rev": "5f45f55b9f6f2de78504a95b372e13951793be3a",
         "type": "github"
       },
       "original": {
