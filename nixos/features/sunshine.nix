@@ -95,10 +95,19 @@ let
     # Reopening the stream onto a running game: gameWatch already put it on the stream.
     $pgrep -x Wow.exe >/dev/null && exit 0
     $pgrep -f "$client" >/dev/null || ${pkgs.systemd}/bin/systemctl --user start --no-block battlenet-background.service
-    for _ in $(${pkgs.coreutils}/bin/seq 180); do
+    for i in $(${pkgs.coreutils}/bin/seq 180); do
       signed_in && break
       # The stream can sit on an empty workspace, hiding the sign-in window.
       hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })' >/dev/null
+      # The login window can stall until it's resized. Stop after a minute so a real password prompt can be used.
+      if [ "$i" -le 60 ] && [ $(( i % 5 )) -eq 0 ]; then
+        a=$(hyprctl clients -j | ${pkgs.jq}/bin/jq -r 'first(.[] | select(.class == "steam_app_default" and .title == "Battle.net Login") | .address) // empty')
+        if [ -n "$a" ]; then
+          hyprctl dispatch "hl.dsp.window.float({ action = \"enable\", window = \"address:$a\" })" >/dev/null
+          hyprctl dispatch "hl.dsp.window.resize({ x = $(( 600 + i % 2 * 20 )), y = 700, window = \"address:$a\" })" >/dev/null
+          hyprctl dispatch "hl.dsp.window.center({ window = \"address:$a\" })" >/dev/null
+        fi
+      fi
       ${pkgs.coreutils}/bin/sleep 1
     done
     exec ${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/6
