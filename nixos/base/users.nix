@@ -13,6 +13,7 @@
       "audio" # audio devices (belt-and-suspenders with pipewire)
       "input" # keyd and input-remapper access
       "dialout" # /dev/ttyACM* — ZMK Studio serial, flashing
+      "i2c" # /dev/i2c-* — ddcutil monitor control
     ];
   };
 

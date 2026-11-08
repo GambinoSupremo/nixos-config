@@ -68,6 +68,10 @@ in
   };
   environment.systemPackages = [ pkgs.keyd ]; # `sudo keyd monitor`
 
+  # ── DDC/CI (monitor control) ──────────────────────────────────────────────────
+  # i2c-dev + an i2c group so ddcutil can talk to the monitors without sudo.
+  hardware.i2c.enable = true;
+
   # ── GameMode ──────────────────────────────────────────────────────────────────
   # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
   programs.gamemode.enable = true;

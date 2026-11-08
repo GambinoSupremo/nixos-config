@@ -45,6 +45,7 @@
     dmidecode
     smartmontools
     usbutils
+    ddcutil # monitor settings over DDC/CI; needs hardware.i2c in services.nix
 
     # ── Wayland tooling ───────────────────────────────────────────────────────
     # niri registered via programs.niri in desktop.nix
