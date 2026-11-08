@@ -30,13 +30,15 @@ let
         IFS='|' read -r name source palette dir <<<"$line"
         dir="$HOME/Pictures/$dir"
         noctalia msg color-scheme-set "$source" "$palette" >/dev/null
-        if find "$dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit 2>/dev/null | grep -q .; then
+        if find -L "$dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit 2>/dev/null | grep -q .; then
           noctalia msg config-set wallpaper.directory "'$dir'" >/dev/null
           noctalia msg wallpaper-random >/dev/null
         else
           notify-send -a Theme "$name" "No wallpapers in $dir yet; kept the current ones."
         fi
         echo "$name" >"$state"
+        # Login screen follows too, once the new wallpaper has landed.
+        (sleep 3; noctalia msg greeter-sync >/dev/null 2>&1) &
       }
 
       case "''${1:-}" in
