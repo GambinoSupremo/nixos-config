@@ -16,7 +16,7 @@ contact_shadow = false
 
     [[bar.default.capsule_group]]
     id = "left"
-    members = [ "launcher", "wallpaper", "workspaces" ]
+    members = [ "launcher", "wallpaper", "theme", "workspaces" ]
     fill = "surface_variant"
     border = "outline"
     foreground = "on_surface"
@@ -230,6 +230,19 @@ scale = 1.2000000000000002
 
 [widget.notifications]
 hide_when_no_unread = true
+
+# Theme button: click = picker, scroll = next/previous theme, right click = back to wallpaper colors.
+[widget.theme]
+type = "custom_button"
+glyph = "palette"
+tooltip = "Theme (scroll to cycle)"
+scroll_repeat = "gesture"
+
+    [widget.theme.actions]
+    left = "exec theme"
+    right = "exec theme Wallpaper"
+    scroll_up = "exec theme prev"
+    scroll_down = "exec theme next"
 
 [widget.tray]
 drawer = true

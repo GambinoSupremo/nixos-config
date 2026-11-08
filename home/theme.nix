@@ -5,7 +5,10 @@
 let
   theme = pkgs.writeShellApplication {
     name = "theme";
-    runtimeInputs = [ pkgs.libnotify ];
+    runtimeInputs = [
+      pkgs.libnotify
+      pkgs.util-linux # flock
+    ];
     text = ''
       # name|source|palette|wallpaper folder (relative to ~/Pictures)
       themes='Wallpaper|wallpaper|m3-content|backgrounds
@@ -37,12 +40,28 @@ let
           notify-send -a Theme "$name" "No wallpapers in $dir yet; kept the current ones."
         fi
         echo "$name" >"$state"
+        [ -n "''${THEME_NOTIFY:-}" ] && notify-send -a Theme -t 2000 "Theme" "$name"
         # Login screen follows too, once the new wallpaper has landed.
-        (sleep 3; noctalia msg greeter-sync >/dev/null 2>&1) &
+        (sleep 3; noctalia msg greeter-sync >/dev/null 2>&1) 9>&- &
       }
+
+      # Step through the list (wraps); used by the bar button scroll and Super+Ctrl+T.
+      step() {
+        local names cur i n
+        mapfile -t names < <(cut -d'|' -f1 <<<"$themes")
+        cur=$(current); n=''${#names[@]}
+        for i in "''${!names[@]}"; do [ "''${names[$i]}" = "$cur" ] && break; done
+        THEME_NOTIFY=1 apply "''${names[$(( (i + $1 + n) % n ))]}"
+      }
+
+      # One switch at a time, so fast scrolling doesn't pile up.
+      exec 9>"''${XDG_RUNTIME_DIR:-/tmp}/theme.lock"
+      flock -n 9 || exit 0
 
       case "''${1:-}" in
         list) cut -d'|' -f1 <<<"$themes" ;;
+        next) step 1 ;;
+        prev) step -1 ;;
         current) current ;;
         "")
           cur=$(current)
