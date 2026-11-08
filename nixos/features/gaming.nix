@@ -10,6 +10,7 @@
 let
   # Hyprland's fullscreen window rule is skipped when the window maps without initial
   # focus (e.g. a ProtonFixes popup just closed), so make new game windows fullscreen here.
+  # The "windowed" tag comes from dotfiles hypr/rule.lua.
   gameFullscreen = pkgs.writeShellScript "game-fullscreen" ''
     jq=${pkgs.jq}/bin/jq
     ${pkgs.socat}/bin/socat -U - UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" |
@@ -19,7 +20,7 @@ let
       case "$cls" in steam_app_*|*.exe) ;; *) continue ;; esac
       case "$title" in Launcher|broken) continue ;; esac
       sleep 1
-      hyprctl clients -j | $jq -e --arg a "0x$a" '.[] | select(.address == $a and .fullscreen == 0 and (.floating | not))' >/dev/null || continue
+      hyprctl clients -j | $jq -e --arg a "0x$a" '.[] | select(.address == $a and .fullscreen == 0 and (.floating | not) and (any(.tags[]; startswith("windowed")) | not))' >/dev/null || continue
       hyprctl dispatch "hl.dsp.focus({ window = \"address:0x$a\" })"
       hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })'
     done
