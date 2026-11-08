@@ -138,11 +138,11 @@
     },
     "private": {
       "locked": {
-        "lastModified": 1794123063,
-        "narHash": "sha256-Buz0mpW929wMVMQVvACL8wb9jieROn3HY4eXUtJQ4Go=",
+        "lastModified": 1794123385,
+        "narHash": "sha256-/oq8lTrmmjedqXdOWiASrxXFTrqPe48r8MKOpwAaZsY=",
         "ref": "refs/heads/main",
-        "rev": "a1df99e80069b9fef4fb60e627988a714569af5b",
-        "revCount": 4,
+        "rev": "62f39fbdf40f307a44c46fad67b855322a2cf26d",
+        "revCount": 5,
         "type": "git",
         "url": "ssh://git@github.com/GambinoSupremo/nixos-private"
       },
