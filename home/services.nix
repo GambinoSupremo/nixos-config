@@ -45,4 +45,54 @@ in
 
   # Blueman toasts on every BT connect/disconnect (Lily58 flaps); keep the applet, drop the toasts.
   dconf.settings."org/blueman/general".plugin-list = lib.mkIf (!isVM) [ "!ConnectionNotifier" ];
+
+  # Started by the compositor bootstrap after importing its display environment.
+  # Battle.net can drop a game launch request while still signing in after boot.
+  systemd.user.services.battlenet-background = lib.mkIf (!isVM) {
+    Unit = {
+      Description = "Battle.net background login";
+      PartOf = [ "graphical-session.target" ];
+      ConditionPathExists = "%h/.local/share/lutris/games/battlenet-1793150466.yml";
+    };
+    Service = {
+      Type = "simple";
+      ExecStartPre = toString (
+        pkgs.writeShellScript "battlenet-startup-settings" ''
+          ${pkgs.python3}/bin/python3 - <<'PY'
+          import json
+          import shutil
+          from pathlib import Path
+
+          settings = Path.home() / "Games/battlenet/drive_c/users/steamuser/AppData/Roaming/Battle.net"
+          for path in settings.glob("*.config"):
+              data = json.loads(path.read_text())
+              # Keep the client available for subsequent game launch requests.
+              client = data.get("Client") if path.name == "Battle.net.config" else data.get("User", {}).get("Client")
+              if not isinstance(client, dict):
+                  continue
+              key, value = ("GameLaunchWindowBehavior", "2") if path.name == "Battle.net.config" else ("MinimizedOnStartup", "true")
+              if client.get(key) == value:
+                  continue
+              backup = path.with_suffix(".config.before-background-login")
+              if not backup.exists():
+                  shutil.copy2(path, backup)
+              client[key] = value
+              temp = path.with_suffix(".config.tmp")
+              temp.write_text(json.dumps(data, indent=4) + "\n")
+              temp.replace(path)
+
+          game = Path.home() / ".local/share/lutris/games/battlenet-1793150466.yml"
+          text = game.read_text()
+          if "  args:" not in text.split("game_slug:", 1)[0]:
+              backup = game.with_suffix(".yml.before-background-login")
+              if not backup.exists():
+                  shutil.copy2(game, backup)
+              game.write_text(text.replace("game:\n", "game:\n  args: --autostarted\n", 1))
+          PY
+        ''
+      );
+      ExecStart = "${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/1";
+      Restart = "no";
+    };
+  };
 }
