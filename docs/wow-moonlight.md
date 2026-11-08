@@ -13,6 +13,10 @@ every 5 seconds. Battle.net
 stays running in the background afterwards (game launch behavior `3`; `2` exits
 the client) so later launches are instant.
 
+WoW can draw its menus and 3D scene misaligned on the stream. Taking its window
+out of fullscreen and back fixes that, so the app does this once, 20 seconds
+after the window appears.
+
 Run `apply` on Gavos after landing this change. Then refresh Gavos's app list
 in Moonlight on the already-paired Steam Machine and test `WoW Forever`.
 
