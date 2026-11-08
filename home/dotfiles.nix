@@ -252,8 +252,9 @@ in
   };
 
   # ── Wallpapers ───────────────────────────────────────────────────────────────
-  # Noctalia reads this path from [wallpaper] directory in config.toml; read-only is fine.
-  home.file."Pictures/backgrounds".source = "${inputs.wallpapers}";
+  # Noctalia reads these from [wallpaper] directory and the theme command; read-only is fine.
+  home.file."Pictures/backgrounds".source = "${inputs.wallpapers}/backgrounds";
+  home.file."Pictures/themes".source = "${inputs.wallpapers}/themes";
 
   # ── Noctalia runtime seed ─────────────────────────────────────────────────────
   # Seed Noctalia's runtime templates once as writable copies; rebuilds skip

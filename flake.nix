@@ -33,8 +33,9 @@
       flake = false;
     };
 
+    # Private; fetched over SSH. Shallow so builds skip old history.
     wallpapers = {
-      url = "github:GambinoSupremo/wallpapers";
+      url = "git+ssh://git@github.com/GambinoSupremo/wallpapers?shallow=1";
       flake = false;
     };
 
