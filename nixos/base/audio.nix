@@ -19,6 +19,7 @@ _:
 
     # let the graph switch to the stream's native rate instead of resampling to 48k
     extraConfig.pipewire."99-sample-rates" = {
+      "context.properties"."default.clock.rate" = 44100;
       "context.properties"."default.clock.allowed-rates" = [
         44100
         48000
