@@ -64,7 +64,8 @@ let
         continue ;;
       esac
       case "$ev" in openwindow\>\>*|movewindowv2\>\>*) ;; *) continue ;; esac
-      hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and .workspace.name != "2") | .address' |
+      # Battle.net's main window stays hidden (dotfiles hypr/rule.lua), even on a stream.
+      hyprctl clients -j | ${pkgs.jq}/bin/jq -r '.[] | select((.class | test("^steam_app_|[.]exe$")) and .workspace.name != "2" and .title != "Battle.net") | .address' |
       while read -r a; do
         hyprctl dispatch "hl.dsp.window.move({ workspace = \"2\", window = \"address:$a\", follow = true })"
       done

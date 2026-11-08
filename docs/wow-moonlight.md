@@ -3,7 +3,9 @@
 Sunshine exposes `WoW Forever`, launching Lutris game 6 on Gavos. That entry
 launches Battle.net with `--exec="launch WoWF"`, preserving automatic login.
 The existing stream display setup, game watcher, audio and controller setup
-also apply to this app. Battle.net may appear briefly during startup.
+also apply to this app. On Hyprland the main Battle.net window stays hidden on
+`special:battlenet` (Super+Alt+B shows it, for updates). Its login window stays
+visible and can appear briefly during startup.
 
 Battle.net only hands WoW a sign-in if it has finished logging in, otherwise
 WoW asks for the password. So the app and the PC shortcut both run
