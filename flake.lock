@@ -24,11 +24,11 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1794174312,
-        "narHash": "sha256-B9JZqSxI7ugjyttKqJzok1RHZBGw3Girb+7mOyLWewE=",
+        "lastModified": 1794176709,
+        "narHash": "sha256-nARsRUzIcpMBQ6/ehc27d2XhJH89vzpNvYWXAeRgxRM=",
         "owner": "GambinoSupremo",
         "repo": "dotfiles",
-        "rev": "e38dffc5a6bb96ab1923cd6ace692e9dfcb740e0",
+        "rev": "41ae7a5ea73459fc92cea581cfdc773db6e519e8",
         "type": "github"
       },
       "original": {
