@@ -347,6 +347,13 @@ in
     };
     applications.apps = [
       {
+        name = "WoW Forever";
+        # Reuse the Lutris entry that authenticates and launches through Battle.net.
+        detached = [
+          "${pkgs.util-linux}/bin/setsid ${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/6"
+        ];
+      }
+      {
         name = "Steam Big Picture";
         image-path = "steam.png";
         detached = [ "setsid steam steam://open/bigpicture" ];

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=WoW Forever
+Comment=Stream WoW Forever from Gavos
+Exec=/usr/bin/flatpak run com.moonlight_stream.Moonlight stream gavos "WoW Forever"
+Icon=com.moonlight_stream.Moonlight
+Terminal=false
+Categories=Game;
