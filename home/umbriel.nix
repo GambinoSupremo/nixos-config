@@ -4,6 +4,7 @@
   lib,
   pkgs,
   osConfig,
+  host,
   ...
 }:
 let
@@ -22,6 +23,7 @@ let
     systemctl --user restart sunshine.service
     # Remote Play's display prep needs the Umbriel env too.
     systemctl --user restart remoteplay-watch.service
+    ${lib.optionalString (!host.isVM) "systemctl --user start --no-block battlenet-background.service"}
   '';
 in
 {

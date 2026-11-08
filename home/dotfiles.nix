@@ -47,6 +47,7 @@ let
     systemctl --user restart noctalia.service
     # Sunshine needs the compositor env for wlr screen capture.
     systemctl --user restart sunshine.service
+    ${lib.optionalString (!isVM) "systemctl --user start --no-block battlenet-background.service"}
   '';
 
   # Hyprland has no session target without uwsm, so nothing pulls
@@ -58,6 +59,7 @@ let
     systemctl --user restart noctalia.service
     # Sunshine needs the compositor env for wlr screen capture.
     systemctl --user restart sunshine.service
+    ${lib.optionalString (!isVM) "systemctl --user start --no-block battlenet-background.service"}
   '';
 
   # Hyprland's .conf fallback, written whole (hyprland.lua normally wins): the
