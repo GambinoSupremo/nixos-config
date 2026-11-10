@@ -1,4 +1,5 @@
-# sysmenu: a nested system menu (capture, tools, toggles, style, setup, power) in Noctalia's launcher.
+# sysmenu: a nested system menu (capture, tools, toggles, style, setup, power) in Noctalia's launcher;
+# the icon rows come from the plugin in noctalia/plugins/sysmenu.
 # keybinds: searchable list of the live compositor binds. Both are bound in the dotfiles.
 { pkgs, ... }:
 
@@ -52,7 +53,7 @@ let
       settle() { sleep 0.3; }
 
       learn() {
-        case $(pick Learn Keybindings "Hyprland wiki" "NixOS options" "Home Manager options" "Noctalia docs") in
+        case ''${1:-$(pick Learn Keybindings "Hyprland wiki" "NixOS options" "Home Manager options" "Noctalia docs")} in
           Keybindings) keybinds ;;
           "Hyprland wiki") web https://wiki.hypr.land ;;
           "NixOS options") web https://search.nixos.org/options ;;
@@ -73,7 +74,7 @@ let
       capture() {
         local opts=(Region Window Screen "Draw on screen" "Region to clipboard" "Scan QR code" "Record region" "Record screen" "Color picker")
         recording && opts=("Stop recording" "''${opts[@]}")
-        case $(pick Capture "''${opts[@]}") in
+        case ''${1:-$(pick Capture "''${opts[@]}")} in
           Region) settle; n screenshot-region ;;
           Window) settle; n screenshot-window ;;
           Screen) settle; n screenshot-fullscreen ;;
@@ -102,7 +103,7 @@ let
       # Terminal apps, each in its own window.
       tui() { ghostty --gtk-single-instance=false "$@" & }
       tools() {
-        case $(pick Tools "System monitor (btop)" "Git (lazygit)" "Disk usage (dua)" "Audio mixer (wiremix)") in
+        case ''${1:-$(pick Tools "System monitor (btop)" "Git (lazygit)" "Disk usage (dua)" "Audio mixer (wiremix)")} in
           "System monitor (btop)") tui -e btop ;;
           "Git (lazygit)") tui --working-directory="$HOME/nixos-config" -e lazygit ;;
           "Disk usage (dua)") tui --working-directory="$HOME" -e dua interactive ;;
@@ -111,7 +112,7 @@ let
       }
 
       toggle() {
-        case $(pick Toggle "Night light" "Do not disturb" "Stay awake" Bar Bluetooth) in
+        case ''${1:-$(pick Toggle "Night light" "Do not disturb" "Stay awake" Bar Bluetooth)} in
           "Night light") n nightlight-force-toggle ;;
           "Do not disturb") n notification-dnd-toggle ;;
           "Stay awake") n caffeine-toggle ;;
@@ -121,7 +122,7 @@ let
       }
 
       style() {
-        case $(pick Style Theme Wallpaper "Random wallpaper" "Light/dark" "Noctalia settings") in
+        case ''${1:-$(pick Style Theme Wallpaper "Random wallpaper" "Light/dark" "Noctalia settings")} in
           Theme) theme ;;
           Wallpaper) n panel-open wallpaper ;;
           "Light/dark") n theme-mode-toggle ;;
@@ -131,7 +132,7 @@ let
       }
 
       setup() {
-        case $(pick Setup Audio "Edit nixos-config" "Edit dotfiles" "Restart Noctalia" "Reload Hyprland") in
+        case ''${1:-$(pick Setup Audio "Edit nixos-config" "Edit dotfiles" "Restart Noctalia" "Reload Hyprland")} in
           Audio) n panel-open control-center audio ;;
           "Edit nixos-config") zeditor "$HOME/nixos-config" ;;
           "Edit dotfiles") zeditor "$HOME/Projects/dotfiles" ;;
@@ -141,14 +142,14 @@ let
       }
 
       update() {
-        case $(pick Update "Apply config" "Update inputs") in
+        case ''${1:-$(pick Update "Apply config" "Update inputs")} in
           "Apply config") term apply ;;
           "Update inputs") term update ;;
         esac
       }
 
       system() {
-        case $(pick System Screensaver Lock Suspend "Log out" Reboot "Reboot to UEFI" "Shut down") in
+        case ''${1:-$(pick System Screensaver Lock Suspend "Log out" Reboot "Reboot to UEFI" "Shut down")} in
           Screensaver) settle; screensaver ;;
           Lock) n session lock ;;
           Suspend) n session suspend ;;
@@ -159,31 +160,30 @@ let
         esac
       }
 
-      # Optional extra top-level entries, one "Label<tab>command" per line.
+      # Optional extra top-level entries, one "Label<tab>command[<tab>glyph]" per line.
       declare -A extras=()
-      extra_labels=()
       extra_file=$HOME/.config/sysmenu/extra
       if [ -r "$extra_file" ]; then
-        while IFS=$'\t' read -r label command; do
+        while IFS=$'\t' read -r label command _glyph; do
           extras[$label]=$command
-          extra_labels+=("$label")
         done <"$extra_file"
       fi
 
-      # `sysmenu <section>` opens a section directly.
-      choice=''${1:-$(pick Menu Apps "''${extra_labels[@]}" Learn Capture Tools Toggle Style Setup Update System)}
-      case "$choice" in
-        "") ;;
+      # Bare `sysmenu` opens the icon menu (Noctalia plugin gav/sysmenu, `/sys`).
+      # `sysmenu <section> [item]` runs a section or one entry directly.
+      item=''${2:-}
+      case "''${1:-}" in
+        "") n panel-toggle launcher "/sys " ;;
         Apps | apps) n panel-open launcher ;;
-        Learn | learn) learn ;;
-        Capture | capture) capture ;;
-        Tools | tools) tools ;;
-        Toggle | toggle) toggle ;;
-        Style | style) style ;;
-        Setup | setup) setup ;;
-        Update | update) update ;;
-        System | system) system ;;
-        *) [ -z "''${extras[$choice]:-}" ] || exec sh -c "''${extras[$choice]}" ;;
+        Learn | learn) learn "$item" ;;
+        Capture | capture) capture "$item" ;;
+        Tools | tools) tools "$item" ;;
+        Toggle | toggle) toggle "$item" ;;
+        Style | style) style "$item" ;;
+        Setup | setup) setup "$item" ;;
+        Update | update) update "$item" ;;
+        System | system) system "$item" ;;
+        *) [ -z "''${extras[$1]:-}" ] || exec sh -c "''${extras[$1]}" ;;
       esac
     '';
   };
@@ -195,4 +195,7 @@ in
     pkgs.dua
     pkgs.wiremix
   ];
+
+  # Enabled via [plugins] in noctalia/config.toml.
+  xdg.dataFile."noctalia/plugins/sysmenu".source = ./noctalia/plugins/sysmenu;
 }
