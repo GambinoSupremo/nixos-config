@@ -1,4 +1,4 @@
-# sysmenu: a nested system menu (capture, toggles, style, setup, power) in Noctalia's launcher.
+# sysmenu: a nested system menu (capture, tools, toggles, style, setup, power) in Noctalia's launcher.
 # keybinds: searchable list of the live compositor binds. Both are bound in the dotfiles.
 { pkgs, ... }:
 
@@ -35,6 +35,9 @@ let
       pkgs.wl-clipboard
       pkgs.hyprpicker
       pkgs.xdg-utils
+      pkgs.zbar
+      pkgs.libnotify
+      pkgs.procps
     ];
     text = ''
       pick() { local p=$1; shift; printf '%s\n' "$@" | noctalia dmenu -p "$p" || true; }
@@ -58,14 +61,52 @@ let
         esac
       }
 
+      # gpu-screen-recorder with desktop audio; Ctrl-C (SIGINT) finishes the file.
+      record() {
+        local dir=$HOME/Videos/Recordings
+        mkdir -p "$dir"
+        gpu-screen-recorder "$@" -a default_output -o "$dir/$(date +%F_%H-%M-%S).mp4" >/dev/null 2>&1 &
+        notify-send -a Recorder "Recording" "Stop it from System menu → Capture."
+      }
+      recording() { pgrep -f 'gpu-screen-recorder -w' >/dev/null; }
+
       capture() {
-        case $(pick Capture Region Window Screen "Draw on screen" "Region to clipboard" "Color picker") in
+        local opts=(Region Window Screen "Draw on screen" "Region to clipboard" "Scan QR code" "Record region" "Record screen" "Color picker")
+        recording && opts=("Stop recording" "''${opts[@]}")
+        case $(pick Capture "''${opts[@]}") in
           Region) settle; n screenshot-region ;;
           Window) settle; n screenshot-window ;;
           Screen) settle; n screenshot-fullscreen ;;
           "Draw on screen") settle; n annotate ;;
           "Region to clipboard") settle; grim -g "$(slurp)" - | wl-copy ;;
+          "Scan QR code")
+            settle
+            area=$(slurp) || exit 0
+            if code=$(grim -g "$area" - | zbarimg -q --raw -); then
+              printf '%s' "$code" | wl-copy
+              notify-send -a "QR code" "Copied" "$code"
+            else
+              notify-send -a "QR code" "No QR code found"
+            fi
+            ;;
+          "Record region") settle; area=$(slurp -f '%wx%h+%x+%y') || exit 0; record -w region -region "$area" ;;
+          "Record screen") settle; output=$(slurp -o -f '%o') || exit 0; record -w "$output" ;;
+          "Stop recording")
+            pkill -INT -f 'gpu-screen-recorder -w'
+            notify-send -a Recorder "Recording saved" "In ~/Videos/Recordings"
+            ;;
           "Color picker") settle; hyprpicker -a ;;
+        esac
+      }
+
+      # Terminal apps, each in its own window.
+      tui() { ghostty --gtk-single-instance=false "$@" & }
+      tools() {
+        case $(pick Tools "System monitor (btop)" "Git (lazygit)" "Disk usage (dua)" "Audio mixer (wiremix)") in
+          "System monitor (btop)") tui -e btop ;;
+          "Git (lazygit)") tui --working-directory="$HOME/nixos-config" -e lazygit ;;
+          "Disk usage (dua)") tui --working-directory="$HOME" -e dua interactive ;;
+          "Audio mixer (wiremix)") tui --class=com.ghostty.floating -e wiremix ;;
         esac
       }
 
@@ -107,7 +148,8 @@ let
       }
 
       system() {
-        case $(pick System Lock Suspend "Log out" Reboot "Reboot to UEFI" "Shut down") in
+        case $(pick System Screensaver Lock Suspend "Log out" Reboot "Reboot to UEFI" "Shut down") in
+          Screensaver) settle; screensaver ;;
           Lock) n session lock ;;
           Suspend) n session suspend ;;
           "Log out") n session logout ;;
@@ -129,12 +171,13 @@ let
       fi
 
       # `sysmenu <section>` opens a section directly.
-      choice=''${1:-$(pick Menu Apps "''${extra_labels[@]}" Learn Capture Toggle Style Setup Update System)}
+      choice=''${1:-$(pick Menu Apps "''${extra_labels[@]}" Learn Capture Tools Toggle Style Setup Update System)}
       case "$choice" in
         "") ;;
         Apps | apps) n panel-open launcher ;;
         Learn | learn) learn ;;
         Capture | capture) capture ;;
+        Tools | tools) tools ;;
         Toggle | toggle) toggle ;;
         Style | style) style ;;
         Setup | setup) setup ;;
@@ -149,5 +192,7 @@ in
   home.packages = [
     sysmenu
     keybinds
+    pkgs.dua
+    pkgs.wiremix
   ];
 }
