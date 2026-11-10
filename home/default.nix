@@ -20,6 +20,7 @@
     ./kobo-sync.nix # kobo-sync: Kobo reading log → Obsidian Books notes (desktop)
     ./garmin-sync.nix # garmin-sync: Garmin steps/sleep/workouts → Obsidian daily notes (desktop)
     ./game-log.nix # game-log: Steam playtime → Obsidian daily notes (desktop)
+    ./todoist-log.nix # todoist-log: Todoist check-offs → Obsidian daily notes (desktop)
     ./vesktop-mic.nix # vesktop-mic: mute Discord's mic stream during in-game push-to-talk
     ./philips-input.nix # philips-input: switch the Philips between Linux and the work Mac
     ./webapps.nix # app-like Firefox windows (PWAsForFirefox)
