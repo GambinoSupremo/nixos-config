@@ -66,6 +66,9 @@ in
     capSysNice = true; # lets gamescope keep its compositor thread scheduled under load
   };
 
+  # Screen recording from sysmenu → Capture; the wrapper skips the permission prompt.
+  programs.gpu-screen-recorder.enable = true;
+
   # enable lives in services.nix; this is what gamemode does when a game starts.
   programs.gamemode.settings = {
     general = {
