@@ -104,16 +104,16 @@ def write_note(path, blocks, order, body):
 
 def daily_path(d):
     """Today's daily note: an existing YYYY-MM-DD note anywhere in the daily folder, else
-    where Obsidian's daily-notes format would put it (e.g. YYYY/MM MMMM/[Week] WW/YYYY-MM-DD)."""
-    cfg = json.load(open(os.path.join(VAULT, ".obsidian", "daily-notes.json")))
-    folder = os.path.join(VAULT, cfg.get("folder", ""))
+    where DAILY_NOTE_FORMAT (Obsidian's daily-notes syntax, from home/daily-note.nix) puts it."""
+    folder = os.path.join(VAULT, os.environ["DAILY_NOTE_FOLDER"])
     for root, _, files in os.walk(folder):
         if f"{d:%Y-%m-%d}.md" in files:
             return os.path.join(root, f"{d:%Y-%m-%d}.md")
-    tokens = {"YYYY": "%Y", "MMMM": "%B", "MM": "%m", "DD": "%d", "dddd": "%A", "WW": "%V"}
-    fmt = re.sub(r"\[([^\]]*)\]|YYYY|MMMM|MM|DD|dddd|WW",
+    tokens = {"YYYY": "%Y", "MMMM": "%B", "MM": "%m", "DD": "%d", "dddd": "%A", "WW": "%V",
+              "W": str(d.isocalendar()[1])}
+    fmt = re.sub(r"\[([^\]]*)\]|YYYY|MMMM|MM|DD|dddd|WW|W",
                  lambda m: m.group(1).replace("%", "%%") if m.group(1) is not None else tokens[m.group(0)],
-                 cfg.get("format") or "YYYY-MM-DD")
+                 os.environ["DAILY_NOTE_FORMAT"])
     return os.path.join(folder, d.strftime(fmt) + ".md")
 
 

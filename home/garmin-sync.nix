@@ -13,6 +13,8 @@ let
   garmin-sync = pkgs.writeShellApplication {
     name = "garmin-sync";
     text = ''
+      export DAILY_NOTE_FOLDER=${lib.escapeShellArg config.gav.dailyNote.folder}
+      export DAILY_NOTE_FORMAT=${lib.escapeShellArg config.gav.dailyNote.format}
       exec ${python}/bin/python3 -I ${./garmin-sync.py} "${config.home.homeDirectory}/Documents/Personal" "''${1:-sync}"
     '';
   };
