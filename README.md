@@ -15,7 +15,7 @@ separate repo and patched for NixOS at build time.
   wrapper so games can skip Mullvad.
 - **Game streaming.** Sunshine streams to Moonlight through a virtual display
   sized for the client.
-- **One-command upkeep.** `apply`, `update` and `dotsync` build both hosts;
+- **One-command upkeep.** `apply`, `update` and `dotsync` build and switch in one go;
   `apply` validates before publishing and keeps cleanup branches on failure.
 
 ## Hardware
@@ -30,13 +30,13 @@ separate repo and patched for NixOS at build time.
 
 ## Hosts
 
-Both track nixos-unstable. `apply`, `update` and `dotsync` build both outputs;
-only the desktop output is activated on gavos.
+Both track nixos-unstable. `apply`, `update` and `dotsync` build and activate
+only the host they run on.
 
 - **desktop** (`gavos`): the machine above.
 - **vm** (`nix-vm`): a build-only target. It evaluates the shared modules
   without the desktop's hardware (no GPU, Bluetooth or gaming) and is built
-  alongside desktop on every change.
+  when checking a change, not by `apply`.
 
 ## Where to edit
 
