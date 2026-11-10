@@ -1,4 +1,4 @@
-# game-log: Steam playtime → "## Played" in the Obsidian daily notes, hourly and at login.
+# game-log: Steam playtime → "## Played" in the Obsidian daily notes, every 15 min while Obsidian is open.
 {
   pkgs,
   lib,
@@ -32,10 +32,10 @@ lib.mkIf (!host.isVM) {
     };
   };
   systemd.user.timers.game-log = {
-    Unit.Description = "Log Steam playtime to Obsidian every hour";
+    Unit.Description = "Log Steam playtime to Obsidian every 15 minutes";
     Timer = {
       OnStartupSec = "5min";
-      OnUnitActiveSec = "1h";
+      OnUnitActiveSec = "15min";
     };
     Install.WantedBy = [ "timers.target" ];
   };

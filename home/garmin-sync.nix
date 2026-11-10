@@ -1,5 +1,6 @@
 # garmin-sync: Garmin Connect steps, sleep and workouts → Obsidian daily notes.
-# Run `garmin-sync login` once; the timer then syncs at login and every 3 hours.
+# Run `garmin-sync login` once; the timer then syncs every 3 hours while Obsidian is open
+# (it checks every 30 min, so a skipped sync catches up soon after Obsidian opens).
 {
   pkgs,
   lib,
@@ -33,7 +34,7 @@ lib.mkIf (!host.isVM) {
     Unit.Description = "Sync Garmin into Obsidian every few hours";
     Timer = {
       OnStartupSec = "3min";
-      OnUnitActiveSec = "3h";
+      OnUnitActiveSec = "30min";
     };
     Install.WantedBy = [ "timers.target" ];
   };
