@@ -3,10 +3,10 @@
 ## Rebuild
 
 ```bash
-apply     # validate both hosts, switch, then publish landed cleanup branches
+apply     # build this host, switch, then publish landed cleanup branches
 rebuild   # alias: sudo nixos-rebuild switch --flake ~/nixos-config#<host> (desktop or vm, set per host)
-update    # update all inputs, validate both hosts, switch, commit flake.lock, push
-dotsync   # update the dotfiles pin, validate both hosts, switch, commit and push
+update    # update all inputs, build this host, switch, commit flake.lock, push
+dotsync   # update the dotfiles pin, build this host, switch, commit and push
 save      # build-check, then commit tracked changes as-is (no switch, no push)
 ```
 
@@ -26,7 +26,7 @@ units.
 `apply` is the one to run after committing a change on a cleanup branch. It
 checks both repos for a single pending `cleanup/*` branch that fast-forwards
 (stopping before either `main` moves if not), fast-forwards both, then builds
-desktop and VM against the committed local dotfiles checkout. A failed build
+this host against the committed local dotfiles checkout. A failed build
 restores both local `main` branches and keeps the cleanup branches. If the new
 system goes live but activation reports errors, nothing is reset or pushed;
 fix it and run `apply` again to publish. After a clean activation it pushes

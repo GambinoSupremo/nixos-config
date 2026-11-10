@@ -112,18 +112,7 @@ show_diff() {
 new_system=""
 nh_switch() {
   local dotfiles_dir="${1:-}"
-  local desktop_system vm_system
-  section "Building desktop"
-  build_system desktop "$dotfiles_dir" || return
-  desktop_system="$new_system"
-  section "Building VM validation target"
-  build_system vm "$dotfiles_dir" || return
-  vm_system="$new_system"
-  if [[ "$host" == desktop ]]; then
-    new_system="$desktop_system"
-  else
-    new_system="$vm_system"
-  fi
+  build_system "$host" "$dotfiles_dir" || return
   section "Changes"
   show_diff
   section "Activating"
@@ -335,7 +324,7 @@ cmd_apply() {
   fi
   land_branch "$nix_branch"
 
-  section "Validating and activating ($host)"
+  section "Building and activating ($host)"
   nh_switch "$dotfiles_override" || rc=$?
   ((rc != 2)) || live_with_errors "Nothing pushed; run apply again once fixed to publish."
   if ((rc != 0)); then
@@ -343,7 +332,7 @@ cmd_apply() {
     [[ -z "$dotfiles_override" ]] || git -C "$dot_dir" reset -q --hard "$dot_before"
     die "Validation or activation failed. Local main branches were restored; cleanup branches remain."
   fi
-  ok "Both hosts validated and $host activated"
+  ok "$host built and activated"
 
   if [[ -n "$dotfiles_override" && -n "$(git -C "$dot_dir" rev-list origin/main..main)" ]]; then
     if ! quiet git -C "$dot_dir" push; then
