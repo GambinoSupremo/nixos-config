@@ -98,6 +98,8 @@ in
   # ── gvfs (SMB / network browsing) ────────────────────────────────────────────
   # Needed for Nautilus to browse SMB shares (replaces gvfs-smb).
   services.gvfs.enable = true;
+  # Sushi: Space in Nautilus previews the selected file.
+  services.gnome.sushi.enable = true;
 
   # ── Flatpak ───────────────────────────────────────────────────────────────────
   # Escape hatch for apps not in nixpkgs; currently nothing installed.
