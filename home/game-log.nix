@@ -15,6 +15,8 @@ let
       pkgs.python3
     ];
     text = ''
+      export DAILY_NOTE_FOLDER=${lib.escapeShellArg config.gav.dailyNote.folder}
+      export DAILY_NOTE_FORMAT=${lib.escapeShellArg config.gav.dailyNote.format}
       exec python3 -I ${./game-log.py} "${config.home.homeDirectory}/Documents/Personal"
     '';
   };

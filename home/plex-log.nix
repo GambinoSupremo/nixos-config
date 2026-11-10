@@ -15,6 +15,10 @@ lib.mkIf (!host.isVM) {
     Unit.Description = "Plex watch log for Obsidian";
     Service = {
       ExecStart = "${pkgs.python3}/bin/python3 -I ${./plex-log.py} ${config.home.homeDirectory}/Documents/Personal 8765 10.0.0.11";
+      Environment = [
+        "\"DAILY_NOTE_FOLDER=${config.gav.dailyNote.folder}\""
+        "\"DAILY_NOTE_FORMAT=${config.gav.dailyNote.format}\""
+      ];
       Restart = "on-failure";
       RestartSec = "10s";
     };

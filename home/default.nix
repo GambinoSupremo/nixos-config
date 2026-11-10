@@ -15,6 +15,7 @@
     ./programs.nix # default apps, launchers, OBS, screenshots
     ./services.nix # mullvad-gui user service
     ./backup.nix # nightly encrypted NAS Personal → pCloud backup (desktop)
+    ./daily-note.nix # gav.dailyNote: daily note folder + path pattern for the loggers below
     ./plex-log.nix # Plex webhooks → Obsidian Movies/TV notes (desktop)
     ./kobo-sync.nix # kobo-sync: Kobo reading log → Obsidian Books notes (desktop)
     ./garmin-sync.nix # garmin-sync: Garmin steps/sleep/workouts → Obsidian daily notes (desktop)
