@@ -36,14 +36,12 @@
   # Memtest86+ entry in the boot menu (RAM stability checks after BIOS changes).
   boot.loader.systemd-boot.memtest86.enable = true;
 
-  # Plymouth theme from the adi1090x pack — swap the name in BOTH places to try
-  # another. Esc during boot drops to the text log.
+  # Boot/shutdown splash: ASCII "gavos" logo (plymouth-gavos.nix). Was adi1090x
+  # "rings" until 2026-11-10. Esc during boot drops to the text log.
   boot.plymouth = {
     enable = true;
-    theme = "rings";
-    themePackages = [
-      (pkgs.adi1090x-plymouth-themes.override { selected_themes = [ "rings" ]; })
-    ];
+    theme = "gavos";
+    themePackages = [ (pkgs.callPackage ./plymouth-gavos.nix { }) ];
   };
 
   # Silence the console text Plymouth would otherwise paint over.
