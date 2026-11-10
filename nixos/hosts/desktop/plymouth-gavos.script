@@ -1,0 +1,45 @@
+// gavos boot/shutdown splash. Images come from plymouth-gavos.nix.
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+cx = Window.GetX() + Window.GetWidth() / 2;
+cy = Window.GetY() + Window.GetHeight() / 2;
+
+logo_image = Image("logo.png");
+logo = Sprite(logo_image);
+logo.SetPosition(cx - logo_image.GetWidth() / 2, cy - logo_image.GetHeight() - 20, 1);
+logo.SetOpacity(0);
+
+for (i = 0; i < 42; i++)
+  bar_frames[i] = Image("bar-" + i + ".png");
+bar = Sprite(bar_frames[0]);
+bar.SetPosition(cx - bar_frames[0].GetWidth() / 2, cy + 40, 1);
+
+mode = Plymouth.GetMode();
+word = "boot";
+if (mode == "shutdown") word = "shutdown";
+if (mode == "reboot") word = "reboot";
+status_on = Image("status-" + word + "-on.png");
+status_off = Image("status-" + word + "-off.png");
+status = Sprite(status_on);
+status.SetPosition(cx - status_on.GetWidth() / 2, cy + 85, 1);
+
+message = Sprite();
+
+global.tick = 0;
+fun refresh() {
+  global.tick++;
+  if (global.tick <= 25) logo.SetOpacity(global.tick / 25);
+  bar.SetImage(bar_frames[Math.Int(global.tick / 3) % 42]);
+  if (Math.Int(global.tick / 25) % 2 == 0) status.SetImage(status_on);
+  else status.SetImage(status_off);
+}
+Plymouth.SetRefreshFunction(refresh);
+
+// fsck and other boot messages, under the status line.
+fun show_message(text) {
+  img = Image.Text(text, 0.44, 0.44, 0.44);
+  message.SetImage(img);
+  message.SetPosition(cx - img.GetWidth() / 2, cy + 140, 1);
+}
+Plymouth.SetMessageFunction(show_message);
