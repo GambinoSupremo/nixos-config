@@ -250,3 +250,7 @@ drawer = true
 [widget.workspaces]
 label_source = "name"
 hide_when_empty = true
+
+# System menu icons (home/noctalia/plugins/sysmenu).
+[plugins]
+enabled = ["gav/sysmenu"]

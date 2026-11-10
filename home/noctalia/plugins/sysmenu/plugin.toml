@@ -1,0 +1,12 @@
+id = "gav/sysmenu"
+name = "System menu"
+version = "1.0.0"
+author = "gav"
+description = "gavos System menu with an icon per entry; actions run `sysmenu <section> <item>`."
+plugin_api = 24
+
+[[launcher_provider]]
+id = "menu"
+entry = "sysmenu.luau"
+prefix = "sys"
+glyph = "settings"
