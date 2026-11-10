@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import tempfile
+import time
 from datetime import date, timedelta
 
 from garminconnect import Garmin, GarminConnectAuthenticationError
@@ -24,6 +25,21 @@ ICONS = {"run": "🏃", "bik": "🚴", "cycl": "🚴", "walk": "🚶", "hik": "�
 # write there stays. (Older notes used %% garmin-sync %% markers; those get swapped out.)
 OLD_BLOCK = re.compile(r"\n*%% garmin-sync %%.*?%% end garmin-sync %%\n?", re.S)
 WORKOUTS = re.compile(r"^## Workouts\n(?:- [^\w\s].*\n?)*", re.M)
+
+
+def obsidian_synced(min_age=120):
+    """Obsidian open here for 2+ minutes, so Sync has pulled notes made on the phone or at work."""
+    up, tick = float(open("/proc/uptime").read().split()[0]), os.sysconf("SC_CLK_TCK")
+    for pid in filter(str.isdigit, os.listdir("/proc")):
+        try:
+            args = open(f"/proc/{pid}/cmdline", "rb").read().split(b"\0")
+            started = int(open(f"/proc/{pid}/stat").read().rsplit(")", 1)[1].split()[19]) / tick
+        except (OSError, IndexError, ValueError):
+            continue
+        if any(a.endswith(b"/obsidian/app.asar") for a in args) and not any(a.startswith(b"--type=") for a in args):
+            if up - started >= min_age:
+                return True
+    return False
 
 
 def login():
@@ -163,6 +179,12 @@ if MODE == "login":
 if not os.path.exists(TOKENS):
     print("Not logged in to Garmin yet. Run: garmin-sync login")
     sys.exit(0 if MODE == "auto" else 1)
+if MODE == "auto":
+    if not obsidian_synced():
+        print("Garmin: waiting until Obsidian has been open a couple of minutes (so it can't clash with the phone).")
+        sys.exit()
+    if os.path.exists(LAST) and time.time() - os.path.getmtime(LAST) < 3 * 3600:
+        sys.exit()  # synced in the last 3 hours
 api = Garmin()
 try:
     api.login(TOKENS)

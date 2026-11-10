@@ -15,10 +15,25 @@ STEAM = os.path.expanduser("~/.local/share/Steam")
 LOGS = [os.path.join(STEAM, "logs", f) for f in ("gameprocess_log.previous.txt", "gameprocess_log.txt")]
 STATE_DIR = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
 NAMES = os.path.join(STATE_DIR, "game-log-names.json")
-DAYS = 7
+DAYS = 14
 MIN_SESSION = 120  # seconds; shorter ones are crashed launches
 LINE = re.compile(r"^\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)\] (?:AppID (\d+) (adding PID|no longer tracking PID) (\d+)|Client version)")
 MANAGED = re.compile(r"^## Played\n(?:- [^\w\s].*\n?)*", re.M)
+
+
+def obsidian_synced(min_age=120):
+    """Obsidian open here for 2+ minutes, so Sync has pulled notes made on the phone or at work."""
+    up, tick = float(open("/proc/uptime").read().split()[0]), os.sysconf("SC_CLK_TCK")
+    for pid in filter(str.isdigit, os.listdir("/proc")):
+        try:
+            args = open(f"/proc/{pid}/cmdline", "rb").read().split(b"\0")
+            started = int(open(f"/proc/{pid}/stat").read().rsplit(")", 1)[1].split()[19]) / tick
+        except (OSError, IndexError, ValueError):
+            continue
+        if any(a.endswith(b"/obsidian/app.asar") for a in args) and not any(a.startswith(b"--type=") for a in args):
+            if up - started >= min_age:
+                return True
+    return False
 
 
 def sessions():
@@ -115,8 +130,10 @@ def update(d, games):
     path = daily_path(d)
     if os.path.exists(path):
         text = open(path, encoding="utf-8").read()
-    else:
+    elif d < date.today():
         text = d.strftime(f"# %A, %B {d.day}\n\n- \n")
+    else:
+        return False  # today's note comes from Obsidian (maybe the phone's); filled in once it's here
     m = re.match(r"---\n(.*?)\n---\n?", text, re.S)
     fm, body = (m.group(1).split("\n"), text[m.end():]) if m else ([], text)
     ranked = sorted(games.items(), key=lambda g: -g[1])
@@ -134,6 +151,9 @@ def update(d, games):
     return True
 
 
+if not obsidian_synced():
+    print("Games: waiting until Obsidian has been open a couple of minutes (so it can't clash with the phone).")
+    sys.exit()
 names = json.load(open(NAMES)) if os.path.exists(NAMES) else {}
 first = date.today() - timedelta(days=DAYS - 1)
 days = defaultdict(lambda: defaultdict(float))

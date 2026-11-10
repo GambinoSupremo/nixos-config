@@ -1,7 +1,8 @@
 # Plex webhooks -> Obsidian Collections notes. Play creates the note and sets started;
 # scrobble (~90% watched) marks a movie watched or bumps a show's lastWatched.
 # On start it also catches up on whatever Plex logged while this PC was off. Finished
-# episodes and movies also go under "## Watched" in that day's daily note.
+# episodes and movies also go under "## Watched" in that day's daily note. Everything waits
+# in a queue until Obsidian has been open a couple of minutes, so it can't clash with Sync.
 import email.parser
 import email.policy
 import json
@@ -21,7 +22,24 @@ OWNER_ID = 1  # the server owner's local account id; shared users are ignored
 MEDIA_DB = os.path.join(VAULT, ".obsidian/plugins/obsidian-media-db-plugin/data.json")
 KEYS = ["title", "year", "image", "watched", "started", "lastWatched", "personalRating"]
 STATE = os.path.join(os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"), "plex-log-last")
+QUEUE = os.path.join(os.path.dirname(STATE), "plex-log-queue.json")  # events waiting for Obsidian
+LOCK = threading.Lock()
 TOKEN_FILE = os.path.expanduser("~/.config/plex-token")  # optional; not needed if Plex allows this PC without auth
+
+
+def obsidian_synced(min_age=120):
+    """Obsidian open here for 2+ minutes, so Sync has pulled notes made on the phone or at work."""
+    up, tick = float(open("/proc/uptime").read().split()[0]), os.sysconf("SC_CLK_TCK")
+    for pid in filter(str.isdigit, os.listdir("/proc")):
+        try:
+            args = open(f"/proc/{pid}/cmdline", "rb").read().split(b"\0")
+            started = int(open(f"/proc/{pid}/stat").read().rsplit(")", 1)[1].split()[19]) / tick
+        except (OSError, IndexError, ValueError):
+            continue
+        if any(a.endswith(b"/obsidian/app.asar") for a in args) and not any(a.startswith(b"--type=") for a in args):
+            if up - started >= min_age:
+                return True
+    return False
 
 
 def fetch(url):
@@ -207,6 +225,38 @@ def handle(event, md, today=None):
             log_watched(today, " · ".join(filter(None, [f"- 📺 {note}", " ".join(filter(None, [ep, name]))])))
 
 
+def log_event(event=None, md=None, day=None):
+    """Handle queued events in order, plus this one, once Obsidian has synced; the rest wait.
+    Today's events also wait for today's note, so it comes from Obsidian, not a bare copy."""
+    with LOCK:
+        try:
+            queue = json.load(open(QUEUE))
+        except (OSError, ValueError):
+            queue = []
+        if event:
+            queue.append({"event": event, "md": md, "day": day or date.today().isoformat()})
+        synced = queue and obsidian_synced()
+        while queue and synced:
+            e = queue[0]
+            if e["day"] >= date.today().isoformat() and not os.path.exists(daily_path(date.today())):
+                break
+            try:
+                handle(e["event"], e["md"], e["day"])
+            except Exception as ex:
+                print(f"Couldn't log {e['event']}: {ex}", flush=True)
+            queue.pop(0)
+        os.makedirs(os.path.dirname(QUEUE), exist_ok=True)
+        with open(QUEUE + ".tmp", "w") as f:
+            json.dump(queue, f)
+        os.replace(QUEUE + ".tmp", QUEUE)
+
+
+def flush_loop():
+    while True:
+        time.sleep(60)
+        log_event()
+
+
 def save_last(ts):
     os.makedirs(os.path.dirname(STATE), exist_ok=True)
     with open(STATE, "w") as f:
@@ -235,11 +285,8 @@ def catch_up():
     for v in views:
         if v.get("accountID") != OWNER_ID or v.get("viewedAt", 0) <= last:
             continue
-        try:
-            handle("media.scrobble", v, date.fromtimestamp(v["viewedAt"]).isoformat())
-            print(f"Caught up: {v.get('grandparentTitle') or v.get('title')}", flush=True)
-        except Exception as e:
-            print(f"Couldn't catch up on {v.get('title')}: {e}", flush=True)
+        log_event("media.scrobble", v, date.fromtimestamp(v["viewedAt"]).isoformat())
+        print(f"Caught up: {v.get('grandparentTitle') or v.get('title')}", flush=True)
         last = max(last, v["viewedAt"])
     save_last(max(last, time.time() - 60))
 
@@ -265,7 +312,7 @@ class Hook(BaseHTTPRequestHandler):
                     save_last(time.time())
                 if p.get("event") in ("media.play", "media.resume", "media.scrobble"):
                     try:
-                        handle(p["event"], p.get("Metadata", {}))
+                        log_event(p["event"], p.get("Metadata", {}))
                     except Exception as e:
                         print(f"Couldn't log {p.get('event')}: {e}", flush=True)
 
@@ -275,4 +322,5 @@ class Hook(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     threading.Thread(target=catch_up, daemon=True).start()
+    threading.Thread(target=flush_loop, daemon=True).start()
     ThreadingHTTPServer(("0.0.0.0", int(PORT)), Hook).serve_forever()
