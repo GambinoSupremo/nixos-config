@@ -25,6 +25,7 @@
     ./menu.nix # sysmenu + keybinds: system menu and bind cheatsheet in Noctalia
     ./theme.nix # theme: named looks (palette + matching wallpapers)
     ./papirus.nix # Papirus folder colors follow the accent
+    ./dictation.nix # voxtype: Super+D speech-to-text (desktop)
     ./deadlock-fov.nix # re-adds r_aspectratio when gameinfo.gi gets rewritten (desktop)
   ];
 
