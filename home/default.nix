@@ -26,6 +26,7 @@
     ./theme.nix # theme: named looks (palette + matching wallpapers)
     ./papirus.nix # Papirus folder colors follow the accent
     ./dictation.nix # voxtype: Super+D speech-to-text (desktop)
+    ./screensaver.nix # screensaver + Noctalia idle timeouts
     ./deadlock-fov.nix # re-adds r_aspectratio when gameinfo.gi gets rewritten (desktop)
   ];
 
