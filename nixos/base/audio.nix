@@ -39,5 +39,27 @@ _:
     extraConfig.pipewire-pulse."99-resample-quality" = {
       "stream.properties"."resample.quality" = 10;
     };
+
+    # hide GPU HDMI/DP audio (AW3423DW) and give the outputs friendly names
+    wireplumber.extraConfig."99-audio-devices"."monitor.alsa.rules" = [
+      {
+        matches = [ { "device.name" = "alsa_card.pci-0000_03_00.1"; } ];
+        actions.update-props."device.disabled" = true;
+      }
+      {
+        matches = [ { "node.name" = "~alsa_output.usb-iFi__by_AMR_.*"; } ];
+        actions.update-props = {
+          "node.description" = "Headphones";
+          "node.nick" = "Headphones";
+        };
+      }
+      {
+        matches = [ { "node.name" = "alsa_output.pci-0000_12_00.6.analog-stereo"; } ];
+        actions.update-props = {
+          "node.description" = "Speakers";
+          "node.nick" = "Speakers";
+        };
+      }
+    ];
   };
 }
