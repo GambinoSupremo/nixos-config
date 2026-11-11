@@ -60,6 +60,18 @@ _:
           "node.nick" = "Speakers";
         };
       }
+      {
+        matches = [ { "node.name" = "~alsa_input.usb-Native_Instruments_Komplete_Audio_2.*"; } ];
+        actions.update-props = {
+          "node.description" = "Mic";
+          "node.nick" = "Mic";
+        };
+      }
+      # hide onboard line-in only; Speakers output stays on
+      {
+        matches = [ { "node.name" = "alsa_input.pci-0000_12_00.6.analog-stereo"; } ];
+        actions.update-props."node.disabled" = true;
+      }
     ];
   };
 }
