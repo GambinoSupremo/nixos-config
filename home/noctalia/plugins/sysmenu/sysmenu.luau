@@ -1,6 +1,5 @@
 -- gavos System menu (`/sys`): sections drill in, items run `sysmenu <section> <item>`.
 -- Keep the labels in step with the case arms in home/menu.nix.
-local PREFIX = "/sys "
 
 local sections = {
   { id = "learn", title = "Learn", glyph = "school", sub = "Keybindings and docs", items = {
@@ -111,7 +110,7 @@ local function render(text)
     add(out, filter, { id = "extra\t" .. e[1], title = e[1], glyph = e[2] })
   end
   for _, s in ipairs(sections) do
-    add(out, filter, { id = s.id, title = s.title, subtitle = s.sub, glyph = s.glyph, query = PREFIX .. s.id .. " " })
+    add(out, filter, { id = s.id, title = s.title, subtitle = s.sub, glyph = s.glyph, query = s.id .. " " })
   end
   -- Typing at the top level also finds items inside sections.
   if filter ~= "" then
@@ -158,7 +157,8 @@ end
 
 function onActivate(id)
   if id == "apps" then
-    launcher.setQuery("")
+    -- setQuery("") only returns to /sys; reopen the plain launcher once this one closes.
+    noctalia.runAsync({ "sh", "-c", "sleep 0.2; noctalia msg panel-open launcher" })
     return
   end
   local argv = { "systemd-run", "--user", "--scope", "--collect", "--quiet", "sysmenu" }
