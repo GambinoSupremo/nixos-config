@@ -16,7 +16,8 @@ in
 lib.mkIf (!host.isVM) {
   services.voxtype = {
     enable = true;
-    package = pkgs.voxtype-vulkan;
+    # Temporary: nixpkgs 2026-11-07 links voxtype against sqlite without providing it.
+    package = pkgs.voxtype-vulkan.overrideAttrs (o: { buildInputs = o.buildInputs ++ [ pkgs.sqlite ]; });
     settings = {
       state_file = "auto"; # needed by `voxtype record toggle`
       hotkey.enabled = false; # the compositor bind does it
