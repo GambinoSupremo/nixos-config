@@ -98,6 +98,19 @@ in
   # Lutris's sandbox still bundles gtk2, which nixpkgs now marks broken (removed by 27.05).
   nixpkgs.config.problems.handlers."gtk+".broken = "ignore";
 
+  # gnome-desktop 51 dropped GnomeDesktop.RRScreen; Lutris 0.5.22 crashes at startup
+  # instead of falling back to xrandr. Drop once Lutris catches it upstream.
+  nixpkgs.overlays = [
+    (final: prev: {
+      lutris-unwrapped = prev.lutris-unwrapped.overrideAttrs (o: {
+        postPatch = (o.postPatch or "") + ''
+          substituteInPlace lutris/util/display.py \
+            --replace-fail "except GLib.Error:" "except (GLib.Error, AttributeError):"
+        '';
+      });
+    })
+  ];
+
   environment.systemPackages = with pkgs; [
     # `novpn %command%`: game outside the Mullvad tunnel via daemon RPC — setuid
     # mullvad-exclude dies in Steam's nosuid sandbox; exec keeps the PID.
