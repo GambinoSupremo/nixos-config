@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   # Import order is load-bearing: list options merge in order, so reordering
@@ -31,15 +31,44 @@
     ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="28de", ATTR{idProduct}=="1304", ATTR{power/wakeup}="disabled"
   '';
 
-  # systemd-boot: plain but instant. (Tried themed GRUB 2026-07-09, reverted —
-  # the menu load lag wasn't worth cosmetics on a menu that's hidden anyway.)
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
   # ── Quiet, pretty boot ────────────────────────────────────────────────────────
-  boot.loader.systemd-boot.configurationLimit = 20;
-  # Memtest86+ entry in the boot menu (RAM stability checks after BIOS changes).
-  boot.loader.systemd-boot.memtest86.enable = true;
+  # Limine: themed boot menu (2026-11-13; was systemd-boot, whose files stay on
+  # the ESP as an F12 fallback). Themed GRUB was too slow (2026-07-09).
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.limine = {
+    enable = true;
+    # ESP is 1 GiB and still holds systemd-boot's copies; ~90 MB per kernel+initrd.
+    maxGenerations = 10;
+    enableEditor = false;
+    # Memtest86+ entry (RAM stability checks after BIOS changes).
+    additionalFiles."efi/memtest86/memtest86.efi" = "${pkgs.memtest86plus}/mt86plus.efi";
+    extraEntries = ''
+      /Memtest86+
+        protocol: efi
+        path: boot():///efi/memtest86/memtest86.efi
+    '';
+    style = {
+      wallpapers = [ (pkgs.callPackage ./limine-wallpaper.nix { inherit inputs; }) ];
+      wallpaperStyle = "stretched";
+      interface = {
+        branding = "gavos";
+        brandingColor = "a48cf2";
+        helpColor = "04d1f9";
+        helpColorBright = "37f499";
+      };
+      # Eldritch palette, to match the island wallpaper.
+      graphicalTerminal = {
+        font.scale = "2x2";
+        background = "70212337";
+        foreground = "ebfafa";
+        brightForeground = "ffffff";
+        palette = "212337;f16c75;37f499;f1fc79;04d1f9;a48cf2;04d1f9;ebfafa";
+        brightPalette = "7081d0;f0313e;10a56f;f1fc79;10b8f7;a48cf2;04d1f9;ffffff";
+        margin = 96;
+        marginGradient = 0;
+      };
+    };
+  };
 
   # Boot/shutdown splash: ASCII "gavos" logo (plymouth-gavos.nix). Was adi1090x
   # "rings" until 2026-11-10. Esc during boot drops to the text log.
