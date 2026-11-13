@@ -32,8 +32,9 @@
   '';
 
   # ── Quiet, pretty boot ────────────────────────────────────────────────────────
-  # Limine: themed boot menu (2026-11-13; was systemd-boot, whose files stay on
-  # the ESP as an F12 fallback). Themed GRUB was too slow (2026-07-09).
+  # Limine: boot menu with a random theme wallpaper each boot (2026-11-13). Was
+  # systemd-boot; its files stay on the ESP as an F12 fallback. Themed GRUB was
+  # too slow (2026-07-09).
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.limine = {
     enable = true;
@@ -48,22 +49,22 @@
         path: boot():///efi/memtest86/memtest86.efi
     '';
     style = {
-      wallpapers = [ (pkgs.callPackage ./limine-wallpaper.nix { inherit inputs; }) ];
+      wallpapers = pkgs.callPackage ./limine-wallpaper.nix { inherit inputs; };
       wallpaperStyle = "stretched";
       interface = {
         branding = "gavos";
-        brandingColor = "a48cf2";
-        helpColor = "04d1f9";
-        helpColorBright = "37f499";
+        brandingColor = "ffffff";
+        helpColor = "c0c4d6";
+        helpColorBright = "ffffff";
       };
-      # Eldritch palette, to match the island wallpaper.
+      # Neutral colours: the wallpaper rotates, so nothing theme-specific.
       graphicalTerminal = {
         font.scale = "2x2";
-        background = "70212337";
-        foreground = "ebfafa";
+        background = "60101014";
+        foreground = "e6e6ea";
         brightForeground = "ffffff";
-        palette = "212337;f16c75;37f499;f1fc79;04d1f9;a48cf2;04d1f9;ebfafa";
-        brightPalette = "7081d0;f0313e;10a56f;f1fc79;10b8f7;a48cf2;04d1f9;ffffff";
+        palette = "101014;e06c75;98c379;e5c07b;8fa3c8;b39ddb;88c0d0;e6e6ea";
+        brightPalette = "5c6370;ef8a92;b5e09a;f0d494;aec3e8;cdb8f0;a8d8e6;ffffff";
         margin = 96;
         marginGradient = 0;
       };
