@@ -5,10 +5,6 @@
     # Rolling unstable.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    # Kernel only: zen 7.3.4 panics at boot on gavos (2026-11-13). Drop once a
-    # newer zen boots; see nixos/hosts/desktop/configuration.nix.
-    nixpkgs-kernel.url = "github:nixos/nixpkgs/f4a03c008967841f2a0b3cb7c436fc6fc31671f6";
-
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
