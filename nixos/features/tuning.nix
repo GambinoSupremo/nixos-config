@@ -3,11 +3,16 @@
 { pkgs, ... }:
 
 {
-  # Limit build parallelism on the 16-thread desktop to reduce contention.
-  # Builders must honor NIX_BUILD_CORES; this is not a hard CPU limit.
-  nix.settings = {
-    max-jobs = 2;
-    cores = 6;
+  # Builds run at lowest CPU/disk priority so they yield to games, and run at
+  # near full speed when idle. cores stays below 16 to bound build RAM (30 GB).
+  nix = {
+    daemonCPUSchedPolicy = "batch";
+    daemonIOSchedClass = "best-effort";
+    daemonIOSchedPriority = 7;
+    settings = {
+      max-jobs = 2;
+      cores = 12;
+    };
   };
 
   # zstd zram ahead of the disk swap (disk stays as overflow, prio -1).
