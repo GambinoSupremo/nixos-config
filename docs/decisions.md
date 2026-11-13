@@ -86,6 +86,7 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   and Mullvad runs with IPv6 off, so every build stalled on lookups and kernel
   bumps would have compiled locally. The CachyOS tuning (zram, ananicy rules,
   sysctls in features/cachyos.nix) doesn't need that input and stays.
+  2026-11-13: zen 7.3.4 panicked at boot, so moved to plain linuxPackages_latest.
 - Mac-style edit keys: keyd [meta] now also maps z = C-z and x = S-delete.
   Compositor binds on Super+Z/X/C/V moved or removed in the dotfiles.
 - noctalia: dropped the noctalia flake input, its cachix cache and our two
