@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   # Import order is load-bearing: list options merge in order, so reordering
@@ -21,7 +21,12 @@
 
   # Zen kernel from nixpkgs (desktop-tuned, on cache.nixos.org). CachyOS tuning
   # stays in features/tuning.nix; see docs/decisions.md for why the kernel changed.
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  # Pinned to zen 7.2.15 (older nixpkgs): 7.3.4 panics in early boot. Retry later.
+  boot.kernelPackages =
+    (import inputs.nixpkgs-kernel {
+      inherit (pkgs.stdenv.hostPlatform) system;
+      config.allowUnfree = true;
+    }).linuxPackages_zen;
 
   # Suspend: mouse receivers woke the PC within seconds, then the re-suspend hung.
   # Only the power button wakes it now (Razer Naga, VAXEE, Steam puck).
