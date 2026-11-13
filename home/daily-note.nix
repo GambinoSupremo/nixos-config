@@ -1,4 +1,5 @@
-# Where the Obsidian daily notes live, read by plex-log, game-log, garmin-sync and todoist-log.
+# Where the Obsidian daily notes live, read by game-log (Todoist, Garmin and
+# Plex logging moved to the lifelog server).
 # Same moment.js syntax as the vault's .obsidian/daily-notes.json; keep the two in step.
 { lib, ... }:
 
