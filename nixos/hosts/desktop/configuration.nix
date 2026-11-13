@@ -26,6 +26,14 @@
   # Plex webhooks for the Obsidian watch log (home/plex-log.nix); LAN interface only.
   networking.firewall.interfaces.enp7s0.allowedTCPPorts = [ 8765 ];
 
+  # Suspend: mouse receivers woke the PC within seconds, then the re-suspend hung.
+  # Only the power button wakes it now (Razer Naga, VAXEE, Steam puck).
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1532", ATTR{idProduct}=="00b4", ATTR{power/wakeup}="disabled"
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="3057", ATTR{idProduct}=="2002", ATTR{power/wakeup}="disabled"
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="28de", ATTR{idProduct}=="1304", ATTR{power/wakeup}="disabled"
+  '';
+
   # systemd-boot: plain but instant. (Tried themed GRUB 2026-07-09, reverted —
   # the menu load lag wasn't worth cosmetics on a menu that's hidden anyway.)
   boot.loader.systemd-boot.enable = true;
