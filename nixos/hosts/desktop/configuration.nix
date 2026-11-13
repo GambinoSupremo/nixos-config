@@ -23,9 +23,6 @@
   # stays in features/tuning.nix; see docs/decisions.md for why the kernel changed.
   boot.kernelPackages = pkgs.linuxPackages_zen;
 
-  # Plex webhooks for the Obsidian watch log (home/plex-log.nix); LAN interface only.
-  networking.firewall.interfaces.enp7s0.allowedTCPPorts = [ 8765 ];
-
   # Suspend: mouse receivers woke the PC within seconds, then the re-suspend hung.
   # Only the power button wakes it now (Razer Naga, VAXEE, Steam puck).
   services.udev.extraRules = ''
