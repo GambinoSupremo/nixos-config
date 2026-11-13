@@ -87,6 +87,9 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   bumps would have compiled locally. The CachyOS tuning (zram, ananicy rules,
   sysctls in features/cachyos.nix) doesn't need that input and stays.
   2026-11-13: zen 7.3.4 panicked at boot, so moved to plain linuxPackages_latest.
+- Boot menu: systemd-boot → Limine (2026-11-13) for a themed menu (Eldritch
+  wallpaper + colours). Old systemd-boot files stay on the ESP; firmware boot
+  menu (F12) can still pick "Linux Boot Manager" if Limine ever fails.
 - Mac-style edit keys: keyd [meta] now also maps z = C-z and x = S-delete.
   Compositor binds on Super+Z/X/C/V moved or removed in the dotfiles.
 - noctalia: dropped the noctalia flake input, its cachix cache and our two
