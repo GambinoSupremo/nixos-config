@@ -29,6 +29,10 @@ lib.mkIf (!host.isVM) {
         model = "${model}";
         language = "en";
       };
+      # Type inside an empty Hyprland submap, so a Super still held from Super+D
+      # can't turn the typed letters into shortcuts (workspace 6, resize mode).
+      output.pre_output_command = "hyprctl eval 'hl.dispatch(hl.dsp.submap(\"dictation\"))'";
+      output.post_output_command = "hyprctl eval 'hl.dispatch(hl.dsp.submap(\"reset\"))'";
       output.notification = {
         on_recording_start = true;
         on_transcription = false;
