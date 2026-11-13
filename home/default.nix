@@ -27,6 +27,7 @@
     ./dictation.nix # voxtype: Super+D speech-to-text (desktop)
     ./screensaver.nix # screensaver + Noctalia idle timeouts
     ./deadlock-fov.nix # re-adds r_aspectratio when gameinfo.gi gets rewritten (desktop)
+    ./home-alerts.nix # home-alerts: Uptime Kuma alerts as desktop notifications (desktop)
   ];
 
   home.stateVersion = "26.05";

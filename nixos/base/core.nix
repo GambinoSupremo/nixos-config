@@ -34,11 +34,17 @@
         "gav"
       ];
       warn-dirty = false;
+      # Avoids "download buffer is full" stalls on big updates.
+      download-buffer-size = 1024 * 1024 * 1024;
+      # Below 5 GiB free, GC during builds until 15 GiB is free.
+      min-free = 5 * 1024 * 1024 * 1024;
+      max-free = 15 * 1024 * 1024 * 1024;
     };
     gc = {
       automatic = true;
       dates = "weekly";
       options = "--delete-older-than 7d";
+      persistent = true; # catch up after the PC was off
     };
   };
 

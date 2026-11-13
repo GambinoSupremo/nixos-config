@@ -2,15 +2,16 @@
 
 ## Keep rebuilds from overwhelming the desktop
 
-`nixos/features/tuning.nix` sets two simultaneous Nix builds and six requested
-workers per build. Previously, `max-jobs = auto` and `cores = 0` allowed up
-to 16 builds, each requesting all 16 threads on the 7800X3D.
+`nixos/features/tuning.nix` runs the Nix build daemon at the lowest priority
+(`daemonCPUSchedPolicy = "batch"`, best-effort IO priority 7), so builds give
+way to games and other interactive work but run near full speed when idle.
+On top of that, two simultaneous builds of up to 12 workers each (was 2 x 6)
+bound build RAM on the 30 GB desktop. `NIX_BUILD_CORES` is a request, not a
+hard quota. See the [Nix cores/jobs documentation](https://nix.dev/manual/nix/2.34/advanced-topics/cores-vs-jobs.html).
 
-The new settings request up to 12 compilation workers across two builds.
-They are not CPU affinity or a hard quota: builders must respect
-`NIX_BUILD_CORES`. Large source builds may take longer, but are less likely
-to overwhelm interactive work. Binary-cache downloads remain enabled.
-See the [Nix cores/jobs documentation](https://nix.dev/manual/nix/2.34/advanced-topics/cores-vs-jobs.html).
+`nixos/base/core.nix` also GCs during builds when free space drops below
+5 GiB (`min-free`/`max-free`), and `nix.gc.persistent` runs a missed weekly
+GC at the next boot.
 
 ## Reduce recurring disk work
 
