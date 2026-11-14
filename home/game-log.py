@@ -1,11 +1,13 @@
 # Steam playtime -> Obsidian daily notes ("## Played" plus a gamesPlayed property), worked out
-# from Steam's own game process log. Recomputes the last week each run, so it's safe to rerun.
+# from Steam's own game process log, plus non-Steam games seen by `--watch`.
+# Recomputes the last two weeks each run, so it's safe to rerun.
 import json
 import os
 import re
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.request
 from collections import defaultdict
 from datetime import date, datetime, timedelta
@@ -15,6 +17,8 @@ STEAM = os.path.expanduser("~/.local/share/Steam")
 LOGS = [os.path.join(STEAM, "logs", f) for f in ("gameprocess_log.previous.txt", "gameprocess_log.txt")]
 STATE_DIR = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
 NAMES = os.path.join(STATE_DIR, "game-log-names.json")
+WATCHED = os.path.join(STATE_DIR, "game-log-watched.json")  # [[title, start, end], ...] from --watch
+OTHER_GAMES = {"Wow.exe": "World of Warcraft"}  # process name -> title, for games outside Steam
 DAYS = 14
 MIN_SESSION = 120  # seconds; shorter ones are crashed launches
 LINE = re.compile(r"^\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)\] (?:AppID (\d+) (adding PID|no longer tracking PID) (\d+)|Client version)")
@@ -64,6 +68,49 @@ def sessions():
         running = subprocess.run(["pgrep", "-f", f"AppId={app}( |$)"], capture_output=True).returncode == 0
         out.append((app, t, datetime.now() if running else last[app]))
     return [s for s in out if (s[2] - s[1]).total_seconds() >= MIN_SESSION]
+
+
+def load_watched():
+    try:
+        return json.load(open(WATCHED))
+    except (OSError, ValueError):
+        return []
+
+
+def watched_sessions():
+    """(title, start, end) for non-Steam games recorded by --watch."""
+    out = [(t, datetime.fromisoformat(s), datetime.fromisoformat(e)) for t, s, e in load_watched()]
+    return [s for s in out if (s[2] - s[1]).total_seconds() >= MIN_SESSION]
+
+
+def watch(every=60):
+    """Check once a minute which OTHER_GAMES are running; extend or start their sessions."""
+    while True:
+        running = set()
+        for pid in filter(str.isdigit, os.listdir("/proc")):
+            try:
+                comm = open(f"/proc/{pid}/comm").read().strip()
+            except OSError:
+                continue
+            if comm in OTHER_GAMES:
+                running.add(OTHER_GAMES[comm])
+        if running:
+            now = datetime.now().replace(microsecond=0)
+            cutoff = (now - timedelta(days=DAYS + 1)).isoformat()
+            rows = [r for r in load_watched() if r[2] >= cutoff]
+            for title in running:
+                open_row = next((r for r in reversed(rows) if r[0] == title), None)
+                # a gap of 3+ minutes (sleep, PC off) starts a new session
+                if open_row and now - datetime.fromisoformat(open_row[2]) < timedelta(minutes=3):
+                    open_row[2] = now.isoformat()
+                else:
+                    rows.append([title, now.isoformat(), now.isoformat()])
+            os.makedirs(STATE_DIR, exist_ok=True)
+            fd, tmp = tempfile.mkstemp(dir=STATE_DIR, prefix=".game-log-watched-")
+            with os.fdopen(fd, "w") as f:
+                json.dump(rows, f, indent=0)
+            os.replace(tmp, WATCHED)
+        time.sleep(every)
 
 
 def name(app, names):
@@ -151,18 +198,21 @@ def update(d, games):
     return True
 
 
+if "--watch" in sys.argv:
+    watch()
 if not obsidian_synced():
     print("Games: waiting until Obsidian has been open a couple of minutes (so it can't clash with the phone).")
     sys.exit()
 names = json.load(open(NAMES)) if os.path.exists(NAMES) else {}
 first = date.today() - timedelta(days=DAYS - 1)
 days = defaultdict(lambda: defaultdict(float))
-for app, start, end in sessions():
+for app, start, end in sessions() + watched_sessions():
+    title = name(app, names) if app.isdigit() else app
     t = start
     while t < end:  # split sessions that run past midnight
         cut = min(end, datetime.combine(t.date() + timedelta(days=1), datetime.min.time()))
         if t.date() >= first:
-            days[t.date()][name(app, names)] += (cut - t).total_seconds()
+            days[t.date()][title] += (cut - t).total_seconds()
         t = cut
 changed = 0
 for d, games in sorted(days.items()):
