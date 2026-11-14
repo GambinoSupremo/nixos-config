@@ -39,4 +39,9 @@ lib.mkIf (!host.isVM) {
       };
     };
   };
+  # The module's PATH has no sh or hyprctl, so the submap hooks above failed silently.
+  systemd.user.services.voxtype.Service.Environment = lib.mkForce [
+    "PATH=${lib.makeBinPath [ pkgs.coreutils pkgs.which ]}:/run/current-system/sw/bin"
+    "XDG_RUNTIME_DIR=%t"
+  ];
 }
