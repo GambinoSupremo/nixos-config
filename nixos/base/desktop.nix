@@ -27,7 +27,7 @@ in
     # Flip either to true to bring that session back on the login screen.
     gav.sessions = {
       umbriel = true;
-      mango = true;
+      mango = false; # paused 2026-11: Hyprland only for now
       niri = false;
     };
 
