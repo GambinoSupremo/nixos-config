@@ -4,30 +4,10 @@
 { pkgs, ... }:
 
 let
-  # Fullscreen title card that covers the switch: blank until Noctalia writes the
-  # new colours (max 1.5 s), then the theme's name in them. Args: name, colors.json stamp.
-  intro = pkgs.writeShellScript "theme-intro" ''
-    printf '\e[?25l\e[2J\e[H'
-    colors=$HOME/.config/noctalia/colors.json
-    for _ in $(seq 30); do
-      [ "$(${pkgs.coreutils}/bin/stat -c %.9Y "$colors" 2>/dev/null)" != "$2" ] && break
-      sleep 0.05
-    done
-    stops=$(${pkgs.jq}/bin/jq -r '[.mPrimary, .mSecondary, .mTertiary] | map(ltrimstr("#")) | join(" ")' "$colors")
-    effects=(expand middleout)
-    # shellcheck disable=SC2086
-    ${pkgs.figlet}/bin/figlet -f slant -C utf8 -w "$(stty size | cut -d' ' -f2)" "$1" \
-      | ${pkgs.terminaltexteffects}/bin/tte --frame-rate 120 --canvas-width 0 --canvas-height 0 \
-        --anchor-canvas c --anchor-text c --no-eol --no-restore-cursor \
-        "''${effects[RANDOM % 2]}" --final-gradient-stops $stops
-    sleep 0.2
-  '';
-
   theme = pkgs.writeShellApplication {
     name = "theme";
     runtimeInputs = [
       pkgs.libnotify
-      pkgs.jq
       pkgs.util-linux # flock
     ];
     text = ''
@@ -65,7 +45,6 @@ let
         line=$(grep -m1 "^$1|" <<<"$themes") || { echo "unknown theme: $1" >&2; exit 1; }
         IFS='|' read -r name mode source palette dir <<<"$line"
         dir="$HOME/Pictures/$dir"
-        [ -n "''${THEME_INTRO:-}" ] && show_intro "$name"
         noctalia msg theme-mode-set "$mode" >/dev/null
         noctalia msg color-scheme-set "$source" "$palette" >/dev/null
         if find -L "$dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit 2>/dev/null | grep -q .; then
@@ -79,20 +58,6 @@ let
         [ -n "''${THEME_NOTIFY:-}" ] && notify-send -a Theme -t 2000 "Theme" "$name"
         # Login screen follows too, once the new wallpaper has landed.
         (sleep 3; noctalia msg greeter-sync >/dev/null 2>&1) 9>&- &
-      }
-
-      # Picker and light/dark only (not scrolling). Opens the title card on the
-      # focused monitor and waits (max 1 s) for it, so the switch happens behind it.
-      show_intro() {
-        [ -n "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ] || return 0
-        local m stamp
-        stamp=$(stat -c %.9Y "$HOME/.config/noctalia/colors.json" 2>/dev/null || true)
-        m=$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name')
-        hyprctl dispatch "hl.dsp.exec_cmd(\"ghostty --gtk-single-instance=false --class=theme-intro --font-size=28 --background=000000 --background-opacity=1 --confirm-close-surface=false -e ${intro} '$1' $stamp\", { monitor = \"$m\", fullscreen = true })" >/dev/null
-        for _ in $(seq 20); do
-          hyprctl clients -j | jq -e 'any(.[]; .class == "theme-intro")' >/dev/null && return 0
-          sleep 0.05
-        done
       }
 
       # Step through the current mode's themes (wraps); bar button scroll and Super+Ctrl+T.
@@ -111,7 +76,7 @@ let
         local m t
         m=$(other "$(mode_of "$(current)")")
         t=$(cat "$sdir/theme-last-$m" 2>/dev/null || names "$m" | head -1)
-        THEME_INTRO=1 apply "$t"
+        THEME_NOTIFY=1 apply "$t"
       }
 
       # Picker shows one mode at a time; the last row flips to the other mode's list.
@@ -124,7 +89,7 @@ let
         case "$choice" in
           "") ;;
           "$sw") pick "$(other "$m")" ;;
-          *) THEME_INTRO=1 apply "''${choice%  ·  current}" ;;
+          *) apply "''${choice%  ·  current}" ;;
         esac
       }
 
