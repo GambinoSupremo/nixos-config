@@ -1,5 +1,6 @@
 # theme: named looks (Noctalia palette + matching wallpaper folder).
 # Wallpapers live in ~/Pictures/themes/<slug>; "Wallpaper" = colors from the wallpaper.
+# Each theme is dark or light; `theme toggle` flips to the last one used in the other mode.
 { pkgs, ... }:
 
 let
@@ -10,28 +11,41 @@ let
       pkgs.util-linux # flock
     ];
     text = ''
-      # name|source|palette|wallpaper folder (relative to ~/Pictures)
-      themes='Wallpaper|wallpaper|m3-content|themes
-      Gruvbox|builtin|Gruvbox|themes/gruvbox
-      Everforest|community|Everforest|themes/everforest
-      Nord|builtin|Nord|themes/nord
-      Catppuccin|builtin|Catppuccin|themes/catppuccin
-      Tokyo Night|builtin|Tokyo-Night|themes/tokyo-night
-      Kanagawa|builtin|Kanagawa|themes/kanagawa
-      Rosé Pine|builtin|Rosé Pine|themes/rose-pine
-      Dracula|builtin|Dracula|themes/dracula
-      Ayu|builtin|Ayu|themes/ayu
-      Eldritch|builtin|Eldritch|themes/eldritch
-      Solarized|community|Solarized|themes/solarized'
-      state="''${XDG_STATE_HOME:-$HOME/.local/state}/theme-current"
+      # name|mode|source|palette|wallpaper folder (relative to ~/Pictures)
+      themes='Wallpaper|dark|wallpaper|m3-content|themes
+      Gruvbox|dark|builtin|Gruvbox|themes/gruvbox
+      Everforest|dark|community|Everforest|themes/everforest
+      Nord|dark|builtin|Nord|themes/nord
+      Catppuccin|dark|builtin|Catppuccin|themes/catppuccin
+      Tokyo Night|dark|builtin|Tokyo-Night|themes/tokyo-night
+      Kanagawa|dark|builtin|Kanagawa|themes/kanagawa
+      Rosé Pine|dark|builtin|Rosé Pine|themes/rose-pine
+      Dracula|dark|builtin|Dracula|themes/dracula
+      Ayu|dark|builtin|Ayu|themes/ayu
+      Eldritch|dark|builtin|Eldritch|themes/eldritch
+      Solarized|dark|community|Solarized|themes/solarized
+      Jade Horse|dark|custom|Jade-Horse|themes/jade-horse
+      Retro-82|dark|custom|Retro-82|themes/retro-82
+      Solitude|dark|custom|Solitude|themes/solitude
+      Hackerman|dark|custom|Hackerman|themes/hackerman
+      Lupine|light|custom|Lupine|themes/lupine
+      Flexoki Light|light|custom|Flexoki-Light|themes/flexoki-light
+      White|light|custom|White|themes/white'
+      sdir="''${XDG_STATE_HOME:-$HOME/.local/state}"
+      state="$sdir/theme-current"
 
       current() { cat "$state" 2>/dev/null || echo Wallpaper; }
+      field() { grep -m1 "^$1|" <<<"$themes" | cut -d'|' -f"$2"; }
+      names() { awk -F'|' -v m="$1" '$2 == m { print $1 }' <<<"$themes"; }
+      mode_of() { local m; m=$(field "$1" 2); echo "''${m:-dark}"; }
+      other() { [ "$1" = dark ] && echo light || echo dark; }
 
       apply() {
-        local line name source palette dir
+        local line name mode source palette dir
         line=$(grep -m1 "^$1|" <<<"$themes") || { echo "unknown theme: $1" >&2; exit 1; }
-        IFS='|' read -r name source palette dir <<<"$line"
+        IFS='|' read -r name mode source palette dir <<<"$line"
         dir="$HOME/Pictures/$dir"
+        noctalia msg theme-mode-set "$mode" >/dev/null
         noctalia msg color-scheme-set "$source" "$palette" >/dev/null
         if find -L "$dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit 2>/dev/null | grep -q .; then
           noctalia msg config-set wallpaper.directory "'$dir'" >/dev/null
@@ -40,35 +54,55 @@ let
           notify-send -a Theme "$name" "No wallpapers in $dir yet; kept the current ones."
         fi
         echo "$name" >"$state"
+        echo "$name" >"$sdir/theme-last-$mode"
         [ -n "''${THEME_NOTIFY:-}" ] && notify-send -a Theme -t 2000 "Theme" "$name"
         # Login screen follows too, once the new wallpaper has landed.
         (sleep 3; noctalia msg greeter-sync >/dev/null 2>&1) 9>&- &
       }
 
-      # Step through the list (wraps); used by the bar button scroll and Super+Ctrl+T.
+      # Step through the current mode's themes (wraps); bar button scroll and Super+Ctrl+T.
       step() {
-        local names cur i n
-        mapfile -t names < <(cut -d'|' -f1 <<<"$themes")
-        cur=$(current); n=''${#names[@]}
-        for i in "''${!names[@]}"; do [ "''${names[$i]}" = "$cur" ] && break; done
-        THEME_NOTIFY=1 apply "''${names[$(( (i + $1 + n) % n ))]}"
+        local list cur i n
+        cur=$(current)
+        mapfile -t list < <(names "$(mode_of "$cur")")
+        n=''${#list[@]}
+        for i in "''${!list[@]}"; do [ "''${list[$i]}" = "$cur" ] && break; done
+        THEME_NOTIFY=1 apply "''${list[$(( (i + $1 + n) % n ))]}"
       }
 
       # One switch at a time, so fast scrolling doesn't pile up.
+      # Light <-> dark: back to the last theme used in the other mode.
+      toggle() {
+        local m t
+        m=$(other "$(mode_of "$(current)")")
+        t=$(cat "$sdir/theme-last-$m" 2>/dev/null || names "$m" | head -1)
+        THEME_NOTIFY=1 apply "$t"
+      }
+
+      # Picker shows one mode at a time; the last row flips to the other mode's list.
+      pick() {
+        local m=$1 cur sw choice
+        cur=$(current)
+        sw="→ $(other "$m") themes"
+        choice=$( { names "$m" | sed "s/^$cur\$/$cur  ·  current/"; echo "$sw"; } \
+          | noctalia dmenu -p "Theme ($m)" || true)
+        case "$choice" in
+          "") ;;
+          "$sw") pick "$(other "$m")" ;;
+          *) apply "''${choice%  ·  current}" ;;
+        esac
+      }
+
       exec 9>"''${XDG_RUNTIME_DIR:-/tmp}/theme.lock"
       flock -n 9 || exit 0
 
       case "''${1:-}" in
-        list) cut -d'|' -f1 <<<"$themes" ;;
+        list) cut -d'|' -f1,2 <<<"$themes" | tr '|' '\t' ;;
         next) step 1 ;;
         prev) step -1 ;;
+        toggle) toggle ;;
         current) current ;;
-        "")
-          cur=$(current)
-          pick=$(cut -d'|' -f1 <<<"$themes" | sed "s/^$cur\$/$cur  ·  current/" \
-            | noctalia dmenu -p "Theme" || true)
-          [ -n "$pick" ] && apply "''${pick%  ·  current}"
-          ;;
+        "") pick "$(mode_of "$(current)")" ;;
         *) apply "$*" ;;
       esac
     '';
@@ -76,4 +110,12 @@ let
 in
 {
   home.packages = [ theme ];
+
+  # Custom palettes for the "custom" source.
+  xdg.configFile = builtins.listToAttrs (
+    map (f: {
+      name = "noctalia/palettes/${f}";
+      value.source = ./palettes + "/${f}";
+    }) (builtins.attrNames (builtins.readDir ./palettes))
+  );
 }

@@ -1,4 +1,4 @@
-# Dictation: Super+D starts/stops voxtype, which types what you said at the cursor.
+# Dictation: Super+D starts/stops voxtype (or hold Right Alt), which types what you said at the cursor.
 # Runs Whisper large-v3-turbo on the GPU (Vulkan); the model is pinned in the store.
 {
   pkgs,

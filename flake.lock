@@ -138,11 +138,11 @@
     },
     "private": {
       "locked": {
-        "lastModified": 1794696518,
-        "narHash": "sha256-urOs/p1UdmQJwG//xTvvA9GB0XbI0ybPY5Eb9zOGoM0=",
+        "lastModified": 1794772065,
+        "narHash": "sha256-fBVdZfdYLW6LS7W5lnrtbZTgO5rjveoR6plvQQ0Nf1A=",
         "ref": "refs/heads/main",
-        "rev": "69ac7757c776e0180254b6306937e703c0e21577",
-        "revCount": 14,
+        "rev": "be4c4ee91f90e31fbd2e57c14a04b2aed8a48668",
+        "revCount": 15,
         "type": "git",
         "url": "ssh://git@github.com/GambinoSupremo/nixos-private"
       },
@@ -223,10 +223,10 @@
     "wallpapers": {
       "flake": false,
       "locked": {
-        "lastModified": 1794541881,
-        "narHash": "sha256-/u8yuIh7W9HTlM2LlB/Nv12+jePaIs1JWJiIlwqubVM=",
+        "lastModified": 1794772066,
+        "narHash": "sha256-dIKc7x2s1izTRETbwnOcVj3zrnfH0qZvVo+Q6+WU3ug=",
         "ref": "refs/heads/main",
-        "rev": "c18eced774e7630f0db1d24831685f85397e04c3",
+        "rev": "b81af6669ae034d8d2707eb77530db4cb5ae4c2f",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/GambinoSupremo/wallpapers"

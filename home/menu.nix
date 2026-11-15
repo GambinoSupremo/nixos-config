@@ -79,7 +79,14 @@ let
           Window) settle; n screenshot-window ;;
           Screen) settle; n screenshot-fullscreen ;;
           "Draw on screen") settle; n annotate ;;
-          "Region to clipboard") settle; grim -g "$(slurp)" - | wl-copy ;;
+          "Region to clipboard")
+            settle
+            area=$(slurp) || exit 0
+            grim -g "$area" - | wl-copy
+            # Edit opens the copy in Satty (annotate, then copy or save from there).
+            [ "$(notify-send -a Screenshot --action=edit=Edit "Copied to clipboard" "Region screenshot")" = edit ] \
+              && wl-paste | satty --filename -
+            ;;
           "Scan QR code")
             settle
             area=$(slurp) || exit 0
@@ -94,7 +101,12 @@ let
           "Record screen") settle; output=$(slurp -o -f '%o') || exit 0; record -w "$output" ;;
           "Stop recording")
             pkill -INT -f 'gpu-screen-recorder -w'
-            notify-send -a Recorder "Recording saved" "In ~/Videos/Recordings"
+            sleep 0.5 # let it finish writing
+            file=$(find "$HOME/Videos/Recordings" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+            case "$(notify-send -a Recorder --action=open=Open --action=folder="Show folder" "Recording saved" "''${file##*/}")" in
+              open) xdg-open "$file" ;;
+              folder) xdg-open "''${file%/*}" ;;
+            esac
             ;;
           "Color picker") settle; hyprpicker -a ;;
         esac
@@ -125,7 +137,7 @@ let
         case ''${1:-$(pick Style Theme Wallpaper "Random wallpaper" "Light/dark" "Noctalia settings")} in
           Theme) theme ;;
           Wallpaper) n panel-open wallpaper ;;
-          "Light/dark") n theme-mode-toggle ;;
+          "Light/dark") theme toggle ;;
           "Random wallpaper") n wallpaper-random ;;
           "Noctalia settings") n settings-open ;;
         esac
