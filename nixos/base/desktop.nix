@@ -4,7 +4,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 
@@ -12,12 +11,10 @@ let
   cfg = config.gav.sessions;
 in
 {
-  imports = [ inputs.umbriel.nixosModules.default ];
-
   # Spare compositors. Off by default; their configs stay in the dotfiles, and
-  # home-manager and Sunshine follow these too.
+  # home-manager and Sunshine follow these too. (Umbriel trial removed 2026-11-16;
+  # it's in git history.)
   options.gav.sessions = {
-    umbriel = lib.mkEnableOption "the Umbriel trial session";
     mango = lib.mkEnableOption "the Mango session";
     niri = lib.mkEnableOption "the niri session";
   };
@@ -26,17 +23,8 @@ in
     # ── Compositors ───────────────────────────────────────────────────────────────
     # Flip either to true to bring that session back on the login screen.
     gav.sessions = {
-      umbriel = false; # paused 2026-11: Hyprland only for now
       mango = false; # paused 2026-11: Hyprland only for now
       niri = false;
-    };
-
-    # Umbriel — upstream flake module (session, portal); its Cachix matches the
-    # flake's own nixpkgs, so no follows.
-    programs.umbriel.enable = cfg.umbriel;
-    nix.settings = lib.mkIf cfg.umbriel {
-      substituters = [ "https://umbriel.cachix.org" ];
-      trusted-public-keys = [ "umbriel.cachix.org-1:JfNq/2yg2S6D6z4Z2dVSZrZlDPQTKtexB6GAVLD98nw=" ];
     };
 
     # Mango — nixpkgs module registers the session + wlr portal config. Its
@@ -108,11 +96,7 @@ in
     xdg.portal = {
       enable = true;
       extraPortals = [ pkgs.xdg-desktop-portal-gtk ]; # file dialogs everywhere
-      config = {
-        common.default = [ "gtk" ];
-        # Upstream sets umbriel;gtk only; keep the keyring Secret portal like Mango.
-        umbriel = lib.mkIf cfg.umbriel { "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ]; };
-      };
+      config.common.default = [ "gtk" ];
     };
 
     # ── upower ────────────────────────────────────────────────────────────────────

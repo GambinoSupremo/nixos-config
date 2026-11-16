@@ -17,16 +17,6 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # Consumed as a plain source tree and built against the system Hyprland so
-    # the plugin ABI matches (the repo's own flake targets Hyprland master).
-    hyprland-scroll-overview = {
-      url = "github:yayuuu/hyprland-scroll-overview";
-      flake = false;
-    };
-
-    # Cached upstream compositor build; keep its own nixpkgs for cache compatibility.
-    umbriel.url = "github:noctalia-dev/umbriel/cachix";
-
     # Dotfiles deployed declaratively via home-manager (see home/default.nix)
     dotfiles = {
       url = "github:GambinoSupremo/dotfiles";

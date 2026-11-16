@@ -12,8 +12,6 @@
 
 let
   inherit (host) isVM;
-  # off: broke Hyprland startup on 0.57, 2026-11-03
-  scrollOverviewOn = !isVM && false;
   sessions = osConfig.gav.sessions; # nixos/base/desktop.nix
   configDirs = [
     "hypr"
@@ -21,21 +19,6 @@ let
   ]
   ++ lib.optional sessions.mango "mango"
   ++ lib.optional sessions.niri "niri";
-
-  # niri-style scrollable overview for Hyprland, built against pkgs.hyprland so
-  # the plugin ABI matches (the upstream flake pins Hyprland master).
-  scrollOverview = pkgs.hyprlandPlugins.mkHyprlandPlugin {
-    pluginName = "scrolloverview";
-    version = "0-unstable";
-    src = inputs.hyprland-scroll-overview;
-    buildInputs = [ pkgs.lua5_4 ]; # Makefile pkg-configs lua5.4
-    installPhase = ''
-      runHook preInstall
-      install -Dm644 ./*scrolloverview.so $out/lib/libscrolloverview.so
-      runHook postInstall
-    '';
-    meta.description = "Scrollable niri-like overview plugin for Hyprland";
-  };
 
   # Mango imports the env and starts mango-session.target itself, but asynchronously;
   # import here first, then restart what needs the new env. Drops a stale Hyprland signature.
@@ -63,8 +46,9 @@ let
   '';
 
   # Hyprland's .conf fallback, written whole (hyprland.lua normally wins): the
-  # Noctalia colours source line, a minimal usable session, and on the desktop
-  # the scroll-overview plugin. Nix strips a leading blank line, hence the "\n".
+  # Noctalia colours source line and a minimal usable session. Nix strips a
+  # leading blank line, hence the "\n". (The scroll-overview plugin that also
+  # lived here broke startup on Hyprland 0.57; removed 2026-11-16, see git history.)
   hyprFallbackConf = pkgs.writeText "hyprland.conf" (
     "\n"
     + ''
@@ -91,44 +75,7 @@ let
       windowrule = match:class ^(vesktop)$, opacity 0.95 0.90
       windowrule = match:class ^(obsidian)$, opacity 0.95 0.90
     ''
-    + lib.optionalString scrollOverviewOn (
-      "\n"
-      + ''
-        # ── scroll-overview plugin ───────────────────────────────────────────────────
-        plugin = ${scrollOverview}/lib/libscrolloverview.so
-        plugin {
-            scrolloverview {
-                scale = 0.5
-                workspace_gap = 100
-                layout = vertical
-            }
-        }
-        bind = SUPER, Tab, scrolloverview:overview, toggle
-      ''
-    )
   );
-
-  # Desktop only; the dotfiles' hyprland.lua loads it with pcall(require, "nixos").
-  hyprNixosLua = pkgs.writeText "nixos.lua" ''
-    -- ── scroll-overview plugin (NixOS addition) ─────────────────────────────────
-    hl.on("hyprland.start", function()
-        hl.exec_cmd("hyprctl plugin load ${scrollOverview}/lib/libscrolloverview.so")
-    end)
-    hl.config({
-        plugin = {
-            scrolloverview = {
-                scale = 0.5,
-                workspace_gap = 100,
-                layout = "vertical",
-            },
-        },
-    })
-    -- Callback form defers the hl.plugin lookup to keypress time, after the
-    -- plugin has loaded.
-    hl.bind("SUPER + Tab", function()
-        hl.plugin.scrolloverview.overview("toggle")
-    end)
-  '';
 
   # Dotfiles copied for NixOS: Hyprland session bootstrap patch plus NixOS-only
   # additions. Files Noctalia regenerates are removed here and seeded writable below.
@@ -169,7 +116,6 @@ let
     # ── hypr ─────────────────────────────────────────────────────────────
     # hyprland.lua is the effective config; hyprland.conf is only a fallback.
     cp ${hyprFallbackConf} $out/hypr/hyprland.conf
-    ${lib.optionalString scrollOverviewOn "cp ${hyprNixosLua} $out/hypr/nixos.lua"}
     # Replace the async env-import exec_cmds with the sequential bootstrap.
     mustSed $out/hypr/autostart.lua \
       'hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")' \

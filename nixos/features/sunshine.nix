@@ -256,90 +256,12 @@ let
     esac
   '';
 
-  # ── Umbriel ────────────────────────────────────────────────────────────────
-  # Virtual output via IPC; stream.toml (included after games.toml) points Steam/game
-  # rules at SUNSHINE for new windows, existing ones are moved by id.
-  umbriel = "${config.programs.umbriel.package}/bin/umbriel";
-  streamToml = ''
-    [general]
-    xwayland_primary_output = "SUNSHINE"
-
-    [[window_rule]]
-    match.app_id = "^(steam|steam_app_.*|.*\\.exe)$"
-    default_output = "SUNSHINE"
-    default_workspace = 1
-    default_focused = true
-
-    [[window_rule]]
-    match.app_id = "^(steam_app_.*|.*\\.exe)$"
-    default_fullscreen = true
-
-    [[window_rule]]
-    match.app_id = "^(steam_app_.*|.*\\.exe)$"
-    match.title = "^(Launcher|broken)$"
-    default_fullscreen = false
-  '';
-  # Pull stray games onto SUNSHINE, then focus + fullscreen each one once (running ones
-  # included) so Big Picture doesn't keep the controller, like gameWatch.
-  umbrielGameWatch = pkgs.writeShellScript "sunshine-umbriel-game-watch" ''
-    jq=${pkgs.jq}/bin/jq
-    seen=" "
-    ${umbriel} subscribe windows | while IFS= read -r ev; do
-      while read -r id out; do
-        [ -n "$id" ] || continue
-        if [ "$out" != SUNSHINE ]; then
-          ${umbriel} msg window-focus "$id" >/dev/null
-          ${umbriel} msg window-move-to-workspace-silent 1 --output SUNSHINE >/dev/null
-        fi
-        case "$seen" in *" $id "*) continue ;; esac
-        seen="$seen$id "
-        sleep 1
-        ${umbriel} msg window-focus "$id" >/dev/null
-        ${umbriel} windows --json | $jq -e --arg id "$id" '.[] | select((.id | tostring) == $id and (.fullscreen or .floating | not))' >/dev/null &&
-          ${umbriel} msg window-toggle-fullscreen >/dev/null
-      done <<< "$(echo "$ev" | $jq -r '.data[]? | select(.app_id | test("^steam_app_|[.]exe$")) | "\(.id) \(.output)"')"
-    done
-  '';
-  umbrielStream = pkgs.writeShellScript "sunshine-umbriel-stream" ''
-    jq=${pkgs.jq}/bin/jq
-    cfg="$HOME/.config/umbriel/stream.toml"
-    # Focus each matching window, then move it (the move acts on the focused window).
-    moveAll() {
-      ${umbriel} windows --json | $jq -r --arg sel "$1" '.[] | select(.app_id | test("^(steam|steam_app_.*|.*[.]exe)$")) | select((.output == "SUNSHINE") == ($sel == "on")) | .id' |
-      while read -r id; do
-        ${umbriel} msg window-focus "$id" >/dev/null
-        ${umbriel} msg window-move-to-workspace-silent "$2" --output "$3" >/dev/null
-      done
-    }
-    case "$1" in
-    start)
-      ${umbriel} output-destroy SUNSHINE >/dev/null 2>&1
-      ${umbriel} output-create SUNSHINE "''${SUNSHINE_CLIENT_WIDTH:-1920}x''${SUNSHINE_CLIENT_HEIGHT:-1080}@''${SUNSHINE_CLIENT_FPS:-60}" >/dev/null
-      printf '%s' ${lib.escapeShellArg streamToml} > "$cfg"
-      ${umbriel} msg config-reload >/dev/null
-      moveAll off 1 SUNSHINE
-      ${umbriel} msg workspace-switch 1 --output SUNSHINE >/dev/null
-      [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null
-      setsid ${umbrielGameWatch} >/dev/null 2>&1 < /dev/null & echo $! > "${watchPid}"
-      ;;
-    stop)
-      [ -f "${watchPid}" ] && kill -- "-$(cat "${watchPid}")" 2>/dev/null; rm -f "${watchPid}"
-      rm -f "$cfg"
-      ${umbriel} msg config-reload >/dev/null
-      aw=$(${pkgs.wlr-randr}/bin/wlr-randr --json | $jq -r '.[] | select(.model == "Dell AW3423DW") | .name')
-      moveAll on 2 "''${aw:-DP-1}"
-      ${umbriel} output-destroy SUNSHINE >/dev/null
-      ;;
-    esac
-  '';
-
   streamDisplay = pkgs.writeShellScript "sunshine-stream-display" ''
     [ "$1" = start ] && { ${puck "0"} }
     # Elsewhere (niri) Sunshine falls back to streaming monitor 0.
     case "$XDG_CURRENT_DESKTOP" in
     Hyprland) ${hyprStream} "$1" ;;
     ${lib.optionalString config.gav.sessions.mango ''mango) ${mangoStream} "$1" ;;''}
-    ${lib.optionalString config.gav.sessions.umbriel ''umbriel) ${umbrielStream} "$1" ;;''}
     esac
     [ "$1" = stop ] && { ${puck "1"} }
     exit 0
