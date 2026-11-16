@@ -1,6 +1,6 @@
 # Hardware and misc system services shared by all hosts. The VM host
 # force-disables the physical-hardware ones (nixos/hosts/vm).
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   # Modifier combos must live in a layer named after the modifier:
@@ -109,6 +109,8 @@ in
   # ── Printing ──────────────────────────────────────────────────────────────────
   # Brother HL-L2340D at its reserved IP; driverless IPP Everywhere, no Brother driver.
   services.printing.enable = true;
+  # Setting up the printer fails while it's asleep; don't let that stop CUPS at boot.
+  systemd.services.cups.postStart = lib.mkBefore "set +e";
   hardware.printers = {
     ensurePrinters = [
       {
