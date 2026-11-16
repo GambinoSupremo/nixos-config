@@ -21,18 +21,12 @@
   };
 
   nix = {
-    # Newest Nix release rather than nixpkgs' default.
-    package = pkgs.nixVersions.latest;
     settings = {
       experimental-features = [
         "nix-command"
         "flakes"
       ];
       auto-optimise-store = true;
-      trusted-users = [
-        "root"
-        "gav"
-      ];
       warn-dirty = false;
       # Avoids "download buffer is full" stalls on big updates.
       download-buffer-size = 1024 * 1024 * 1024;
