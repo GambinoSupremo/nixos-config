@@ -26,11 +26,12 @@ units.
 `apply` is the one to run after committing a change on a cleanup branch. It
 checks both repos for a single pending `cleanup/*` branch that fast-forwards
 (stopping before either `main` moves if not), fast-forwards both, then builds
-this host against the committed local dotfiles checkout. A failed build
+this host against the committed local dotfiles and nixos-private checkouts
+(the private repo has no cleanup branches; its `main` is used as is). A failed build
 restores both local `main` branches and keeps the cleanup branches. If the new
 system goes live but activation reports errors, nothing is reset or pushed;
 fix it and run `apply` again to publish. After a clean activation it pushes
-dotfiles, refreshes the pin, commits and pushes `flake.lock`, then prunes
+dotfiles and nixos-private, refreshes both pins, commits and pushes `flake.lock`, then prunes
 cleanup branches that are fully on `main`.
 
 The helper is packaged in the active system, so after changing

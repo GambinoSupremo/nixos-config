@@ -54,7 +54,7 @@ live() {
 
 # Build behind a one-line spinner; the build output only goes to the log.
 build_system() {
-  local target_host="${1:-$host}" dotfiles_dir="${2:-}"
+  local target_host="${1:-$host}" dotfiles_dir="${2:-}" private_dir="${3:-}"
   local attr="$flake_dir#nixosConfigurations.$target_host.config.system.build.toplevel"
   local blog out pid rc=0 start=$SECONDS i=0 total started cur status
   local -a frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
@@ -63,6 +63,7 @@ build_system() {
     # git+file, not path: builds the committed tree, so it matches the pin after pushing.
     cmd+=(--override-input dotfiles "git+file://$dotfiles_dir")
   fi
+  [[ -z "$private_dir" ]] || cmd+=(--override-input private "git+file://$private_dir")
   cmd+=("$attr")
   blog=$(mktemp) out=$(mktemp)
   "${cmd[@]}" >"$out" 2>"$blog" &
@@ -111,8 +112,7 @@ show_diff() {
 
 new_system=""
 nh_switch() {
-  local dotfiles_dir="${1:-}"
-  build_system "$host" "$dotfiles_dir" || return
+  build_system "$host" "${1:-}" "${2:-}" || return
   section "Changes"
   show_diff
   section "Activating"
@@ -297,6 +297,7 @@ prune_branches() {
 cmd_apply() {
   start_log apply
   local before dot_before="" dot_dir="$HOME/Projects/dotfiles" dotfiles_override="" nix_branch dot_branch="" rc=0
+  local priv_dir="$HOME/Projects/nixos-private" private_override=""
   section "Checking ~/nixos-config"
   preflight
   require_clean
@@ -312,6 +313,14 @@ cmd_apply() {
     dot_before=$(git -C "$dot_dir" rev-parse HEAD)
   fi
 
+  # The private repo has no cleanup branches: whatever is committed on its main is built.
+  if [[ -d "$priv_dir/.git" ]]; then
+    private_override="$priv_dir"
+    section "Checking ~/Projects/nixos-private"
+    preflight "$priv_dir"
+    require_clean
+  fi
+
   cd "$flake_dir"
   find_pending
   nix_branch=$pending
@@ -325,7 +334,7 @@ cmd_apply() {
   land_branch "$nix_branch"
 
   section "Building and activating ($host)"
-  nh_switch "$dotfiles_override" || rc=$?
+  nh_switch "$dotfiles_override" "$private_override" || rc=$?
   ((rc != 2)) || live_with_errors "Nothing pushed; run apply again once fixed to publish."
   if ((rc != 0)); then
     git reset -q --hard "$before"
@@ -342,17 +351,27 @@ cmd_apply() {
     fi
     ok "Pushed dotfiles after validation"
   fi
+  if [[ -n "$private_override" && -n "$(git -C "$priv_dir" rev-list origin/main..main)" ]]; then
+    if ! quiet git -C "$priv_dir" push; then
+      warn "System activated; nixos-private push failed. Local commits and cleanup branches were kept."
+      after_switch
+      return 1
+    fi
+    ok "Pushed nixos-private after validation"
+  fi
 
-  section "Refreshing the dotfiles pin"
-  if ! quiet nix flake update dotfiles --refresh --flake "$flake_dir"; then
-    warn "System activated, but the dotfiles pin refresh failed. Run dotsync to finish."
+  section "Refreshing the dotfiles and private pins"
+  local -a pins=(dotfiles)
+  [[ -z "$private_override" ]] || pins+=(private)
+  if ! quiet nix flake update "${pins[@]}" --refresh --flake "$flake_dir"; then
+    warn "System activated, but the pin refresh failed. Run apply again to finish."
     after_switch
     return 1
   fi
   print_changes "$backup" flake.lock
 
   section "Publishing nixos-config"
-  commit_lock "flake: update dotfiles" || true
+  commit_lock "flake: refresh pins" || true
   if quiet git push; then
     ok "Pushed nixos-config"
     if [[ -n "$dotfiles_override" ]]; then
