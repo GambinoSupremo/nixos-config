@@ -88,6 +88,7 @@
     qbittorrent
     matugen # material color generation from wallpaper
     firefox
+    tutanota-desktop
 
     # ── Media ────────────────────────────────────────────────────────────────
     spotify # was spotify-launcher (AUR downloader wrapper)
