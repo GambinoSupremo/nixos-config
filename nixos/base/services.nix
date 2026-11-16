@@ -51,19 +51,6 @@ in
           inherit meta;
         };
       };
-      # Basilisk's keyboard keys (clutch, front side button, edge, tilt, top button)
-      # switched off so it only uses the buttons the Vaxee NP-01 Ergo has.
-      basilisk = {
-        ids = [ "k:1532:00e3" ];
-        settings.main = {
-          kp0 = "noop";
-          kp1 = "noop";
-          kp2 = "noop";
-          kp3 = "noop";
-          left = "noop";
-          right = "noop";
-        };
-      };
     };
   };
   environment.systemPackages = [ pkgs.keyd ]; # `sudo keyd monitor`
@@ -100,11 +87,6 @@ in
   services.gvfs.enable = true;
   # Sushi: Space in Nautilus previews the selected file.
   services.gnome.sushi.enable = true;
-
-  # ── Flatpak ───────────────────────────────────────────────────────────────────
-  # Escape hatch for apps not in nixpkgs; currently nothing installed.
-  # First use: flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-  services.flatpak.enable = true;
 
   # ── Printing ──────────────────────────────────────────────────────────────────
   # Brother HL-L2340D at its reserved IP; driverless IPP Everywhere, no Brother driver.

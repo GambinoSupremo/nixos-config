@@ -98,9 +98,6 @@
     # obs-studio and plugins managed via programs.obs-studio in home/default.nix
     protonplus
 
-    # ── Peripherals ───────────────────────────────────────────────────────────
-    zmk-studio # runtime keymap editor for the Lily58 (firmware built in ~/Projects/zmk-config)
-
     # ── Networking ────────────────────────────────────────────────────────────
     # mullvad-vpn comes from the services.mullvad-vpn module (keeps daemon + GUI
     # matched); pkgs.mullvad (headless) lags and would shadow the CLI — keep out.

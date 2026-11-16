@@ -10,7 +10,6 @@
     ../../features/gaming.nix
     ../../features/sunshine.nix
     ../../features/tuning.nix
-    ../../features/razer-white.nix
   ];
 
   services.btrfs.autoScrub = {
