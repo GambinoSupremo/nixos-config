@@ -7,9 +7,9 @@
 
     # ── Shell / Terminal ──────────────────────────────────────────────────────
     # fish registered system-wide via programs.fish in users.nix
-    # starship / bat / fzf / zoxide: HM-owned — home/shell.nix
+    # starship / bat / fzf / zoxide: HM-owned — home/terminal/shell.nix
     ghostty
-    eza # stays: only aliased (no programs.eza) in home/shell.nix
+    eza # stays: only aliased (no programs.eza) in home/terminal/shell.nix
     ripgrep
     fd
     tree
@@ -23,7 +23,7 @@
     unzip
 
     # ── Editors ───────────────────────────────────────────────────────────────
-    neovim # `vim` runs nvim too (wrapper in home/editors.nix)
+    neovim # `vim` runs nvim too (wrapper in home/terminal/editors.nix)
     nano
     zed-editor
 
@@ -63,7 +63,7 @@
     playerctl
     xrandr
     # noctalia — v5, managed by the upstream HM module (programs.noctalia)
-    #            in home/default.nix; runs as noctalia.service
+    #            in home/desktop/dotfiles.nix; runs as noctalia.service
 
     # ── Themes / Appearance ───────────────────────────────────────────────────
     bibata-cursors # was bibata-cursor-theme-bin (AUR)
@@ -79,9 +79,9 @@
     pcloud # pCloud Drive (Electron); unfree
     signal-desktop
     vesktop # Discord
-    # zen-browser moved to home-manager (home/zen.nix, programs.zen-browser)
+    # zen-browser moved to home-manager (home/apps/zen.nix, programs.zen-browser)
     mpv
-    nomacs # the image viewer, Canon RAW included; defaults in home/programs.nix
+    nomacs # the image viewer, Canon RAW included; defaults in home/apps/programs.nix
     nautilus
     gnome-disk-utility
     pavucontrol
@@ -96,7 +96,7 @@
     cider-2 # Apple Music (cider.sh 4.x); plain `cider` is the dead 1.x fork
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
-    # obs-studio and plugins managed via programs.obs-studio in home/default.nix
+    # obs-studio and plugins managed via programs.obs-studio in home/apps/programs.nix
     protonplus
 
     # ── Networking ────────────────────────────────────────────────────────────

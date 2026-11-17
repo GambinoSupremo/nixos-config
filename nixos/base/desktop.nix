@@ -38,7 +38,7 @@ in
     environment.systemPackages = lib.mkIf cfg.niri [ pkgs.xwayland-satellite ];
 
     # Hyprland — primary/daily driver. Session env / noctalia startup driven by
-    # hyprSessionBootstrap in home/dotfiles.nix (the bare target raced noctalia).
+    # hyprSessionBootstrap in home/desktop/dotfiles.nix (the bare target raced noctalia).
     programs.hyprland = {
       enable = true;
       # false alone doesn't drop the duplicate session entry — the package ships

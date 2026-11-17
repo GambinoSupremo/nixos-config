@@ -131,7 +131,7 @@ def name(app, names):
 
 def daily_path(d):
     """Today's daily note: an existing YYYY-MM-DD note anywhere in the daily folder, else
-    where DAILY_NOTE_FORMAT (Obsidian's daily-notes syntax, from home/daily-note.nix) puts it."""
+    where DAILY_NOTE_FORMAT (Obsidian's daily-notes syntax, from home/sync/daily-note.nix) puts it."""
     folder = os.path.join(VAULT, os.environ["DAILY_NOTE_FOLDER"])
     for root, _, files in os.walk(folder):
         if f"{d:%Y-%m-%d}.md" in files:

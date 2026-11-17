@@ -36,16 +36,16 @@ KDE Plasma is not installed.
   black-screened plasmashell. Plasma is gone now, but `qt.style` would still
   force `QT_STYLE_OVERRIDE` on every session. All compositors set
   `QT_QPA_PLATFORMTHEME=qt6ct`, so Qt 6 apps get the Noctalia palette from
-  qt6ct.conf (home/theming.nix).
+  qt6ct.conf (home/look/gtk-cursor.nix).
 - **Electron apps**: `NIXOS_OZONE_WL=1` (amd.nix) puts them on Wayland.
   Signal must launch with `--password-store=gnome-libsecret` everywhere or
   the keyring backend flips between sessions and loses the encryption key.
 - **Mullvad**: the GUI user service polls the system daemon with a BOUNDED
-  wait (home/services.nix) — an unbounded loop hung activation during
+  wait (home/desktop/vpn-bluetooth.nix) — an unbounded loop hung activation during
   rebuilds. `mullvad-exclude` is setuid and dies in Steam's nosuid sandbox;
   games that need to bypass the VPN use the `novpn` wrapper (daemon RPC,
   gaming.nix): `novpn gamemoderun %command%`.
-- **mustSed coupling**: home/dotfiles.nix patches exact line text in the
+- **mustSed coupling**: home/desktop/dotfiles.nix patches exact line text in the
   dotfiles repo. Rewording a matched line there fails this repo's build on
   purpose. Each patched dotfile carries a warning header.
 

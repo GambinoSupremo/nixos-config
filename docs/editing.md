@@ -15,7 +15,7 @@ install through Mason. The formatter version follows `flake.lock`.
   to check the server or `:ConformInfo` to check formatting.
 - **Zed:** install the Nix extension once. `.zed/settings.json` selects
   `nil` and `nixfmt` for this project, without replacing your global settings.
-- **Terminal:** `nix fmt home/editors.nix` formats a specific file. Review
+- **Terminal:** `nix fmt home/terminal/editors.nix` formats a specific file. Review
   `git diff` before committing.
 
 `.editorconfig` keeps indentation and line endings consistent. Add settings

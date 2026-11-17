@@ -1,4 +1,4 @@
-# nixos-sync apply|update|dotsync|save — backs the fish helpers in home/shell.nix.
+# nixos-sync apply|update|dotsync|save — backs the fish helpers in home/terminal/shell.nix.
 # NIXOS_SYNC_HOST (the flake output name) is set by writeShellApplication.
 
 flake_dir="$HOME/nixos-config"

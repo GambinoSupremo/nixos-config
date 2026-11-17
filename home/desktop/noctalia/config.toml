@@ -124,7 +124,7 @@ telemetry_enabled = false
     open_near_click_session = true
     open_near_click_wallpaper = true
 
-    # Region capture → Satty for annotation (satty config in home/programs.nix).
+    # Region capture → Satty for annotation (satty config in home/apps/programs.nix).
     [shell.screenshot]
     freeze_screen = true
     pipe_to_command = true
@@ -251,6 +251,6 @@ drawer = true
 label_source = "name"
 hide_when_empty = true
 
-# System menu icons (home/noctalia/plugins/sysmenu).
+# System menu icons (home/desktop/noctalia/plugins/sysmenu).
 [plugins]
 enabled = ["gav/sysmenu"]

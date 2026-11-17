@@ -1,5 +1,5 @@
 -- gavos System menu (`/sys`): sections drill in, items run `sysmenu <section> <item>`.
--- Keep the labels in step with the case arms in home/menu.nix.
+-- Keep the labels in step with the case arms in home/desktop/menu.nix.
 
 local sections = {
   { id = "learn", title = "Learn", glyph = "school", sub = "Keybindings and docs", items = {

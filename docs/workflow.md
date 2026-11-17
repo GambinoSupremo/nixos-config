@@ -11,7 +11,7 @@ save      # build-check, then commit tracked changes as-is (no switch, no push)
 ```
 
 `apply`, `update`, `dotsync` and `save` are fish wrappers around `nixos-sync`
-(home/nixos-sync.sh, wired up in home/shell.nix). Switches go through `nh`
+(home/terminal/nixos-sync.sh, wired up in home/terminal/shell.nix). Switches go through `nh`
 (build progress tree, then a package diff). Each run's raw output is kept in
 `~/.cache/nixos-sync/last-<command>.log`, and the path is printed on failure.
 Each first makes sure ~/nixos-config is on an up-to-date `main`: it switches to
@@ -35,7 +35,7 @@ dotfiles and nixos-private, refreshes both pins, commits and pushes `flake.lock`
 cleanup branches that are fully on `main`.
 
 The helper is packaged in the active system, so after changing
-`home/nixos-sync.sh` the first `apply` still runs the old version.
+`home/terminal/nixos-sync.sh` the first `apply` still runs the old version.
 
 The `private` input is a private GitHub repo fetched over SSH, so building
 needs GitHub SSH access.

@@ -72,7 +72,7 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
   per-game `novpn` launch options are still the live mechanism.
 
 ## 2026-10-01
-- MangoWM HM plumbing removed from home/dotfiles.nix (bootstrap script,
+- MangoWM HM plumbing removed from home/desktop/dotfiles.nix (bootstrap script,
   mustSeds, generated monitor.conf, 255-char check, deploy + noctalia seed).
   Session was already disabled 2026-09-24; mango edits in the dotfiles repo
   can no longer break this build.
@@ -104,7 +104,7 @@ Judgment calls from the deep-cleanup pass. Pairs with dotfiles/DECISIONS.md.
 - Mango back as a session, from nixpkgs (programs.mango, 0.17.5) instead of the
   old mangowm flake input. systemd.packages links its mango-session.target.
   The dotfiles mango/ was brought in line with Hyprland (binds, rules,
-  monitors, tags); home/dotfiles.nix deploys it with one mustSed (bootstrap).
+  monitors, tags); home/desktop/dotfiles.nix deploys it with one mustSed (bootstrap).
 - Sunshine on Mango: create_virtual_output SUNSHINE + wlr-randr mode, then
   tagmon the Steam windows onto it (tags are per monitor, so there's no
   workspace to lend). monitor.conf's SUNSHINE rule makes it the X11 primary;

@@ -17,7 +17,7 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # Dotfiles deployed declaratively via home-manager (see home/default.nix)
+    # Dotfiles deployed declaratively via home-manager (see home/desktop/dotfiles.nix)
     dotfiles = {
       url = "github:GambinoSupremo/dotfiles";
       flake = false;

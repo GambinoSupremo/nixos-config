@@ -18,7 +18,7 @@
   };
 
   # Registers fish as a valid login shell system-wide and enables vendor completions.
-  # User-level fish config (aliases, plugins, etc.) lives in home/default.nix.
+  # User-level fish config (aliases, plugins, etc.) lives in home/terminal/shell.nix.
   programs.fish.enable = true;
 
   # Allow passwordless sudo for wheel — remove if you want a sudo password

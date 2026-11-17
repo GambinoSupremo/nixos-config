@@ -6,7 +6,7 @@ separate repo and patched for NixOS at build time.
 ## Highlights
 
 - **Dotfiles as a pinned input.** The [dotfiles](https://github.com/GambinoSupremo/dotfiles)
-  repo is a GitHub flake input; `home/dotfiles.nix` deploys and patches it, and
+  repo is a GitHub flake input; `home/desktop/dotfiles.nix` deploys and patches it, and
   a patch whose source line changes fails the build instead of silently missing.
 - **Hyprland with Noctalia.** Noctalia v5 is the bar, shell and greeter (on
   greetd). Mango and Niri are kept as one-flag alternative sessions.
@@ -38,6 +38,24 @@ only the host they run on.
   without the desktop's hardware (no GPU, Bluetooth or gaming) and is built
   when checking a change, not by `apply`.
 
+## Layout
+
+```
+flake.nix            inputs (where everything is downloaded from) and the two hosts
+nixos/               the system: needs root, same for every user
+  base/              every host: users, network, audio, login screen, packages
+  features/          desktop only: AMD GPU, gaming, Sunshine streaming, tuning
+  hosts/             per machine: boot, kernel, disks
+home/                my user: apps, desktop, scripts (default.nix lists them all)
+  desktop/           dotfiles, Noctalia, system menu, screensaver, dictation
+  look/              GTK theme, cursor, palettes, folder icon colors
+  apps/              Zen, web apps, default apps, OBS
+  terminal/          fish, git, Neovim, the apply/update script
+  gaming/            Battle.net sign-in, Deadlock camera, Discord mic
+  sync/              NAS backup, game and Kobo logs into Obsidian
+docs/                notes on why things are the way they are
+```
+
 ## Where to edit
 
 | Change | File |
@@ -51,16 +69,20 @@ only the host they run on.
 | Steam and game launch wrappers | `nixos/features/gaming.nix` |
 | Streaming and virtual display | `nixos/features/sunshine.nix` |
 | GPU and system tuning | `nixos/features/amd.nix`, `tuning.nix` |
-| Browser, search, privacy | `home/zen.nix` |
-| Git and SSH | `home/development.nix` |
-| Neovim and editing tools | `home/editors.nix` |
-| Default apps, launchers, screenshots | `home/programs.nix` |
-| Shell aliases and prompt | `home/shell.nix` |
-| Dotfile deployment and overview toggle | `home/dotfiles.nix` |
-| GTK, Qt, cursor, live music themes | `home/theming.nix` |
-| Noctalia defaults for a new install | `home/noctalia/config.toml` |
-| Backup and activity logs | `home/backup.nix`, `home/*-log.nix`, `home/*-sync.nix` |
-| Rebuild workflow | `home/nixos-sync.sh`, [workflow](docs/workflow.md) |
+| Dotfile deployment, Noctalia | `home/desktop/dotfiles.nix` |
+| Noctalia defaults for a new install | `home/desktop/noctalia/config.toml` |
+| System menu, keybind cheatsheet | `home/desktop/menu.nix` |
+| GTK, Qt, cursor, Nautilus sidebar | `home/look/gtk-cursor.nix` |
+| Themes (palette + wallpapers) | `home/look/theme.nix`, `home/look/palettes/` |
+| Browser, search, privacy | `home/apps/zen.nix` |
+| Web apps | `home/apps/webapps.nix` |
+| Default apps, launchers, screenshots | `home/apps/programs.nix` |
+| Shell aliases and prompt | `home/terminal/shell.nix` |
+| Git and SSH | `home/terminal/git.nix` |
+| Neovim and editing tools | `home/terminal/editors.nix` |
+| Battle.net and WoW launcher | `home/gaming/battlenet.nix` |
+| Backup and activity logs | `home/sync/` |
+| Rebuild workflow | `home/terminal/nixos-sync.sh`, [workflow](docs/workflow.md) |
 
 `home/default.nix` and `nixos/base/default.nix` list the imported modules.
 Compositor binds, rules, layouts and monitors live in `~/Projects/dotfiles`.

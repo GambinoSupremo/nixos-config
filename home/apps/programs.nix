@@ -109,7 +109,7 @@
 
   # ── Vesktop ──────────────────────────────────────────────────────────────────
   # Every launcher path goes through mullvad-exclude or Discord won't connect.
-  # Compositor autostarts handle themselves (dotfiles / home/dotfiles.nix).
+  # Compositor autostarts handle themselves (dotfiles / home/desktop/dotfiles.nix).
   xdg.desktopEntries.vesktop = {
     name = "Vesktop";
     exec = "mullvad-exclude vesktop %U";

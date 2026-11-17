@@ -174,7 +174,7 @@ in
     "noctalia/templates/cider.scss".source = ./noctalia/templates/cider.scss;
     "sh.cider.genten/themes/noctalia/theme.yml".source = ./noctalia/templates/cider-theme.yml;
     # Suppress the stale XDG autostart entry so the mullvad-gui systemd user
-    # service (services.nix) controls launch timing instead.
+    # service (vpn-bluetooth.nix) controls launch timing instead.
     "autostart/mullvad-vpn.desktop" = {
       force = true;
       text = "[Desktop Entry]\nHidden=true\n";
