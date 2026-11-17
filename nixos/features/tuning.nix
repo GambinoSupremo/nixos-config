@@ -1,10 +1,10 @@
-# System tuning borrowed from CachyOS: zram, ananicy-cpp with its rules, and
-# VM/IO sysctls. The kernel itself is set in hosts/desktop.
+# Speed tweaks borrowed from CachyOS: memory compression, process
+# priorities and a few kernel settings. The kernel itself is in hosts/desktop.
 { pkgs, ... }:
 
 {
-  # Builds run at lowest CPU/disk priority so they yield to games, and run at
-  # near full speed when idle. cores stays below 16 to bound build RAM (30 GB).
+  # --- Builds stay out of the way ---
+  # Lowest priority so games win; cores is capped to keep build memory down.
   nix = {
     daemonCPUSchedPolicy = "batch";
     daemonIOSchedClass = "best-effort";
@@ -15,7 +15,8 @@
     };
   };
 
-  # zstd zram ahead of the disk swap (disk stays as overflow, prio -1).
+  # --- Memory compression (zram) ---
+  # Used before the swap on disk, which stays as overflow.
   zramSwap = {
     enable = true;
     algorithm = "zstd";
@@ -23,18 +24,20 @@
     priority = 100;
   };
 
+  # --- Process priorities ---
   services.ananicy = {
     enable = true;
     package = pkgs.ananicy-cpp;
     rulesProvider = pkgs.ananicy-rules-cachyos;
   };
 
+  # --- Kernel settings ---
   boot.kernel.sysctl = {
-    # Tuned for zram: swap compressed pages early, no readahead clustering.
+    # Tuned for zram.
     "vm.swappiness" = 100;
     "vm.page-cluster" = 0;
     "vm.vfs_cache_pressure" = 50;
-    # Byte-based dirty limits keep big writes from stalling the desktop.
+    # Keeps big file copies from freezing the desktop.
     "vm.dirty_bytes" = 268435456;
     "vm.dirty_background_bytes" = 67108864;
     "vm.dirty_writeback_centisecs" = 1500;

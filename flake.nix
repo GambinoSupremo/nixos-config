@@ -1,47 +1,52 @@
+# The entry point: where everything is downloaded from (inputs) and the two
+# systems built from it (outputs): desktop and the vm test build.
 {
   description = "gav's nixos configuration";
 
+  # --- Where things come from ---
   inputs = {
-    # Rolling unstable.
+    # The main package collection, rolling release.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # Manages my home folder settings (home/).
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Not in nixpkgs; homeModules.beta provides programs.zen-browser.
+    # Zen browser isn't in nixpkgs.
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
 
-    # Dotfiles deployed declaratively via home-manager (see home/desktop/dotfiles.nix)
+    # My desktop config files (home/desktop/dotfiles.nix puts them in place).
     dotfiles = {
       url = "github:GambinoSupremo/dotfiles";
       flake = false;
     };
 
-    # Private; fetched over SSH. Shallow so builds skip old history.
+    # Private repo. Shallow so it skips old history.
     wallpapers = {
       url = "git+ssh://git@github.com/GambinoSupremo/wallpapers?shallow=1";
       flake = false;
     };
 
-    # Deadlock Mod Manager from upstream, pinned to a release tag (nixpkgs lags at 1.1.0).
-    # No nixpkgs.follows so the build matches their Cachix cache (gaming.nix).
+    # Straight from the developers because nixpkgs has an old version.
+    # No nixpkgs.follows, so it downloads prebuilt (gaming.nix).
     # Go back to pkgs.deadlock-mod-manager once nixpkgs catches up.
     deadlock-mod-manager.url = "github:deadlock-mod-manager/deadlock-mod-manager/v2.1.1";
 
-    # Personal modules kept out of this public repo (private; fetched over SSH).
+    # Personal settings kept out of this public repo.
     private.url = "git+ssh://git@github.com/GambinoSupremo/nixos-private";
   };
 
+  # --- What gets built ---
   outputs =
     { nixpkgs, home-manager, ... }@inputs:
     let
-      # Shared home-manager config applied to every host.
+      # Home folder settings, the same on every host.
       hmModule =
         { host, ... }:
         {
@@ -53,14 +58,13 @@
               ./home/default.nix
               inputs.private.homeModules.default
             ];
-            # Pre-existing files that home-manager would clobber are moved aside
-            # as *.hm-bak instead of aborting the activation.
+            # A file already in the way is renamed to *.hm-bak instead of failing.
             backupFileExtension = "hm-bak";
           };
         };
 
-      # Per-host facts live only here; NixOS and home-manager get them as `host`
-      # (host.name is the flake output, which differs from hostName).
+      # Builds one system. The other files get its details as `host`
+      # (host.name is "desktop" or "vm", host.hostName is the network name).
       mkHost =
         name:
         { hostName, isVM }:
@@ -84,13 +88,13 @@
 
       nixosConfigurations = {
 
-        # Build-only target for the shared modules (no VM deployed)
+        # Test build only, no real VM.
         vm = mkHost "vm" {
           hostName = "nix-vm";
           isVM = true;
         };
 
-        # Physical desktop
+        # My PC.
         desktop = mkHost "desktop" {
           hostName = "gavos";
           isVM = false;

@@ -1,5 +1,5 @@
-# Boot menu wallpapers: every theme wallpaper, cropped to 21:9 and dimmed so the
-# menu reads on bright ones. Limine picks one at random each boot.
+# Boot menu wallpapers: every theme wallpaper, cropped to ultrawide and dimmed
+# so the menu text is readable. Limine picks one at random each boot.
 {
   lib,
   runCommand,

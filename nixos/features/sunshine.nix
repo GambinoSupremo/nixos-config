@@ -1,6 +1,6 @@
-# Sunshine (Moonlight streaming host). Each stream gets a headless virtual
-# display at the client's resolution/refresh; physical monitors stay on.
-# Steam Remote Play sessions get the same display, started from Steam's log.
+# Game streaming to the Steam Machine (Sunshine + Moonlight). Each stream gets
+# its own invisible screen sized for the TV; my monitors stay on.
+# Steam Remote Play uses the same screen.
 {
   config,
   lib,
@@ -11,15 +11,18 @@
 
 let
   alienware = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH";
-  # Steam Controller puck (28de:1304): a controller paired to it grabs player 1 over Moonlight's pad.
+  # Steam Controller puck: unplugged during a stream, or a controller paired
+  # to it takes player 1 from the Moonlight one.
   puck = state: ''
     for d in /sys/bus/usb/devices/*; do
       [ "$(cat "$d/idVendor" 2>/dev/null):$(cat "$d/idProduct" 2>/dev/null)" = 28de:1304 ] && echo ${state} > "$d/authorized"
     done
   '';
   watchPid = "$XDG_RUNTIME_DIR/sunshine-game-watch.pid";
-  # Put ws 2 (Steam + games) on SUNSHINE at the client mode. Fullscreen windows can block the
-  # move, so drop fullscreen first, retry until ws 2 actually lands, then re-fullscreen games.
+
+  # --- Hyprland ---
+  # Moves workspace 2 (Steam + games) onto the stream screen. Fullscreen windows
+  # can block the move, so it drops fullscreen, retries, then restores it.
   lendWs2 = pkgs.writeShellScript "sunshine-lend-ws2" ''
     jq=${pkgs.jq}/bin/jq
     hyprctl eval "hl.monitor({ output = \"SUNSHINE\", mode = \"''${SUNSHINE_CLIENT_WIDTH:-1920}x''${SUNSHINE_CLIENT_HEIGHT:-1080}@''${SUNSHINE_CLIENT_FPS:-60}\", position = \"auto-right\", scale = 1 })"
@@ -42,8 +45,8 @@ let
       [ "$fs" = 0 ] && hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })'
     done
   '';
-  # XWayland games sometimes map on the wrong workspace despite the ws-2 rule; pull them back.
-  # Proton Wayland games (PROTON_ENABLE_WAYLAND=1) are named after the exe, hence [.]exe.
+  # Runs during a stream: pulls games that open on the wrong workspace back
+  # to 2, and focuses and fullscreens each new one.
   gameWatch = pkgs.writeShellScript "sunshine-game-watch" ''
     ${pkgs.socat}/bin/socat -U - UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" |
     while IFS= read -r ev; do
@@ -82,8 +85,8 @@ let
         hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })'
     done
   '';
-  # Battle.net gives WoW no sign-in token until it has logged in, and WoW then asks for the
-  # password. The sign-in service restarts a stalled client; if it gives up, don't launch.
+  # Starts WoW on the stream. Waits for Battle.net to sign in first, otherwise
+  # WoW asks for the password; if sign-in fails, WoW isn't started.
   wowLaunch = pkgs.writeShellScript "sunshine-wow-launch" ''
     # Reopening the stream onto a running game: gameWatch already put it on the stream.
     ${pkgs.procps}/bin/pgrep -x Wow.exe >/dev/null && exit 0
@@ -124,7 +127,7 @@ let
     ) >/dev/null 2>&1 &
     exec ${pkgs.coreutils}/bin/env LUTRIS_SKIP_INIT=1 ${pkgs.lutris}/bin/lutris lutris:rungameid/6
   '';
-  # Kill whatever Steam is running (every process under its reaper), then back to Big Picture.
+  # Closes whatever game Steam is running, then goes back to Big Picture.
   closeGame = pkgs.writeShellScript "sunshine-close-game" ''
     tree() { echo "$1"; for c in $(${pkgs.procps}/bin/ps -o pid= --ppid "$1"); do tree "$c"; done; }
     pids=$(${pkgs.procps}/bin/ps -eo pid=,args= | ${pkgs.gawk}/bin/awk '$2 ~ /\/reaper$/ && $3 == "SteamLaunch" { print $1 }' |
@@ -136,6 +139,7 @@ let
     fi
     steam steam://open/bigpicture
   '';
+  # Sets the stream screen up when a stream starts and puts everything back after.
   hyprStream = pkgs.writeShellScript "sunshine-hypr-stream" ''
     case "$1" in
     start)
@@ -181,9 +185,8 @@ let
     esac
   '';
 
-  # ── Mango ──────────────────────────────────────────────────────────────────
-  # Mango tags are per monitor, so move the Steam windows themselves. monitor.conf's
-  # SUNSHINE rule makes it the X11 primary; its mode survives config reloads.
+  # --- Mango (only used when the Mango session is on) ---
+  # Mango's workspaces belong to a monitor, so this moves the Steam windows instead.
   mmsg = "${pkgs.mango}/bin/mmsg";
   isSteam = ''.appid == "steam" or (.appid | startswith("steam_app_"))'';
   mangoLend = pkgs.writeShellScript "sunshine-mango-lend" ''
@@ -204,8 +207,7 @@ let
       ${mmsg} dispatch togglefullscreen "client,$id"
     done
   '';
-  # Pull stray games onto the stream (Noctalia's theme apply reloads Mango, dropping the
-  # runtime rules) and fullscreen each new one, like gameWatch.
+  # Same job as gameWatch.
   mangoGameWatch = pkgs.writeShellScript "sunshine-mango-game-watch" ''
     jq=${pkgs.jq}/bin/jq
     seen=" "
@@ -256,6 +258,8 @@ let
     esac
   '';
 
+  # --- Start and stop ---
+  # What Sunshine runs when a stream starts and ends; picks the right desktop.
   streamDisplay = pkgs.writeShellScript "sunshine-stream-display" ''
     [ "$1" = start ] && { ${puck "0"} }
     # Elsewhere (niri) Sunshine falls back to streaming monitor 0.
@@ -266,8 +270,8 @@ let
     [ "$1" = stop ] && { ${puck "1"} }
     exit 0
   '';
-  # Steam logs each Remote Play session; reuse the Moonlight display prep at the
-  # Steam Machine's 1440p120 (Remote Play has no client-mode hook like Sunshine's).
+  # Remote Play has no start/stop hook, so this watches Steam's log and does
+  # the same setup at the Steam Machine's 1440p 120 Hz.
   remotePlayWatch = pkgs.writeShellScript "remoteplay-watch" ''
     log="$HOME/.local/share/Steam/logs/streaming_log.txt"
     flag="$XDG_RUNTIME_DIR/remoteplay-active"
@@ -288,17 +292,19 @@ let
   '';
 in
 {
-  # Let the stream script (user) disconnect/reconnect the puck via sysfs.
+  # --- Controller puck ---
+  # Lets the stream script switch the puck off and on without sudo.
   services.udev.extraRules = ''
     ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="28de", ATTR{idProduct}=="1304", RUN+="${pkgs.coreutils}/bin/chgrp users /sys%p/authorized", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys%p/authorized"
   '';
 
+  # --- Remote Play watcher ---
   systemd.user.services.remoteplay-watch = {
     description = "Virtual display for Steam Remote Play sessions";
     wantedBy = [ "graphical-session.target" ];
     partOf = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
-    # NixOS units get a minimal PATH; the stream scripts call hyprctl and setsid.
+    # The stream scripts need hyprctl and setsid.
     path = [
       config.programs.hyprland.package
       pkgs.util-linux
@@ -309,17 +315,17 @@ in
     };
   };
 
+  # --- Sunshine ---
   services.sunshine = {
     enable = true;
     openFirewall = true;
     settings = {
       sunshine_name = host.hostName;
-      # Pin to wlr screencopy — otherwise Sunshine probes the portal backend
-      # too, popping the screen-share picker on every login.
+      # Without this the screen-share picker pops up on every login.
       capture = "wlr";
-      # Tray "Quit" kills the service; relaunching from the menu then runs unconfigured.
+      # The tray's Quit kills the service and it comes back without these settings.
       system_tray = "disabled";
-      # Matched by output name (falls back to monitor 0 when absent).
+      # The stream screen; falls back to the first monitor if it's missing.
       output_name = "SUNSHINE";
       global_prep_cmd = builtins.toJSON [
         {

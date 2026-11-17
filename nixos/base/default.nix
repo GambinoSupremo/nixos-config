@@ -1,13 +1,13 @@
-# Shared by every host. Order matters only for the system hash (list options
-# merge in import order), not behaviour.
+# Settings every host shares. Keep this order; changing it rebuilds the
+# system for no reason.
 {
   imports = [
-    ./core.nix # nix settings, locale, GC
+    ./core.nix # time zone, Nix settings
     ./users.nix
-    ./networking.nix # NetworkManager, firewall, Mullvad, resolved
-    ./desktop.nix # greeter, Hyprland (+ optional Mango/Niri), portals, fonts
-    ./audio.nix # PipeWire
-    ./services.nix # keyd, bluetooth, gamemode, ...
-    ./packages.nix # systemPackages
+    ./networking.nix # firewall, Mullvad, DNS
+    ./desktop.nix # login screen, Hyprland, fonts
+    ./audio.nix
+    ./services.nix # keyd, Bluetooth, printer, SSH
+    ./packages.nix # installed programs
   ];
 }

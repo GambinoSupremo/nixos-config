@@ -1,5 +1,5 @@
-# Plymouth theme "gavos": figlet logo (same as the screensaver) + ASCII bouncer.
-# Images are rendered at build time; the script only fades, bounces and blinks.
+# Boot splash "gavos": the text logo (same as the screensaver) and a bouncing bar.
+# The pictures are made here; plymouth-gavos.script animates them.
 {
   runCommand,
   figlet,

@@ -1,5 +1,5 @@
-# Gaming: Steam (+extest, protontricks), gamescope, gamemode tuning,
-# game-friendly sysctls, and the novpn and hdr-game launch-option wrappers.
+# Gaming: Steam, gamescope, GameMode, kernel settings for games, and the
+# novpn and hdr-game launch options.
 {
   config,
   pkgs,
@@ -8,9 +8,9 @@
 }:
 
 let
-  # Hyprland's fullscreen window rule is skipped when the window maps without initial
-  # focus (e.g. a ProtonFixes popup just closed), so make new game windows fullscreen here.
-  # The "windowed" tag comes from dotfiles hypr/rule.lua.
+  # Hyprland skips its fullscreen rule when a game opens without focus (e.g. right
+  # after a ProtonFixes popup), so this does it. Games tagged "windowed" in
+  # dotfiles hypr/rule.lua are left alone.
   gameFullscreen = pkgs.writeShellScript "game-fullscreen" ''
     jq=${pkgs.jq}/bin/jq
     ${pkgs.socat}/bin/socat -U - UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" |
@@ -27,7 +27,8 @@ let
   '';
 in
 {
-  # Upstream's binary cache for the Deadlock Mod Manager flake input.
+  # --- Deadlock Mod Manager ---
+  # Download it prebuilt instead of compiling it.
   nix.settings = {
     substituters = [ "https://deadlock-mod-manager.cachix.org" ];
     trusted-public-keys = [
@@ -35,6 +36,7 @@ in
     ];
   };
 
+  # --- Fullscreen new game windows ---
   systemd.user.services.game-fullscreen = {
     description = "Fullscreen new game windows on Hyprland";
     wantedBy = [ "graphical-session.target" ];
@@ -47,38 +49,41 @@ in
     };
   };
 
+  # --- Steam ---
   programs.steam = {
     enable = true;
-    # Steam guesses UI scale from the X11 primary at launch; Sunshine's 0mm virtual output made it huge.
+    # Stops Steam's windows coming up huge after a Sunshine stream.
     package = pkgs.steam.override { extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1"; };
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
     extraCompatPackages = with pkgs; [ proton-ge-bin ];
-    # Controller-as-mouse comes in as XTEST (X11-only, dead on Wayland);
-    # extest rewrites it into real uinput events.
-    extest.enable = true;
+    extest.enable = true; # makes controller-as-mouse work on Wayland
     protontricks.enable = true;
   };
 
-  # HDR + VRR scaler; use --hdr-enabled for the AW3423DW
+  # --- Gamescope ---
   programs.gamescope = {
     enable = true;
-    capSysNice = true; # lets gamescope keep its compositor thread scheduled under load
+    capSysNice = true; # keeps it smooth when the CPU is busy
   };
 
-  # Screen recording from sysmenu → Capture; the wrapper skips the permission prompt.
+  # --- Screen recording ---
+  # Used by the menu's Capture entry.
   programs.gpu-screen-recorder.enable = true;
 
-  # enable lives in services.nix; this is what gamemode does when a game starts.
+  # --- GameMode ---
+  # Switched on in base/services.nix; this is what it does when a game starts.
   programs.gamemode.settings = {
     general = {
-      desiredgov = "performance"; # switch CPU governor while gaming
-      softrealtime = "auto"; # real-time scheduling if available
-      reaper_freq = 5; # poll interval (seconds)
+      desiredgov = "performance";
+      softrealtime = "auto";
+      reaper_freq = 5; # seconds between checks
       inhibit_screensaver = 1;
     };
   };
 
+  # --- Kernel settings ---
+  # ntsync: faster Windows-game sync for Proton.
   boot.kernelModules = [ "ntsync" ];
   services.udev.extraRules = ''
     KERNEL=="ntsync", MODE="0644"
@@ -86,20 +91,20 @@ in
 
   services.scx-loader = {
     enable = true;
-    config.default_sched = "scx_bpfland"; # scx_lavd RCU-stalls the whole system on kernel 7.2.0+
+    config.default_sched = "scx_bpfland"; # not scx_lavd: it freezes the PC on kernel 7.2+
   };
 
   boot.kernel.sysctl."vm.max_map_count" = 2147483642;
 
-  # Split-lock mitigation throttles cores on misaligned atomics — several
-  # Proton games trip it constantly (huge stutter). No untrusted tenants: off.
+  # Left on, this makes several Proton games stutter badly.
   boot.kernel.sysctl."kernel.split_lock_mitigate" = 0;
 
-  # Lutris's sandbox still bundles gtk2, which nixpkgs now marks broken (removed by 27.05).
+  # --- Lutris fixes ---
+  # Lutris still bundles gtk2, which nixpkgs marks broken.
   nixpkgs.config.problems.handlers."gtk+".broken = "ignore";
 
-  # gnome-desktop 51 dropped GnomeDesktop.RRScreen; Lutris 0.5.22 crashes at startup
-  # instead of falling back to xrandr. Drop once Lutris catches it upstream.
+  # Lutris 0.5.22 crashes at startup with the current gnome-desktop.
+  # Drop this once Lutris fixes it.
   nixpkgs.overlays = [
     (final: prev: {
       lutris-unwrapped = prev.lutris-unwrapped.overrideAttrs (o: {
@@ -111,15 +116,16 @@ in
     })
   ];
 
+  # --- Programs ---
   environment.systemPackages = with pkgs; [
-    # `novpn %command%`: game outside the Mullvad tunnel via daemon RPC — setuid
-    # mullvad-exclude dies in Steam's nosuid sandbox; exec keeps the PID.
+    # `novpn %command%`: runs a game outside the VPN. mullvad-exclude
+    # doesn't work inside Steam, so this asks the Mullvad service instead.
     (writeShellScriptBin "novpn" ''
       mullvad split-tunnel add $$ >/dev/null 2>&1 || true
       exec "$@"
     '')
-    # `hdr-game %command%`: native Wayland + HDR at the desk (SDL covers native Linux
-    # games); Remote Play can't capture Wayland game windows, so streamed launches stay on XWayland.
+    # `hdr-game %command%`: HDR when playing at the desk. Streamed launches
+    # are left alone, Remote Play can't capture HDR game windows.
     (writeShellScriptBin "hdr-game" ''
       if [ "''${SteamStreaming:-0}" != 1 ]; then
         export PROTON_ENABLE_WAYLAND=1 PROTON_ENABLE_HDR=1 SDL_VIDEODRIVER=wayland
@@ -127,9 +133,8 @@ in
       exec "$@"
     '')
     lutris
-    wowup-cf # WoW addon manager (CurseForge, Wago, GitHub)
+    wowup-cf # WoW addon manager
     mangohud
     inputs.deadlock-mod-manager.packages.${pkgs.stdenv.hostPlatform.system}.default
-    # obs-studio and plugins managed via programs.obs-studio in home/apps/programs.nix
   ];
 }

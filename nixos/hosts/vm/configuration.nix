@@ -1,5 +1,5 @@
-# Build-only target: checks the shared modules without the desktop's hardware
-# (no GPU, Bluetooth or gaming). No VM is deployed from it.
+# Test build only: checks the shared settings without the desktop's hardware
+# (no GPU, Bluetooth or gaming). No real VM runs from it.
 { lib, ... }:
 
 {
@@ -10,22 +10,19 @@
 
   boot.loader.grub.device = "/dev/sda";
 
-  # QEMU guest agent, so the config stays bootable as a VM if ever deployed
+  # --- VM helpers ---
+  # So it would still boot and be usable if it ever did run as a VM.
   services.qemuGuest.enable = true;
+  services.spice-vdagentd.enable = true; # clipboard and auto-resize
 
-  # SPICE agent — clipboard passthrough + dynamic resolution in a VM console
-  services.spice-vdagentd.enable = true;
-
-  # virtio-gpu / llvmpipe is enough for the wlroots compositors; no GPU config here.
+  # --- Graphics ---
+  # No real GPU, so let the desktop draw in software.
   hardware.graphics.enable = true;
-
-  # Let wlroots compositors fall back to software rendering when the
-  # VM exposes no usable GPU acceleration.
   environment.sessionVariables.WLR_RENDERER_ALLOW_SOFTWARE = "1";
 
-  # Desktop-hardware services that make no sense in a VM.
-  # mkForce because nixos/base/services.nix enables them for the physical machine.
-  hardware.bluetooth.enable = lib.mkForce false; # no BT in VM
+  # --- Switched off here ---
+  # base/services.nix turns these on for the real PC.
+  hardware.bluetooth.enable = lib.mkForce false;
   services.blueman.enable = lib.mkForce false;
-  programs.gamemode.enable = lib.mkForce false; # pointless without a GPU
+  programs.gamemode.enable = lib.mkForce false;
 }
