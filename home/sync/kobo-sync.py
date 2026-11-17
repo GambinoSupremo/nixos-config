@@ -1,5 +1,5 @@
-# Kobo reading log -> Obsidian Books notes (manga/comic volumes -> one Comics note per series),
-# for books you've opened. Reads a copy of KoboReader.sqlite; covers from the Kobo's cache.
+# Books I've opened on the Kobo -> Obsidian Books notes. Comic volumes share one
+# Comics note per series. Reads a copy of the Kobo's database and its cover cache.
 import json
 import os
 import re

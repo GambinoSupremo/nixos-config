@@ -1,6 +1,6 @@
-# Steam playtime -> Obsidian daily notes ("## Played" plus a gamesPlayed property), worked out
-# from Steam's own game process log, plus non-Steam games seen by `--watch`.
-# Recomputes the last two weeks each run, so it's safe to rerun.
+# Game playtime -> Obsidian daily notes ("## Played" plus a gamesPlayed property).
+# Steam games come from Steam's own log; others (WoW) from `--watch`.
+# Redoes the last two weeks each run, so it's safe to rerun.
 import json
 import os
 import re

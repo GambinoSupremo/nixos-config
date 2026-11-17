@@ -61,7 +61,7 @@ let
         esac
       }
 
-      # gpu-screen-recorder with desktop audio; Ctrl-C (SIGINT) finishes the file.
+      # Record the screen with desktop audio. Ctrl-C finishes the file.
       record() {
         local dir=$HOME/Videos/Recordings
         mkdir -p "$dir"
@@ -171,7 +171,7 @@ let
         esac
       }
 
-      # Optional extra top-level entries, one "Label<tab>command[<tab>glyph]" per line.
+      # Extra menu entries, one "Label<tab>command[<tab>icon]" per line.
       declare -A extras=()
       extra_file=$HOME/.config/sysmenu/extra
       if [ -r "$extra_file" ]; then
@@ -180,8 +180,8 @@ let
         done <"$extra_file"
       fi
 
-      # Bare `sysmenu` opens the icon menu (Noctalia plugin gav/sysmenu, `/sys`).
-      # `sysmenu <section> [item]` runs a section or one entry directly.
+      # `sysmenu` alone opens the icon menu (Noctalia plugin gav/sysmenu).
+      # `sysmenu <section> [item]` opens one section or runs one entry.
       item=''${2:-}
       case "''${1:-}" in
         "") n panel-toggle launcher "/sys " ;;

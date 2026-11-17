@@ -1,5 +1,5 @@
-# Battle.net often stalls before it tries to sign in (cause unknown); a restart clears it far
-# sooner than waiting. Exits 0 once signed in or WoW is running, 1 if it gave up.
+# Battle.net often gets stuck before signing in; restarting it is faster than waiting.
+# Exits 0 once signed in or WoW is running, 1 if it gave up.
 logs="$HOME/Games/battlenet/drive_c/users/steamuser/AppData/Local/Battle.net/Logs"
 prefix="$HOME/Games/battlenet/pfx/"
 # Anchored on the Windows path: launcher shells keep Battle.net.exe in their args after it exits.

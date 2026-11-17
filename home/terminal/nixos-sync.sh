@@ -1,5 +1,5 @@
-# nixos-sync apply|update|dotsync|save — backs the fish helpers in home/terminal/shell.nix.
-# NIXOS_SYNC_HOST (the flake output name) is set by writeShellApplication.
+# The work behind my apply, update, dotsync and save commands (home/terminal/shell.nix).
+# NIXOS_SYNC_HOST says which system to build (desktop or vm); shell.nix sets it.
 
 flake_dir="$HOME/nixos-config"
 host="${NIXOS_SYNC_HOST:?}"

@@ -50,9 +50,8 @@ let
     + ''
       source = optional:/home/gav/.config/hypr/noctalia/noctalia-colors.conf
 
-      # ── NixOS additions ─────────────────────────────────────────────────────────
-      # Minimal fallback so the session is never a dead end if hyprland.lua fails.
-      # Matched by EDID description (connector names renumber); wildcard catch-all.
+      # Monitors are matched by name because the port numbers change.
+      # The last line catches any other screen.
       monitor = desc:Dell Inc. Dell AW3423DW #tBszGDAYBQUH, 3440x1440@174, 0x0, 1
       monitor = desc:Philips Consumer Electronics Company PHL 278E1 0x0000065F, 3840x2160@60, 3440x0, 1.5
       monitor = , preferred, auto, 1
@@ -66,7 +65,7 @@ let
       bind = SUPER SHIFT, E, exit
       bind = SUPER SHIFT, D, exec, mullvad-exclude vesktop
       bind = SUPER, code:51, exec, noctalia msg panel-toggle control-center audio
-      # Per-app opacity, same values as niri
+      # Slightly see-through windows
       windowrule = match:class ^(signal)$, opacity 0.95 0.90
       windowrule = match:class ^(vesktop)$, opacity 0.95 0.90
       windowrule = match:class ^(obsidian)$, opacity 0.95 0.90

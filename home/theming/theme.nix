@@ -59,7 +59,7 @@ let
         (sleep 3; noctalia msg greeter-sync >/dev/null 2>&1) 9>&- &
       }
 
-      # Step through the current mode's themes (wraps); bar button scroll and Super+Ctrl+T.
+      # Next or previous theme in the current mode (bar scroll, Super+Ctrl+T).
       step() {
         local list cur i n
         cur=$(current)

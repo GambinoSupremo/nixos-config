@@ -13,14 +13,14 @@ let
       pkgs.gawk
     ];
     text = ''
-      # papirus-accent [#hex]: no arg = last accent (or Noctalia's template output).
+      # With no color given, use the one Noctalia wrote, or the last one used.
       state="''${XDG_STATE_HOME:-$HOME/.local/state}/papirus-accent"
       hex=''${1:-$(head -1 "$HOME/.cache/noctalia/papirus-accent" 2>/dev/null || cat "$state" 2>/dev/null || true)}
       hex=''${hex//[# ]/}
       [ ''${#hex} -ge 6 ] || exit 0
       [ -d "$HOME/.local/share/icons/Papirus-Dark" ] || exit 0
 
-      # Nearest folder color by HSV distance; hue counts most, scaled by saturation.
+      # Pick the closest folder color. Hue counts most.
       color=$(awk -v hex="''${hex:0:6}" '
         function hsv(x,  r,g,b,mx,mn,d,h) {
           r = strtonum("0x" substr(x,1,2))/255; g = strtonum("0x" substr(x,3,2))/255
