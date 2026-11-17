@@ -17,7 +17,9 @@ lib.mkIf (!host.isVM) {
   services.voxtype = {
     enable = true;
     # Temporary: the package is missing sqlite (nixpkgs, Nov 2026).
-    package = pkgs.voxtype-vulkan.overrideAttrs (o: { buildInputs = o.buildInputs ++ [ pkgs.sqlite ]; });
+    package = pkgs.voxtype-vulkan.overrideAttrs (o: {
+      buildInputs = o.buildInputs ++ [ pkgs.sqlite ];
+    });
     settings = {
       state_file = "auto"; # needed by `voxtype record toggle`
       hotkey.enabled = false; # the compositor bind does it
@@ -40,7 +42,12 @@ lib.mkIf (!host.isVM) {
   };
   # The service needs sh and hyprctl on its PATH for the two commands above.
   systemd.user.services.voxtype.Service.Environment = lib.mkForce [
-    "PATH=${lib.makeBinPath [ pkgs.coreutils pkgs.which ]}:/run/current-system/sw/bin"
+    "PATH=${
+      lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.which
+      ]
+    }:/run/current-system/sw/bin"
     "XDG_RUNTIME_DIR=%t"
   ];
 }
