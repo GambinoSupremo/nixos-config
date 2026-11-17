@@ -79,7 +79,6 @@
     pcloud # pCloud Drive (Electron); unfree
     signal-desktop
     vesktop # Discord
-    # zen-browser moved to home-manager (home/apps/zen.nix, programs.zen-browser)
     mpv
     nomacs # the image viewer, Canon RAW included; defaults in home/apps/programs.nix
     nautilus
@@ -93,7 +92,6 @@
     # ── Media ────────────────────────────────────────────────────────────────
     spotify # was spotify-launcher (AUR downloader wrapper)
     sone # TIDAL; plays each track at its native sample rate
-    cider-2 # Apple Music (cider.sh 4.x); plain `cider` is the dead 1.x fork
 
     # ── Gaming / Streaming ────────────────────────────────────────────────────
     # obs-studio and plugins managed via programs.obs-studio in home/apps/programs.nix
