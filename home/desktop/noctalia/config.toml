@@ -10,7 +10,8 @@ font_weight = 400
 margin_edge = 0
 margin_ends = 0
 scale = 0.90000000596046448
-thickness = 24
+thickness = 19
+capsule_thickness = 0.96 # pills stay ~18px
 shadow = false
 contact_shadow = false
 
