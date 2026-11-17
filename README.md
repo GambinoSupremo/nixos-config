@@ -69,7 +69,8 @@ docs/                notes on why things are the way they are
 | Steam and game launch wrappers | `nixos/features/gaming.nix` |
 | Streaming and virtual display | `nixos/features/sunshine.nix` |
 | GPU and system tuning | `nixos/features/amd.nix`, `tuning.nix` |
-| Dotfile deployment, Noctalia | `home/desktop/dotfiles.nix` |
+| Dotfile deployment | `home/desktop/dotfiles.nix` |
+| Noctalia bar, first-run copies | `home/desktop/noctalia.nix` |
 | Noctalia defaults for a new install | `home/desktop/noctalia/config.toml` |
 | System menu, keybind cheatsheet | `home/desktop/menu.nix` |
 | GTK, Qt, cursor, Nautilus sidebar | `home/theming/gtk-cursor.nix` |
@@ -77,7 +78,8 @@ docs/                notes on why things are the way they are
 | Browser, search, privacy | `home/apps/zen.nix` |
 | Web apps | `home/apps/webapps.nix` |
 | Default apps, launchers, screenshots | `home/apps/programs.nix` |
-| Shell aliases and prompt | `home/terminal/shell.nix` |
+| Shell aliases | `home/terminal/shell.nix` |
+| Prompt | `home/terminal/starship.nix` |
 | Git and SSH | `home/terminal/git.nix` |
 | Neovim and editing tools | `home/terminal/editors.nix` |
 | Battle.net and WoW launcher | `home/gaming/battlenet.nix` |

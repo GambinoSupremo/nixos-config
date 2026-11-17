@@ -63,7 +63,7 @@
     playerctl
     xrandr
     # noctalia — v5, managed by the upstream HM module (programs.noctalia)
-    #            in home/desktop/dotfiles.nix; runs as noctalia.service
+    #            in home/desktop/noctalia.nix; runs as noctalia.service
 
     # ── Themes / Appearance ───────────────────────────────────────────────────
     bibata-cursors # was bibata-cursor-theme-bin (AUR)
