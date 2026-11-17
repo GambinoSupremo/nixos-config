@@ -1,15 +1,13 @@
-# System-wide packages; anything owned by a NixOS module or HM programs.* is
-# deliberately absent. git + neovim duplicated on purpose for root/TTY recovery.
+# Programs installed for everyone. Anything with its own settings block
+# (Steam, fish, OBS...) is switched on where those settings live instead.
 { pkgs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
 
-    # ── Shell / Terminal ──────────────────────────────────────────────────────
-    # fish registered system-wide via programs.fish in users.nix
-    # starship / bat / fzf / zoxide: HM-owned — home/terminal/shell.nix
+    # --- Terminal ---
     ghostty
-    eza # stays: only aliased (no programs.eza) in home/terminal/shell.nix
+    eza
     ripgrep
     fd
     tree
@@ -17,95 +15,84 @@
     wget
     curl
 
-    # ── File management ───────────────────────────────────────────────────────
+    # --- Files ---
     rsync
     unrar
     unzip
 
-    # ── Editors ───────────────────────────────────────────────────────────────
-    neovim # `vim` runs nvim too (wrapper in home/terminal/editors.nix)
+    # --- Editors ---
+    neovim # here as well as in home/, so root has it for repairs
     nano
     zed-editor
 
-    # ── Dev tools ─────────────────────────────────────────────────────────────
+    # --- Dev tools ---
     git
     github-cli
-    nil # Nix language server — Zed's Nix extension shells out to it
-    jq # JSON CLI; required by niri
+    nil # Nix language server for Zed
+    jq
     python3
-    # Keeper Commander CLI; not in nixpkgs. Pinned release, deps resolved as of its
-    # release date. Python 3.13 because keeper-mlkem has no 3.14 wheel yet.
+    # Keeper Commander isn't in nixpkgs, so run a pinned release through uv.
+    # Python 3.13 because one of its parts has no 3.14 build yet.
     (writeShellScriptBin "keeper" ''
       exec ${uv}/bin/uv tool run --no-python-downloads --python ${python313}/bin/python3.13 \
         --exclude-newer 2026-10-09T00:00:00Z --from keepercommander==18.1.8 keeper "$@"
     '')
 
-    # ── System utilities ──────────────────────────────────────────────────────
+    # --- System info ---
     fastfetch
     dmidecode
     smartmontools
     usbutils
     pciutils # lspci
-    ddcutil # monitor settings over DDC/CI; needs hardware.i2c in services.nix
+    ddcutil # monitor settings
     dnsutils # dig, nslookup
 
-    # ── Wayland tooling ───────────────────────────────────────────────────────
-    # niri registered via programs.niri in desktop.nix
+    # --- Desktop tools ---
     cliphist
     grim
     slurp
     wl-clipboard
-    hyprshutdown # Hyprland Ctrl+Alt+Delete (clean logout)
-    glib.bin # gsettings, for the dark-mode line in compositor autostarts
+    hyprshutdown # clean logout on Ctrl+Alt+Delete
+    glib.bin # gsettings
     wlr-randr
     wtype
     wev
     playerctl
     xrandr
-    # noctalia — v5, managed by the upstream HM module (programs.noctalia)
-    #            in home/desktop/noctalia.nix; runs as noctalia.service
 
-    # ── Themes / Appearance ───────────────────────────────────────────────────
-    bibata-cursors # was bibata-cursor-theme-bin (AUR)
+    # --- Themes ---
+    bibata-cursors
     papirus-icon-theme
-    adw-gtk3 # was adw-gtk-theme
-    qt6Packages.qt6ct # top-level qt6ct became a throw alias 2025-10-27
-    kdePackages.breeze # was breeze
-    # kvantum intentionally NOT system-wide (it black-screened plasmashell when
-    # Plasma was installed; see docs/decisions.md). Per-user + QT_STYLE_OVERRIDE if wanted.
+    adw-gtk3
+    qt6Packages.qt6ct
+    kdePackages.breeze
+    # No kvantum here: it black-screened Plasma (docs/decisions.md).
 
-    # ── Applications ─────────────────────────────────────────────────────────
+    # --- Apps ---
     obsidian
-    pcloud # pCloud Drive (Electron); unfree
+    pcloud
     signal-desktop
     vesktop # Discord
     mpv
-    nomacs # the image viewer, Canon RAW included; defaults in home/apps/programs.nix
+    nomacs # image viewer
     nautilus
     gnome-disk-utility
     pavucontrol
     qbittorrent
-    matugen # material color generation from wallpaper
+    matugen # colors from the wallpaper
     firefox
     tutanota-desktop
 
-    # ── Media ────────────────────────────────────────────────────────────────
-    spotify # was spotify-launcher (AUR downloader wrapper)
-    sone # TIDAL; plays each track at its native sample rate
+    # --- Music ---
+    spotify
+    sone # TIDAL
 
-    # ── Gaming / Streaming ────────────────────────────────────────────────────
-    # obs-studio and plugins managed via programs.obs-studio in home/apps/programs.nix
+    # --- Gaming ---
     protonplus
 
-    # ── Networking ────────────────────────────────────────────────────────────
-    # mullvad-vpn comes from the services.mullvad-vpn module (keeps daemon + GUI
-    # matched); pkgs.mullvad (headless) lags and would shadow the CLI — keep out.
+    # Mullvad comes from its service (networking.nix). Don't add pkgs.mullvad:
+    # it's an older build and would replace the mullvad command.
 
-    # ── Misc ─────────────────────────────────────────────────────────────────
-    # pipewire / wireplumber managed via services.pipewire in audio.nix
-    # gamemode managed via programs.gamemode in services.nix
-    # keyd managed via services.keyd in services.nix
-
-    pywalfox-native # native messaging host for the Pywalfox browser extension
+    pywalfox-native # lets Zen follow the theme colors
   ];
 }

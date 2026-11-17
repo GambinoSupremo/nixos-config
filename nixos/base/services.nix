@@ -1,10 +1,9 @@
-# Hardware and misc system services shared by all hosts. The VM host
-# force-disables the physical-hardware ones (nixos/hosts/vm).
+# Background services every host gets: keyboard remaps, Bluetooth, printer,
+# SSH. The VM switches the hardware ones off (nixos/hosts/vm).
 { pkgs, lib, ... }:
 
 let
-  # Modifier combos must live in a layer named after the modifier:
-  # [main] can't bind "super+c". Unlisted keys fall through with Super held.
+  # Super+Z/X/C/V = undo, cut, copy, paste.
   meta = {
     z = "C-z";
     x = "S-delete";
@@ -13,31 +12,27 @@ let
   };
 in
 {
-  # ── Bluetooth ─────────────────────────────────────────────────────────────────
-  # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
+  # --- Bluetooth ---
   hardware.bluetooth.enable = true;
-  services.blueman.enable = true; # system tray + pairing GUI
-  # Intel AX210 USB autosuspend drops BLE links (Lily58 reconnect loops).
+  services.blueman.enable = true;
+  # USB power saving on the Bluetooth chip makes keyboards drop and reconnect.
   boot.extraModprobeConfig = "options btusb enable_autosuspend=0";
 
-  # ── Key remapping ─────────────────────────────────────────────────────────────
-  # keyd — Mac-style edit keys in every app and terminal: Super+Z/X/C/V →
-  # undo, cut, copy, paste. Applies with Shift/Ctrl/Alt held too, so compositors
-  # must never bind Super with these letters.
+  # --- Key remapping (keyd) ---
+  # The Super+Z/X/C/V keys work in every app, so the desktop must never
+  # bind Super with those letters.
   services.keyd = {
     enable = true;
     keyboards = {
-      # Caps Lock = push-to-talk. Sends Numpad 0 so game binds and the Hyprland
-      # vesktop-mic bind (code:90) keep working.
+      # Caps Lock = push-to-talk (sends Numpad 0).
       default = {
-        ids = [ "*" ]; # devices listed below get their own config instead
+        ids = [ "*" ]; # every keyboard not listed below
         settings = {
           main.capslock = "kp0";
           inherit meta;
         };
       };
-      # QK75 (wired, 2.4G): same as default, plus knob press = Numpad 3 (Discord mute).
-      # Stock SONiX firmware has no VIA, so the remap lives here.
+      # QK75: the same, plus knob press = Numpad 3 (Discord mute).
       qk75 = {
         ids = [
           "k:0c45:8017"
@@ -53,17 +48,16 @@ in
       };
     };
   };
-  environment.systemPackages = [ pkgs.keyd ]; # `sudo keyd monitor`
+  environment.systemPackages = [ pkgs.keyd ]; # for `sudo keyd monitor`
 
-  # ── DDC/CI (monitor control) ──────────────────────────────────────────────────
-  # i2c-dev + an i2c group so ddcutil can talk to the monitors without sudo.
+  # --- Monitor control ---
+  # Lets ddcutil talk to the monitors without sudo.
   hardware.i2c.enable = true;
 
-  # ── GameMode ──────────────────────────────────────────────────────────────────
-  # Overridden to false in nixos/hosts/vm/configuration.nix; enable on physical machine.
+  # --- GameMode ---
   programs.gamemode.enable = true;
 
-  # ── SSH ───────────────────────────────────────────────────────────────────────
+  # --- SSH ---
   services.openssh = {
     enable = true;
     settings = {
@@ -72,26 +66,24 @@ in
     };
   };
 
-  # ── locate / plocate ──────────────────────────────────────────────────────────
+  # --- File search (locate) ---
   services.locate = {
     enable = true;
     package = pkgs.plocate;
-    interval = "daily"; # Avoid hourly tree scans; locate results may be a day behind.
+    interval = "daily"; # results can be a day behind
   };
 
-  # ── Power profiles daemon ─────────────────────────────────────────────────────
+  # --- Power profiles ---
   services.power-profiles-daemon.enable = true;
 
-  # ── gvfs (SMB / network browsing) ────────────────────────────────────────────
-  # Needed for Nautilus to browse SMB shares (replaces gvfs-smb).
-  services.gvfs.enable = true;
-  # Sushi: Space in Nautilus previews the selected file.
-  services.gnome.sushi.enable = true;
+  # --- Nautilus extras ---
+  services.gvfs.enable = true; # browse network shares
+  services.gnome.sushi.enable = true; # Space previews a file
 
-  # ── Printing ──────────────────────────────────────────────────────────────────
-  # Brother HL-L2340D at its reserved IP; driverless IPP Everywhere, no Brother driver.
+  # --- Printing ---
+  # Brother HL-L2340D on the network, no Brother driver needed.
   services.printing.enable = true;
-  # Setting up the printer fails while it's asleep; don't let that stop CUPS at boot.
+  # Printer setup fails while it's asleep; don't let that stop printing at boot.
   systemd.services.cups.postStart = lib.mkBefore "set +e";
   hardware.printers = {
     ensurePrinters = [
@@ -106,7 +98,7 @@ in
     ensureDefaultPrinter = "Brother";
   };
 
-  # ── Firmware updates ──────────────────────────────────────────────────────────
-  # SSD/BIOS/peripheral firmware via LVFS: fwupdmgr get-updates && fwupdmgr update
+  # --- Firmware updates ---
+  # fwupdmgr get-updates && fwupdmgr update
   services.fwupd.enable = true;
 }

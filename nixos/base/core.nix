@@ -1,20 +1,14 @@
-# Shared basics for every host: locale/time, nix daemon + GC settings,
-# allowUnfree, stateVersion. Kernel and boot loader are per-host.
+# Basics for every host: time zone, Nix settings, cleanup of old builds.
+# Boot loader and kernel are per host (nixos/hosts/).
 { pkgs, ... }:
 
 {
-  # ── Boot ─────────────────────────────────────────────────────────────────────
-  # Boot loader, kernel, and Plymouth are all per-host (nixos/hosts/*).
-  # Don't re-add chaotic-nyx for linux-cachyos: its module forces from-source
-  # rebuilds of the base system and its overlay drops allowUnfree (breaks Steam).
-
-  # ── Locale / Time ─────────────────────────────────────────────────────────────
+  # --- Locale and time ---
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # ── Nix ───────────────────────────────────────────────────────────────────────
-  # nh: progress tree + package diff for switches (used by update/dotsync).
-  # Cleaning stays with nix.gc below.
+  # --- Nix ---
+  # nh shows the progress tree and package diff when switching.
   programs.nh = {
     enable = true;
     flake = "/home/gav/nixos-config";
@@ -28,9 +22,9 @@
       ];
       auto-optimise-store = true;
       warn-dirty = false;
-      # Avoids "download buffer is full" stalls on big updates.
+      # Stops "download buffer is full" stalls on big updates.
       download-buffer-size = 1024 * 1024 * 1024;
-      # Below 5 GiB free, GC during builds until 15 GiB is free.
+      # Under 5 GiB free, clean up during builds until 15 GiB is free.
       min-free = 5 * 1024 * 1024 * 1024;
       max-free = 15 * 1024 * 1024 * 1024;
     };
@@ -42,8 +36,11 @@
     };
   };
 
-  # ── nix-ld ────────────────────────────────────────────────────────────────────
-  # Lets prebuilt developer tools find a loader outside the Nix store.
+  # Obsidian, Steam, Spotify and friends.
+  nixpkgs.config.allowUnfree = true;
+
+  # --- Prebuilt programs ---
+  # nix-ld lets downloaded binaries find the libraries they expect.
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     stdenv.cc.cc.lib
@@ -52,10 +49,7 @@
     icu
   ];
 
-  # Required for obsidian, steam, spotify, etc.
-  nixpkgs.config.allowUnfree = true;
-
-  # ── System version ────────────────────────────────────────────────────────────
-  # Do NOT change after first install — controls stateful service migrations.
+  # --- System version ---
+  # Never change this after install.
   system.stateVersion = "26.05";
 }

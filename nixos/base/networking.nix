@@ -1,30 +1,24 @@
-# NetworkManager, nftables firewall, Mullvad daemon, systemd-resolved.
+# Network, firewall, Mullvad VPN and DNS.
 _:
 
 {
   networking = {
     networkmanager.enable = true;
-
-    # NixOS firewall wraps nftables directly — ufw is not needed.
-    # Open specific ports here rather than via ufw rules.
-    firewall = {
-      enable = true;
-      # Sunshine streaming ports are opened by services.sunshine.openFirewall
-      # (nixos/features/sunshine.nix).
-    };
+    # Sunshine opens its own ports (nixos/features/sunshine.nix).
+    firewall.enable = true;
   };
 
-  # Mullvad daemon. First boot: mullvad account login
+  # --- Mullvad ---
+  # After a fresh install: mullvad account login
   services.mullvad-vpn = {
     enable = true;
     gui.enable = true;
   };
 
-  # systemd-resolved for local DNS caching.
-  # DNSSEC must be false — it breaks Mullvad's DNS.
+  # --- DNS ---
+  # DNSSEC stays off, it breaks Mullvad's DNS. Don't set domains here either.
   services.resolved = {
     enable = true;
     settings.Resolve.DNSSEC = "false";
-    # Don't set domains = [ "~." ] here — let Mullvad manage the split-tunnel DNS
   };
 }

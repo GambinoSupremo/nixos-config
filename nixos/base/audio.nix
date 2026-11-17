@@ -1,23 +1,22 @@
-# PipeWire audio stack: ALSA + PulseAudio shims, WirePlumber, rtkit.
+# Sound: PipeWire, sample rates, and friendly names for my devices.
 _:
 
 {
-  # rtkit lets PipeWire claim real-time scheduling priority safely
-  security.rtkit.enable = true;
+  security.rtkit.enable = true; # lets PipeWire run at high priority
 
   services.pipewire = {
     enable = true;
     alsa.enable = true;
-    alsa.support32Bit = true; # required for 32-bit apps and Steam (lib32-pipewire)
-    pulse.enable = true; # PulseAudio compatibility shim
-    # jack.enable = true;        # enable if you use JACK audio apps
+    alsa.support32Bit = true; # Steam and other 32-bit apps
+    pulse.enable = true;
 
-    # x11-bell module segfaults PipeWire when Xwayland exits (kills Vesktop audio)
+    # This module crashes PipeWire when Xwayland exits (kills Vesktop audio).
     extraConfig.pipewire."99-no-x11-bell" = {
       "context.properties"."module.x11.bell" = false;
     };
 
-    # let the graph switch to the stream's native rate instead of resampling to 48k
+    # --- Sample rates ---
+    # Play each stream at its own rate instead of converting everything to 48k.
     extraConfig.pipewire."99-sample-rates" = {
       "context.properties"."default.clock.rate" = 44100;
       "context.properties"."default.clock.allowed-rates" = [
@@ -32,7 +31,7 @@ _:
       ];
     };
 
-    # best-quality resampler for when streams at different rates share the DAC (default 4)
+    # Best conversion quality when two rates do have to share the DAC.
     extraConfig.client."99-resample-quality" = {
       "stream.properties"."resample.quality" = 10;
     };
@@ -40,7 +39,8 @@ _:
       "stream.properties"."resample.quality" = 10;
     };
 
-    # hide GPU HDMI/DP audio (AW3423DW) and give the outputs friendly names
+    # --- Devices ---
+    # Hide the monitor's audio and the onboard line-in; name the rest.
     wireplumber.extraConfig."99-audio-devices"."monitor.alsa.rules" = [
       {
         matches = [ { "device.name" = "alsa_card.pci-0000_03_00.1"; } ];
@@ -67,7 +67,6 @@ _:
           "node.nick" = "Mic";
         };
       }
-      # hide onboard line-in only; Speakers output stays on
       {
         matches = [ { "node.name" = "alsa_input.pci-0000_12_00.6.analog-stereo"; } ];
         actions.update-props."node.disabled" = true;

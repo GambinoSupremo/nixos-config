@@ -1,5 +1,5 @@
-# Graphical stack: Noctalia Greeter (greetd) plus Hyprland, optional Mango and Niri sessions, with
-# portals, keyring, and fonts.
+# The desktop: login screen, Hyprland (plus Mango and Niri, switched off),
+# file dialogs, keyring and fonts.
 {
   config,
   lib,
@@ -11,41 +11,35 @@ let
   cfg = config.gav.sessions;
 in
 {
-  # Spare compositors. Off by default; their configs stay in the dotfiles, and
-  # home-manager and Sunshine follow these too. (Umbriel trial removed 2026-11-16;
-  # it's in git history.)
   options.gav.sessions = {
     mango = lib.mkEnableOption "the Mango session";
     niri = lib.mkEnableOption "the niri session";
   };
 
   config = {
-    # ── Compositors ───────────────────────────────────────────────────────────────
-    # Flip either to true to bring that session back on the login screen.
+    # --- Which desktops are on ---
+    # Set one to true to get it back on the login screen. Hyprland is always on.
     gav.sessions = {
-      mango = false; # paused 2026-11: Hyprland only for now
+      mango = false;
       niri = false;
     };
 
-    # Mango — nixpkgs module registers the session + wlr portal config. Its
-    # mango-session.target ships in share/systemd/user, which the module doesn't link.
+    # --- Mango and Niri ---
     programs.mango.enable = cfg.mango;
+    # Mango's session target isn't linked by its module.
     systemd.packages = lib.mkIf cfg.mango [ config.programs.mango.package ];
 
-    # Niri — nixpkgs module registers session + portal config.
     programs.niri.enable = cfg.niri;
-    # Niri's X11 support; the module doesn't install it.
+    # Niri needs this to run X11 apps.
     environment.systemPackages = lib.mkIf cfg.niri [ pkgs.xwayland-satellite ];
 
-    # Hyprland — primary/daily driver. Session env / noctalia startup driven by
-    # hyprSessionBootstrap in home/desktop/dotfiles.nix (the bare target raced noctalia).
+    # --- Hyprland ---
+    # Started through the session start script in home/desktop/dotfiles.nix.
     programs.hyprland = {
       enable = true;
-      # false alone doesn't drop the duplicate session entry — the package ships
-      # hyprland-uwsm.desktop itself; the symlinkJoin strips that one file.
       withUWSM = false;
-      # The module calls .override on the package, so the wrapper re-exposes it
-      # (re-stripping after any override) plus the attrs the module reads.
+      # Wrapped to leave one Hyprland entry on the login screen (the package
+      # ships a second one) and to send its startup text to the journal.
       package =
         let
           stripUwsmSession =
@@ -53,8 +47,6 @@ in
             pkgs.symlinkJoin {
               name = "hyprland-single-session";
               paths = [ hl ];
-              # Also send Hyprland's console output (startup banner) to the journal:
-              # greetd runs the session on the visible VT, so it flashed on login.
               postBuild = ''
                 rm $out/share/wayland-sessions/hyprland-uwsm.desktop
                 rm $out/share/wayland-sessions/hyprland.desktop
@@ -62,6 +54,7 @@ in
                   ${hl}/share/wayland-sessions/hyprland.desktop > $out/share/wayland-sessions/hyprland.desktop
               '';
               inherit (hl) version meta;
+              # The Hyprland module overrides the package, so pass that through.
               passthru = hl.passthru or { } // {
                 inherit (hl) man;
                 providedSessions = [ "hyprland" ];
@@ -72,9 +65,9 @@ in
         stripUwsmSession pkgs.hyprland;
     };
 
-    # ── Display Manager ───────────────────────────────────────────────────────────
-    # Noctalia Greeter on greetd; `noctalia msg greeter-sync` copies wallpaper,
-    # colours and monitor layout from the running shell.
+    # --- Login screen ---
+    # Noctalia Greeter. `noctalia msg greeter-sync` copies over the wallpaper,
+    # colors and monitor layout.
     services.displayManager.noctalia-greeter = {
       enable = true;
       passwordlessSyncUsers = [ "gav" ];
@@ -83,52 +76,45 @@ in
         name = "Bibata-Modern-Ice";
       };
     };
-    # greetd doesn't set XDG_DATA_DIRS, which is where the greeter looks for sessions.
+    # Tells the greeter where the list of sessions is.
     services.greetd.settings.default_session.command =
       lib.mkForce "env XDG_DATA_DIRS=${config.services.displayManager.sessionData.desktops}/share ${lib.getExe' config.services.displayManager.noctalia-greeter.package "noctalia-greeter-session"}";
 
-    # Fallback preselection only (the greeter remembers last-used); Hyprland is
-    # the daily driver.
+    # Only matters the first time; the greeter remembers the last one used.
     services.displayManager.defaultSession = "hyprland";
 
-    # ── XDG Portals ───────────────────────────────────────────────────────────────
-    # Each compositor module registers its own backends; only the shared fallback here.
+    # --- File dialogs and screen sharing (portals) ---
     xdg.portal = {
       enable = true;
-      extraPortals = [ pkgs.xdg-desktop-portal-gtk ]; # file dialogs everywhere
+      extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
       config.common.default = [ "gtk" ];
     };
 
-    # ── upower ────────────────────────────────────────────────────────────────────
-    # Required by Noctalia for the battery widget
-    services.upower.enable = true;
-
-    # ── Polkit ────────────────────────────────────────────────────────────────────
+    services.upower.enable = true; # Noctalia's battery widget
     security.polkit.enable = true;
 
-    # ── GNOME Keyring ─────────────────────────────────────────────────────────────
-    # Its PAM hook lands in `login`, which greetd's PAM includes, so it unlocks at the greeter.
+    # --- Keyring ---
+    # Unlocks with my password at the login screen.
     services.gnome.gnome-keyring.enable = true;
-    # Hyprland isn't started by systemd, so it never sees gcr-ssh-agent's
-    # SSH_AUTH_SOCK in the user manager; export it at login instead.
+    # Points Hyprland's apps at the keyring's SSH agent.
     environment.extraInit = ''
       if [ -z "$SSH_AUTH_SOCK" ] && [ -n "$XDG_RUNTIME_DIR" ]; then
         export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
       fi
     '';
 
-    # ── Fonts ─────────────────────────────────────────────────────────────────────
+    # --- Fonts ---
     fonts = {
       enableDefaultPackages = true;
       packages = with pkgs; [
         noto-fonts
-        noto-fonts-cjk-sans # was noto-fonts-cjk
-        noto-fonts-color-emoji # top-level noto-fonts-emoji became a throw alias 2025-10-27
-        dejavu_fonts # was ttf-dejavu
-        liberation_ttf # was ttf-liberation
-        open-sans # was ttf-opensans
+        noto-fonts-cjk-sans
+        noto-fonts-color-emoji
+        dejavu_fonts
+        liberation_ttf
+        open-sans
         ttf-bitstream-vera
-        nerd-fonts.meslo-lg # was ttf-meslo-nerd; kept as fallback
+        nerd-fonts.meslo-lg
         nerd-fonts.jetbrains-mono
       ];
       fontconfig.defaultFonts = {

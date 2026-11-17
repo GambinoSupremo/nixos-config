@@ -1,4 +1,4 @@
-# User account, groups, and login-shell registration.
+# My user account and its groups.
 { pkgs, ... }:
 
 {
@@ -8,19 +8,15 @@
     shell = pkgs.fish;
     extraGroups = [
       "wheel" # sudo
-      "networkmanager" # manage NetworkManager without sudo
-      "video" # brightness control, video devices
-      "audio" # audio devices (belt-and-suspenders with pipewire)
-      "input" # keyd and input-remapper access
-      "dialout" # /dev/ttyACM* — ZMK Studio serial, flashing
-      "i2c" # /dev/i2c-* — ddcutil monitor control
+      "networkmanager"
+      "video"
+      "audio"
+      "input" # keyd
+      "dialout" # keyboard flashing, ZMK Studio
+      "i2c" # ddcutil monitor control
     ];
   };
 
-  # Registers fish as a valid login shell system-wide and enables vendor completions.
-  # User-level fish config (aliases, plugins, etc.) lives in home/terminal/shell.nix.
+  # Makes fish a valid login shell. My fish setup is home/terminal/shell.nix.
   programs.fish.enable = true;
-
-  # Allow passwordless sudo for wheel — remove if you want a sudo password
-  # security.sudo.wheelNeedsPassword = false;
 }
