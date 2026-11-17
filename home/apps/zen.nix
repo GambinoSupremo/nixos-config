@@ -84,7 +84,7 @@
 
   # Live Noctalia colors: zen-live.css maps Noctalia's Zen CSS onto Pywalfox's vars.
   # Noctalia rewrites userChrome.css but keeps extra lines, so append the import once.
-  home.file.".config/zen/default/chrome/zen-live.css".source = ./noctalia/zen-live.css;
+  home.file.".config/zen/default/chrome/zen-live.css".source = ./zen-live.css;
   home.activation.zenLiveImport = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     chrome="${config.home.homeDirectory}/.config/zen/default/chrome/userChrome.css"
     if ! grep -qs 'zen-live.css' "$chrome"; then
@@ -98,7 +98,7 @@
     name = "Zen Browser";
     genericName = "Web Browser";
     exec = "zen-beta --name zen-beta %U";
-    icon = "${./icons/zen.svg}"; # Papirus's Zen icon, dark
+    icon = "${./zen.svg}"; # Papirus's Zen icon, dark
     categories = [
       "Network"
       "WebBrowser"

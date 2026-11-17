@@ -1,3 +1,4 @@
+# GTK theme and icons, Nautilus sidebar pins, mouse cursor, Qt app style.
 { config, pkgs, ... }:
 
 {
