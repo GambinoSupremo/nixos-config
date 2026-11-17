@@ -1,49 +1,22 @@
 [bar.default]
-# Transparent edge-docked bar; each lane is a capsule group, blurred per-capsule (bar-capsule-blur.patch).
-background_opacity = 0.0
+# Solid theme-coloured strip, logo + workspaces | clock + indicators | status icons.
+background_opacity = 1.0
+compositor_blur = false
 capsule = false
-start = [ "group:left" ]
-center = [ "group:middle" ]
-end = [ "group:right" ]
-color = "primary"
+start = [ "control-center", "workspaces" ]
+center = [ "clock", "weather", "privacy", "caffeine", "notifications" ]
+end = [ "tray", "bluetooth", "network", "volume", "cpu" ]
+color = "on_surface"
 font_weight = 400
 margin_edge = 0
 margin_ends = 0
+radius = 0
+padding = 8
+widget_spacing = 16
 scale = 0.90000000596046448
-thickness = 19
-capsule_thickness = 0.96 # pills stay ~18px
+thickness = 26
 shadow = false
 contact_shadow = false
-
-    [[bar.default.capsule_group]]
-    id = "left"
-    members = [ "launcher", "wallpaper", "theme", "workspaces" ]
-    fill = "surface_variant"
-    border = "outline"
-    foreground = "on_surface"
-    padding = 6
-    radius = 10
-    opacity = 0.6
-
-    [[bar.default.capsule_group]]
-    id = "middle"
-    members = [ "clock", "media" ]
-    fill = "surface_variant"
-    border = "outline"
-    foreground = "on_surface"
-    padding = 6
-    radius = 10
-    opacity = 0.6
-
-    [[bar.default.capsule_group]]
-    id = "right"
-    members = [ "tray", "notifications", "clipboard", "volume", "control-center", "session" ]
-    fill = "surface_variant"
-    border = "outline"
-    foreground = "on_surface"
-    padding = 6
-    radius = 10
-    opacity = 0.6
 [config]
 
 [[control_center.shortcuts]]
@@ -221,9 +194,27 @@ address = "Kirkland, WA"
 unit = "imperial"
 
 [widget.clock]
-color = "secondary"
-format = "{:%a %I:%M %p}"
-scale = 1.2000000000000002
+color = "on_surface"
+format = "{:%A %H:%M}"
+
+[widget.control-center]
+custom_image = "/run/current-system/sw/share/icons/hicolor/scalable/apps/nix-snowflake-white.svg"
+custom_image_colorize = true
+
+[widget.cpu]
+type = "sysmon"
+stat = "cpu_usage"
+visualization = "none"
+show_value = false
+
+[widget.network]
+show_label = false
+
+[widget.privacy]
+hide_inactive = true
+
+[widget.volume]
+show_label = false
 
 [widget.notifications]
 hide_when_no_unread = true
@@ -246,7 +237,12 @@ drawer = true
 
 [widget.workspaces]
 label_source = "name"
-hide_when_empty = true
+style = "minimal"
+hide_when_empty = false
+separator = " "
+focused_color = "on_surface"
+occupied_color = "on_surface"
+empty_color = "on_surface_variant"
 
 # System menu icons (home/desktop/noctalia/plugins/sysmenu).
 [plugins]
