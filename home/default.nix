@@ -1,29 +1,44 @@
+# Everything for my user (apps, desktop, scripts). One folder per topic,
+# one file per thing. Add a new file here or it won't be used.
 { ... }:
+
 {
   imports = [
-    ./desktop/dotfiles.nix
-    ./terminal/shell.nix
-    ./look/gtk-cursor.nix
-    ./apps/zen.nix
-    ./terminal/git.nix
-    ./terminal/editors.nix
-    ./apps/programs.nix
-    ./desktop/vpn-bluetooth.nix
-    ./gaming/battlenet.nix
-    ./sync/backup.nix
-    ./sync/daily-note.nix
-    ./sync/kobo-sync.nix
-    ./sync/game-log.nix
-    ./gaming/vesktop-mic.nix
-    ./desktop/philips-input.nix
-    ./apps/webapps.nix
-    ./desktop/menu.nix
-    ./look/theme.nix
-    ./look/papirus.nix
-    ./desktop/dictation.nix
-    ./desktop/screensaver.nix
-    ./gaming/deadlock-fov.nix
-    ./desktop/home-alerts.nix
+    # desktop/ - Hyprland, the Noctalia bar and small desktop tools
+    ./desktop/dotfiles.nix # copies my dotfiles repo into ~/.config
+    ./desktop/menu.nix # system menu + keybind cheatsheet
+    ./desktop/screensaver.nix # screensaver and idle timeouts
+    ./desktop/dictation.nix # Super+D speech to text
+    ./desktop/philips-input.nix # flip the Philips between this PC and the work Mac
+    ./desktop/home-alerts.nix # homelab alerts as desktop notifications
+    ./desktop/vpn-bluetooth.nix # Mullvad window at login, quieter Bluetooth
+
+    # look/ - colors, icons, cursor
+    ./look/gtk-cursor.nix # GTK theme, icons, cursor, Nautilus sidebar
+    ./look/theme.nix # `theme` command: palette + matching wallpapers
+    ./look/papirus.nix # folder icons follow the accent color
+
+    # apps/ - browser, web apps, default apps
+    ./apps/zen.nix # Zen browser, search, privacy
+    ./apps/webapps.nix # sites in their own window
+    ./apps/programs.nix # what opens what, OBS, screenshots
+
+    # terminal/ - shell, git, editor
+    ./terminal/shell.nix # fish, prompt, apply/update commands (nixos-sync.sh)
+    ./terminal/git.nix # git and SSH
+    ./terminal/editors.nix # Neovim
+
+    # gaming/ - game fixes (Steam itself is in nixos/features/gaming.nix)
+    ./gaming/battlenet.nix # Battle.net background sign-in, WoW launcher
+    ./gaming/deadlock-fov.nix # keeps Deadlock's wide camera after updates
+    ./gaming/vesktop-mic.nix # mutes Discord's mic during in-game push-to-talk
+
+    # sync/ - backups and logs into the Obsidian vault
+    ./sync/backup.nix # nightly NAS -> pCloud backup
+    ./sync/daily-note.nix # where the daily notes live (used by game-log)
+    ./sync/game-log.nix # Steam playtime into the daily note
+    ./sync/kobo-sync.nix # Kobo reading log into Books notes
   ];
+
   home.stateVersion = "26.05";
 }
