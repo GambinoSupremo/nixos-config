@@ -13,10 +13,10 @@
     ./desktop/home-alerts.nix # homelab alerts as desktop notifications
     ./desktop/vpn-bluetooth.nix # Mullvad window at login, quieter Bluetooth
 
-    # look/ - colors, icons, cursor
-    ./look/gtk-cursor.nix # GTK theme, icons, cursor, Nautilus sidebar
-    ./look/theme.nix # `theme` command: palette + matching wallpapers
-    ./look/papirus.nix # folder icons follow the accent color
+    # theming/ - colors, icons, cursor
+    ./theming/gtk-cursor.nix # GTK theme, icons, cursor, Nautilus sidebar
+    ./theming/theme.nix # `theme` command: palette + matching wallpapers
+    ./theming/papirus.nix # folder icons follow the accent color
 
     # apps/ - browser, web apps, default apps
     ./apps/zen.nix # Zen browser, search, privacy

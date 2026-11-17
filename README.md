@@ -48,7 +48,7 @@ nixos/               the system: needs root, same for every user
   hosts/             per machine: boot, kernel, disks
 home/                my user: apps, desktop, scripts (default.nix lists them all)
   desktop/           dotfiles, Noctalia, system menu, screensaver, dictation
-  look/              GTK theme, cursor, palettes, folder icon colors
+  theming/           GTK theme, cursor, palettes, folder icon colors
   apps/              Zen, web apps, default apps, OBS
   terminal/          fish, git, Neovim, the apply/update script
   gaming/            Battle.net sign-in, Deadlock camera, Discord mic
@@ -72,8 +72,8 @@ docs/                notes on why things are the way they are
 | Dotfile deployment, Noctalia | `home/desktop/dotfiles.nix` |
 | Noctalia defaults for a new install | `home/desktop/noctalia/config.toml` |
 | System menu, keybind cheatsheet | `home/desktop/menu.nix` |
-| GTK, Qt, cursor, Nautilus sidebar | `home/look/gtk-cursor.nix` |
-| Themes (palette + wallpapers) | `home/look/theme.nix`, `home/look/palettes/` |
+| GTK, Qt, cursor, Nautilus sidebar | `home/theming/gtk-cursor.nix` |
+| Themes (palette + wallpapers) | `home/theming/theme.nix`, `home/theming/palettes/` |
 | Browser, search, privacy | `home/apps/zen.nix` |
 | Web apps | `home/apps/webapps.nix` |
 | Default apps, launchers, screenshots | `home/apps/programs.nix` |
