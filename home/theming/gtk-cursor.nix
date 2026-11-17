@@ -2,7 +2,7 @@
 { config, pkgs, ... }:
 
 {
-  # ── GTK ──────────────────────────────────────────────────────────────────────
+  # --- GTK theme and icons ---
   gtk = {
     enable = true;
     theme = {
@@ -13,7 +13,7 @@
       name = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
     };
-    # Nautilus sidebar pins; file is a read-only symlink, so add pins here, not via Ctrl+D.
+    # Nautilus sidebar pins. Add them here; Ctrl+D in Nautilus won't stick.
     gtk3.bookmarks = [
       "smb://gavin@10.0.0.117/plexmedia NAS"
       "smb://gavin@10.0.0.117/Personal Personal NAS"
@@ -25,9 +25,7 @@
     ];
   };
 
-  # ── Cursor ───────────────────────────────────────────────────────────────────
-  # enable must be explicit — home-manager deprecated inferring it from the
-  # attrset being defined (warning added upstream in home-cursor.nix).
+  # --- Cursor ---
   home.pointerCursor = {
     enable = true;
     gtk.enable = true;
@@ -36,10 +34,8 @@
     size = 24;
   };
 
-  # qt block intentionally disabled: qt.style injects QT_STYLE_OVERRIDE=kvantum
-  # session-wide (it black-screened plasmashell back when Plasma was installed).
-
-  # Every Qt 6 app reads this: the dotfiles set QT_QPA_PLATFORMTHEME=qt6ct for the session.
+  # --- Qt apps ---
+  # Qt apps take their colors from Noctalia through qt6ct.
   xdg.configFile."qt6ct/qt6ct.conf".text = ''
     [Appearance]
     style=Fusion

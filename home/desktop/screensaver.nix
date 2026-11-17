@@ -1,5 +1,5 @@
-# screensaver: terminal text effects, full screen on every monitor (Hyprland), gone on any input.
-# Noctalia starts it after 30 idle minutes and blanks the screens after 60, never while gaming.
+# Screensaver: text effects full screen on every monitor, gone on any input.
+# Starts after 30 idle minutes, screens off after 60, never while gaming.
 { pkgs, ... }:
 
 let

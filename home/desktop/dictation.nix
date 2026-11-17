@@ -1,5 +1,5 @@
-# Dictation: Super+D starts/stops voxtype (or hold Right Alt), which types what you said at the cursor.
-# Runs Whisper large-v3-turbo on the GPU (Vulkan); the model is pinned in the store.
+# Dictation: Super+D starts and stops it, and what I said is typed at the cursor.
+# voxtype runs the Whisper speech model on the GPU.
 {
   pkgs,
   lib,
@@ -16,7 +16,7 @@ in
 lib.mkIf (!host.isVM) {
   services.voxtype = {
     enable = true;
-    # Temporary: nixpkgs 2026-11-07 links voxtype against sqlite without providing it.
+    # Temporary: the package is missing sqlite (nixpkgs, Nov 2026).
     package = pkgs.voxtype-vulkan.overrideAttrs (o: { buildInputs = o.buildInputs ++ [ pkgs.sqlite ]; });
     settings = {
       state_file = "auto"; # needed by `voxtype record toggle`
@@ -29,8 +29,7 @@ lib.mkIf (!host.isVM) {
         model = "${model}";
         language = "en";
       };
-      # Type inside an empty Hyprland submap, so a Super still held from Super+D
-      # can't turn the typed letters into shortcuts (workspace 6, resize mode).
+      # Shortcuts are off while it types, in case Super is still held down.
       output.pre_output_command = "hyprctl eval 'hl.dispatch(hl.dsp.submap(\"dictation\"))'";
       output.post_output_command = "hyprctl eval 'hl.dispatch(hl.dsp.submap(\"reset\"))'";
       output.notification = {
@@ -39,7 +38,7 @@ lib.mkIf (!host.isVM) {
       };
     };
   };
-  # The module's PATH has no sh or hyprctl, so the submap hooks above failed silently.
+  # The service needs sh and hyprctl on its PATH for the two commands above.
   systemd.user.services.voxtype.Service.Environment = lib.mkForce [
     "PATH=${lib.makeBinPath [ pkgs.coreutils pkgs.which ]}:/run/current-system/sw/bin"
     "XDG_RUNTIME_DIR=%t"

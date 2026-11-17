@@ -1,6 +1,5 @@
-# theme: named looks (Noctalia palette + matching wallpaper folder).
-# Wallpapers live in ~/Pictures/themes/<slug>; "Wallpaper" = colors from the wallpaper.
-# Each theme is dark or light; `theme toggle` flips to the last one used in the other mode.
+# The `theme` command: each theme is a color palette plus a wallpaper folder
+# in ~/Pictures/themes. `theme toggle` flips between dark and light.
 { pkgs, ... }:
 
 let

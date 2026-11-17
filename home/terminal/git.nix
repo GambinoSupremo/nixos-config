@@ -2,7 +2,7 @@
 { ... }:
 
 {
-  # ── Git ──────────────────────────────────────────────────────────────────────
+  # --- Git ---
   programs.git = {
     enable = true;
     settings = {
@@ -13,11 +13,10 @@
     };
   };
 
-  # Colours come from Noctalia's lazygit template, which owns config.yml; keep settings empty.
+  # No settings here: Noctalia writes lazygit's config for the colors.
   programs.lazygit.enable = true;
 
-  # ── SSH ──────────────────────────────────────────────────────────────────────
-  # Only the hosts listed here; no HM catch-all defaults (GitHub uses ssh's own).
+  # --- SSH ---
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
@@ -26,7 +25,7 @@
       User = "root";
       IdentityFile = "~/.ssh/id_ed25519_proxmox";
       IdentitiesOnly = true;
-      # GNOME Keyring's agent, so shells without SSH_AUTH_SOCK can still use the key
+      # The keyring holds the key, so it works from any shell.
       IdentityAgent = "/run/user/%i/gcr/ssh";
     };
     settings."github.com" = {

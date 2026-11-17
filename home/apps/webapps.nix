@@ -1,11 +1,12 @@
-# Web apps: sites in their own Firefox window (no URL bar or tabs) via PWAsForFirefox,
-# each with a launcher entry. Add a site with a fresh ULID and a Papirus icon.
+# Web apps: sites in their own window with no tabs or URL bar, each with a
+# launcher entry. To add one, copy a site block and give it a new ID (ULID).
 { lib, pkgs, ... }:
 
 let
   profile = ".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9";
 
-  # Signed XPIs from addons.mozilla.org, pinned (Firefox's auto-update is off below).
+  # --- Extensions ---
+  # Fixed versions from addons.mozilla.org; bump the url and hash to update.
   extensions = {
     "sponsorBlocker@ajay.app" = {
       url = "https://addons.mozilla.org/firefox/downloads/file/4897574/sponsorblock-6.1.7.xpi";
@@ -27,15 +28,13 @@ in
       id: src: lib.nameValuePair "${profile}/extensions/${id}.xpi" { source = pkgs.fetchurl src; }
     ) extensions
     // {
-      # Allow userChrome.css (toolbar below).
-      # Extensions dropped into the profile load enabled, and stay at the pinned versions.
+      # Turn the extensions on and keep them at these versions.
       "${profile}/user.js".text = ''
         user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
         user_pref("extensions.autoDisableScopes", 0);
         user_pref("extensions.update.enabled", false);
       '';
-      # Toolbar hides above the window; mouse at the top edge slides it over the page,
-      # and it stays while an extension popup or menu from it is open.
+      # The toolbar hides above the window; mouse to the top edge brings it back.
       "${profile}/chrome/userChrome.css".text = ''
         #navigator-toolbox {
           position: fixed !important;
@@ -52,15 +51,16 @@ in
       '';
     };
 
-  # The package's own "firefoxpwa" entry just opens the bare runtime browser.
+  # Hide the plain "firefoxpwa" launcher; it only opens an empty browser.
   xdg.dataFile."applications/firefoxpwa.desktop" = {
     force = true;
     text = "[Desktop Entry]\nHidden=true\n";
   };
 
+  # --- Sites ---
   programs.firefoxpwa = {
     enable = true;
-    # One shared profile, so web apps share logins with each other (not with Zen).
+    # One profile, so the web apps share logins with each other (not with Zen).
     profiles."01M5K68BBWCK8J79CEY7C3DDT9" = {
       name = "Web apps";
       sites."01M5K770R4RKNSG5FN1DWH0N2M" = {

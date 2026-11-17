@@ -1,5 +1,5 @@
-# Papirus folder colors follow the Noctalia accent. The store copy is read-only, so
-# activation keeps a writable copy in ~/.local/share/icons; a Noctalia template hook recolors it.
+# Folder icons follow the theme's accent color. Noctalia recolors a writable
+# copy of the Papirus icons in ~/.local/share/icons.
 { pkgs, lib, ... }:
 
 let

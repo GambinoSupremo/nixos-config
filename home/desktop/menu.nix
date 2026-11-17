@@ -1,6 +1,5 @@
-# sysmenu: a nested system menu (capture, tools, toggles, style, setup, power) in Noctalia's launcher;
-# the icon rows come from the plugin in noctalia/plugins/sysmenu.
-# keybinds: searchable list of the live compositor binds. Both are bound in the dotfiles.
+# Two launcher menus: sysmenu (capture, tools, toggles, style, setup, power)
+# and keybinds (searchable list of my shortcuts). The keys are set in the dotfiles.
 { pkgs, ... }:
 
 let

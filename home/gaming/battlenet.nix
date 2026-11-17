@@ -33,8 +33,8 @@ let
   '';
 in
 {
-  # Started by the compositor bootstrap after importing its display environment.
-  # Battle.net can drop a game launch request while still signing in after boot.
+  # --- Battle.net in the background ---
+  # Started at login by the session start script (desktop/dotfiles.nix).
   systemd.user.services.battlenet-background = lib.mkIf (!isVM) {
     Unit = {
       Description = "Battle.net background login";
@@ -86,7 +86,8 @@ in
     };
   };
 
-  # Callers share one run: systemctl start joins a run already in progress.
+  # --- Sign-in check ---
+  # Starting it twice just joins the run already going.
   systemd.user.services.battlenet-signin = lib.mkIf (!isVM) {
     Unit = {
       Description = "Restart Battle.net if its sign-in stalls";
@@ -100,7 +101,8 @@ in
     };
   };
 
-  # Replaces the shortcut Lutris made, which started WoW without waiting for sign-in.
+  # --- WoW launcher ---
+  # Replaces the Lutris shortcut, which didn't wait for sign-in.
   xdg.dataFile."applications/net.lutris.world-of-warcraft-forever-6.desktop" = lib.mkIf (!isVM) {
     force = true;
     text = ''

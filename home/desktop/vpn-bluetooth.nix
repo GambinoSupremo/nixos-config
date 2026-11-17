@@ -11,13 +11,11 @@ let
   inherit (host) isVM;
 in
 {
-  # ── Mullvad VPN GUI ───────────────────────────────────────────────────────────
-  # Systemd user service instead of XDG autostart; waits for the system daemon
-  # so the GUI doesn't show "App is out of sync" at login.
+  # --- Mullvad window ---
+  # Opens once the VPN service is up, so it doesn't say "App is out of sync".
   systemd.user.services.mullvad-gui = lib.mkIf (!isVM) (
     let
-      # Bounded poll (user units can't After= system units); an unbounded loop
-      # here once hung rebuild switches. Past deadline, launch anyway.
+      # Waits 30 seconds at most, then opens anyway.
       waitDaemon = pkgs.writeShellScript "mullvad-daemon-wait" ''
         for _ in $(seq 1 30); do
           systemctl is-active --quiet mullvad-daemon.service && exit 0
@@ -43,6 +41,7 @@ in
     }
   );
 
-  # Blueman toasts on every BT connect/disconnect (Lily58 flaps); keep the applet, drop the toasts.
+  # --- Bluetooth ---
+  # No popup every time a device connects or drops.
   dconf.settings."org/blueman/general".plugin-list = lib.mkIf (!isVM) [ "!ConnectionNotifier" ];
 }

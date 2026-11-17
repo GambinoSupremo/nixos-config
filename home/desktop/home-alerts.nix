@@ -1,6 +1,5 @@
-# home-alerts: Uptime Kuma's ntfy alerts (same topic as the phone) as desktop
-# notifications. The topic is a secret, so its URL lives outside the repo in
-# ~/.config/home-alerts/url (e.g. https://ntfy.sh/<topic>); no file, no service.
+# Homelab alerts (the same ones my phone gets) as desktop notifications.
+# The secret ntfy address goes in ~/.config/home-alerts/url; without it this stays off.
 {
   pkgs,
   lib,
