@@ -1,7 +1,6 @@
-# Dotfiles deployment: patch the dotfiles input for NixOS + Noctalia v5, deploy
-# into ~/.config. Every mustSed matches exact line text in the dotfiles repo.
+# Copies my dotfiles repo into ~/.config, with a few changes NixOS needs.
+# Each change checks its target line is still there, or the build fails.
 {
-  config,
   pkgs,
   lib,
   inputs,
@@ -12,7 +11,7 @@
 
 let
   inherit (host) isVM;
-  sessions = osConfig.gav.sessions; # nixos/base/desktop.nix
+  sessions = osConfig.gav.sessions; # which desktops are on (nixos/base/desktop.nix)
   configDirs = [
     "hypr"
     "ghostty"
@@ -20,8 +19,8 @@ let
   ++ lib.optional sessions.mango "mango"
   ++ lib.optional sessions.niri "niri";
 
-  # Mango imports the env and starts mango-session.target itself, but asynchronously;
-  # import here first, then restart what needs the new env. Drops a stale Hyprland signature.
+  # --- Session start scripts ---
+  # Hand the display settings to systemd, then restart what depends on them.
   mangoSessionBootstrap = pkgs.writeShellScript "mango-session-bootstrap" ''
     systemctl --user unset-environment HYPRLAND_INSTANCE_SIGNATURE
     systemctl --user import-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE MANGO_INSTANCE_SIGNATURE
@@ -33,8 +32,6 @@ let
     ${lib.optionalString (!isVM) "systemctl --user start --no-block battlenet-background.service"}
   '';
 
-  # Hyprland has no session target without uwsm, so nothing pulls
-  # graphical-session.target; restart (not start) recovers from start-limit-hit.
   hyprSessionBootstrap = pkgs.writeShellScript "hypr-session-bootstrap" ''
     systemctl --user import-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE HYPRLAND_INSTANCE_SIGNATURE
     dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
@@ -45,10 +42,9 @@ let
     ${lib.optionalString (!isVM) "systemctl --user start --no-block battlenet-background.service"}
   '';
 
-  # Hyprland's .conf fallback, written whole (hyprland.lua normally wins): the
-  # Noctalia colours source line and a minimal usable session. Nix strips a
-  # leading blank line, hence the "\n". (The scroll-overview plugin that also
-  # lived here broke startup on Hyprland 0.57; removed 2026-11-16, see git history.)
+  # --- Hyprland fallback ---
+  # Bare-bones hyprland.conf, only used if hyprland.lua fails to load.
+  # The "\n" is there because Nix drops a leading blank line.
   hyprFallbackConf = pkgs.writeText "hyprland.conf" (
     "\n"
     + ''
@@ -77,8 +73,8 @@ let
     ''
   );
 
-  # Dotfiles copied for NixOS: Hyprland session bootstrap patch plus NixOS-only
-  # additions. Files Noctalia regenerates are removed here and seeded writable below.
+  # --- The patched copy ---
+  # Files Noctalia rewrites are left out here; noctalia.nix copies those in.
   dotfiles = pkgs.runCommandLocal "dotfiles-patched" { } ''
     mkdir -p $out
     for d in ${lib.concatStringsSep " " configDirs}; do
@@ -135,137 +131,31 @@ let
       exit 1
     fi
   '';
+
+  # recursive: folders stay writable. force: replace whatever was there before.
+  deploy = dir: {
+    source = "${dotfiles}/${dir}";
+    recursive = true;
+    force = true;
+  };
+  hidden = {
+    force = true;
+    text = "[Desktop Entry]\nHidden=true\n";
+  };
 in
 {
-  # ── Noctalia v5 ──────────────────────────────────────────────────────────────
-  # home-manager's module runs noctalia.service with nixpkgs' noctalia (cached,
-  # follows releases). settings left empty so ~/.config/noctalia/config.toml stays
-  # runtime-writable.
-  programs.noctalia = {
-    enable = true;
-    systemd.enable = true;
-  };
-
-  # ── Dotfiles deployment ───────────────────────────────────────────────────────
-  # recursive keeps directories writable for runtime-generated files; force
-  # overwrites leftovers from pre-declarative deployments.
   xdg.configFile = {
-    "mango" = lib.mkIf sessions.mango {
-      source = "${dotfiles}/mango";
-      recursive = true;
-      force = true;
-    };
-    "niri" = lib.mkIf sessions.niri {
-      source = "${dotfiles}/niri";
-      recursive = true;
-      force = true;
-    };
-    "hypr" = {
-      source = "${dotfiles}/hypr";
-      recursive = true;
-      force = true;
-    };
-    "ghostty" = {
-      source = "${dotfiles}/ghostty";
-      recursive = true;
-      force = true;
-    };
-    # Noctalia user templates (wired in noctalia/config.toml [theme.templates.user]).
-    "noctalia/templates/cider.scss".source = ./noctalia/templates/cider.scss;
-    "sh.cider.genten/themes/noctalia/theme.yml".source = ./noctalia/templates/cider-theme.yml;
-    # Suppress the stale XDG autostart entry so the mullvad-gui systemd user
-    # service (vpn-bluetooth.nix) controls launch timing instead.
-    "autostart/mullvad-vpn.desktop" = {
-      force = true;
-      text = "[Desktop Entry]\nHidden=true\n";
-    };
-    # niri runs XDG autostart too; these duplicated its spawn-at-startup lines,
-    # and two Signals racing at login locked its database.
-    "autostart/signal.desktop" = {
-      force = true;
-      text = "[Desktop Entry]\nHidden=true\n";
-    };
-    "autostart/vesktop.desktop" = {
-      force = true;
-      text = "[Desktop Entry]\nHidden=true\n";
-    };
-    # Ad-hoc nix-shell/nix-env read this instead of the system config
-    # (nixpkgs.config.allowUnfree in nixos/base/core.nix).
-    "nixpkgs/config.nix" = {
-      force = true;
-      text = "{ allowUnfree = true; }\n";
-    };
+    # --- Into ~/.config ---
+    "hypr" = deploy "hypr";
+    "ghostty" = deploy "ghostty";
+    "mango" = lib.mkIf sessions.mango (deploy "mango");
+    "niri" = lib.mkIf sessions.niri (deploy "niri");
+
+    # --- Autostart entries switched off ---
+    # Mullvad starts from its own service (vpn-bluetooth.nix). Signal and
+    # Vesktop start from the desktop config; two Signals at login lock its database.
+    "autostart/mullvad-vpn.desktop" = hidden;
+    "autostart/signal.desktop" = hidden;
+    "autostart/vesktop.desktop" = hidden;
   };
-
-  # ── Wallpapers ───────────────────────────────────────────────────────────────
-  # Noctalia reads this from [wallpaper] directory and the theme command; read-only is fine.
-  home.file."Pictures/themes".source = "${inputs.wallpapers}/themes";
-
-  # ── Noctalia runtime seed ─────────────────────────────────────────────────────
-  # Seed Noctalia's runtime templates once as writable copies; rebuilds skip
-  # existing files so runtime edits survive.
-  home.activation.seedNoctaliaTemplates = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    seedNoctalia() {
-      if [ ! -e "$2" ]; then
-        run mkdir -p "$(dirname "$2")"
-        run cp "$1" "$2"
-        run chmod u+w "$2"
-      fi
-    }
-    ${lib.optionalString sessions.mango "seedNoctalia ${inputs.dotfiles}/mango/noctalia.conf ${config.xdg.configHome}/mango/noctalia.conf"}
-    ${lib.optionalString sessions.niri "seedNoctalia ${inputs.dotfiles}/niri/noctalia.kdl ${config.xdg.configHome}/niri/noctalia.kdl"}
-    seedNoctalia ${inputs.dotfiles}/ghostty/themes/noctalia ${config.xdg.configHome}/ghostty/themes/noctalia
-    # hypr/noctalia.lua has no template — seed an empty stub so hyprland.lua's
-    # require("noctalia") loads before Noctalia's first run overwrites it.
-    seedNoctalia ${pkgs.writeText "noctalia-lua-stub" ''
-      -- Seeded by home-manager; Noctalia overwrites with theme colors.
-    ''} ${config.xdg.configHome}/hypr/noctalia.lua
-
-    seedNoctalia ${./noctalia/config.toml} ${config.xdg.configHome}/noctalia/config.toml
-  '';
-
-  # ── Starship config ───────────────────────────────────────────────────────────
-  # Noctalia sed-edits starship.toml at runtime, so it stays a writable file: each
-  # rebuild re-asserts the dotfiles layout and carries over Noctalia's palette block.
-  home.activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    (
-    PATH=${
-      lib.makeBinPath (
-        with pkgs;
-        [
-          coreutils
-          gnugrep
-          gnused
-          gawk
-          diffutils
-        ]
-      )
-    }:$PATH
-    starshipSrc=${inputs.dotfiles}/starship/starship.toml
-    starshipDst=${config.xdg.configHome}/starship.toml
-    starshipMb="# >>> NOCTALIA STARSHIP PALETTE >>>"
-    starshipMe="# <<< NOCTALIA STARSHIP PALETTE <<<"
-    starshipTmp=$(mktemp)
-    starshipBlk=$(mktemp)
-    awk -v mb="$starshipMb" -v me="$starshipMe" \
-      '$0 == mb {skip=1} !skip {print} $0 == me {skip=0}' \
-      "$starshipSrc" > "$starshipTmp"
-    if [ -f "$starshipDst" ] && grep -qF "$starshipMb" "$starshipDst"; then
-      starshipBlkSrc=$starshipDst
-    else
-      starshipBlkSrc=$starshipSrc
-    fi
-    awk -v mb="$starshipMb" -v me="$starshipMe" \
-      '$0 == mb {keep=1} keep {print} $0 == me {keep=0}' \
-      "$starshipBlkSrc" > "$starshipBlk"
-    if [ -s "$starshipBlk" ]; then
-      echo "" >> "$starshipTmp"
-      cat "$starshipBlk" >> "$starshipTmp"
-    fi
-    if ! cmp -s "$starshipTmp" "$starshipDst" 2>/dev/null; then
-      run install -m644 "$starshipTmp" "$starshipDst"
-    fi
-    rm -f "$starshipTmp" "$starshipBlk"
-    )
-  '';
 }

@@ -6,6 +6,7 @@
   imports = [
     # desktop/ - Hyprland, the Noctalia bar and small desktop tools
     ./desktop/dotfiles.nix # copies my dotfiles repo into ~/.config
+    ./desktop/noctalia.nix # the bar, launcher and wallpapers
     ./desktop/menu.nix # system menu + keybind cheatsheet
     ./desktop/screensaver.nix # screensaver and idle timeouts
     ./desktop/dictation.nix # Super+D speech to text
@@ -24,7 +25,8 @@
     ./apps/programs.nix # what opens what, OBS, screenshots
 
     # terminal/ - shell, git, editor
-    ./terminal/shell.nix # fish, prompt, apply/update commands (nixos-sync.sh)
+    ./terminal/shell.nix # fish, aliases, apply/update commands (nixos-sync.sh)
+    ./terminal/starship.nix # prompt
     ./terminal/git.nix # git and SSH
     ./terminal/editors.nix # Neovim
 

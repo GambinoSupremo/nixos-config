@@ -1,4 +1,4 @@
-# Default applications, desktop launchers, OBS, and screenshots.
+# Which app opens what, a few app settings, and fixed-up launcher entries.
 {
   config,
   pkgs,
@@ -7,16 +7,16 @@
 }:
 
 {
-  # ── Default apps (mime associations) ─────────────────────────────────────────
-  # nomacs is the only image viewer; its .desktop doesn't advertise Canon RAW,
-  # and satty claims png/jpeg, so the image defaults are pinned here.
+  # --- Default apps ---
+  # Text and code open in Zed, folders in Nautilus, images in nomacs.
   xdg.mimeApps = {
     enable = true;
+    # nomacs doesn't say it can open Canon RAW, so tell it here.
     associations.added = {
       "image/x-canon-cr2" = [ "org.nomacs.ImageLounge.desktop" ];
       "image/x-canon-cr3" = [ "org.nomacs.ImageLounge.desktop" ];
     };
-    # Text/code in Zed; mkForce beats zen's setAsDefaultBrowser claim on text/plain + json.
+    # mkForce: Zen also wants text and json.
     defaultApplications =
       lib.genAttrs [
         "text/plain"
@@ -40,7 +40,6 @@
         "application/x-zerosize"
       ] (_: lib.mkForce [ "dev.zed.Zed.desktop" ])
       // {
-        # Folders (e.g. Steam "Browse local files") open in Nautilus, not whatever claims the type.
         "inode/directory" = [ "org.gnome.Nautilus.desktop" ];
       }
       // lib.genAttrs [
@@ -54,18 +53,16 @@
       ] (_: [ "org.nomacs.ImageLounge.desktop" ]);
   };
 
-  # ── OBS Studio ───────────────────────────────────────────────────────────────
-  # obs-vaapi → VA-API encoding; obs-vkcapture → GPU-side game capture.
+  # --- App settings ---
   programs.obs-studio = {
     enable = true;
     plugins = with pkgs.obs-studio-plugins; [
-      obs-vaapi
-      obs-vkcapture
+      obs-vaapi # GPU encoding
+      obs-vkcapture # game capture
     ];
   };
 
-  # ── btop ─────────────────────────────────────────────────────────────────────
-  # Uses the theme Noctalia writes to ~/.config/btop/themes/noctalia.theme.
+  # Colors come from the theme Noctalia writes.
   programs.btop = {
     enable = true;
     settings = {
@@ -74,9 +71,7 @@
     };
   };
 
-  # ── Satty ────────────────────────────────────────────────────────────────────
-  # Noctalia pipes region screenshots here (shell.screenshot in noctalia config.toml).
-  # Enter copies + exits, Ctrl+S saves to output-filename.
+  # Screenshot editor: Enter copies and closes, Ctrl+S saves.
   programs.satty = {
     enable = true;
     settings.general = {
@@ -89,8 +84,10 @@
     };
   };
 
-  # ── Signal ───────────────────────────────────────────────────────────────────
-  # Pin gnome-libsecret (key lives there); id "signal" replaces the package entry.
+  # --- Launcher entries ---
+  # Each one replaces the entry the app ships with.
+
+  # Signal's key is in the GNOME keyring, so always start it with that.
   xdg.desktopEntries.signal = {
     name = "Signal";
     exec = "signal-desktop --password-store=gnome-libsecret %U";
@@ -107,13 +104,11 @@
     ];
   };
 
-  # ── Vesktop ──────────────────────────────────────────────────────────────────
-  # Every launcher path goes through mullvad-exclude or Discord won't connect.
-  # Compositor autostarts handle themselves (dotfiles / home/desktop/dotfiles.nix).
+  # Discord only connects outside the VPN.
   xdg.desktopEntries.vesktop = {
     name = "Vesktop";
     exec = "mullvad-exclude vesktop %U";
-    icon = "discord"; # Papirus round icon; its vesktop.svg is the rainbow Vencord logo
+    icon = "discord"; # the round Discord icon, not the rainbow Vencord one
     comment = "Vesktop — Discord via Mullvad split tunnel";
     categories = [
       "Network"
@@ -123,8 +118,7 @@
     mimeType = [ "x-scheme-handler/discord" ];
   };
 
-  # ── Sone ─────────────────────────────────────────────────────────────────────
-  # Same id as the package entry (SONE.desktop) so it replaces it; findable as "Tidal".
+  # Searching "Tidal" finds Sone.
   xdg.desktopEntries.SONE = {
     name = "Sone";
     genericName = "Tidal";
@@ -143,8 +137,7 @@
     };
   };
 
-  # ── Sunshine ─────────────────────────────────────────────────────────────────
-  # Runs as a user service; the menu entry opens the web UI instead of a 2nd copy.
+  # Sunshine already runs in the background; this opens its web page.
   xdg.desktopEntries."dev.lizardbyte.app.Sunshine" = {
     name = "Sunshine";
     exec = "xdg-open https://localhost:47990";
@@ -156,9 +149,7 @@
     ];
   };
 
-  # ── pCloud ───────────────────────────────────────────────────────────────────
-  # pCloud writes its own launcher pointing at an old store path; hide it so only
-  # the package's entry shows up.
+  # pCloud adds a second, broken launcher of its own; hide it.
   xdg.dataFile."applications/appimagekit-pcloud.desktop" = {
     force = true;
     text = "[Desktop Entry]\nHidden=true\n";

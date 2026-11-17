@@ -1,4 +1,6 @@
-# Zen Browser, search, privacy, and live Noctalia colors.
+# Zen Browser: search, privacy settings, and colors that follow the theme.
+# Firefox Sync brings extensions, bookmarks and logins; this sets the rest.
+# On a new machine install Keeper first, it holds the Sync password.
 {
   inputs,
   config,
@@ -10,14 +12,12 @@
 {
   imports = [ inputs.zen-browser.homeModules.beta ];
 
-  # ── Zen Browser ──────────────────────────────────────────────────────────────
-  # Firefox Sync owns extensions, bookmarks and logins (fresh machine: install
-  # Keeper first, it holds the Sync password). Nix sets what Sync doesn't carry.
   programs.zen-browser = {
     enable = true;
     setAsDefaultBrowser = true;
     profiles.default = {
-      # force: HM owns search.json.mozlz4, so hand-added engines don't survive rebuilds.
+      # --- Search ---
+      # Kagi only. Engines added by hand in Zen are wiped on rebuild.
       search = {
         force = true;
         default = "kagi";
@@ -35,7 +35,7 @@
             definedAliases = [ "@k" ];
           };
         }
-        # The Kagi extension's duplicate engine plus built-ins we never use.
+        # Hidden: the Kagi extension's duplicate and the built-ins.
         //
           lib.genAttrs
             [
@@ -51,26 +51,30 @@
             });
       };
 
+      # --- Settings ---
       settings = {
         "zen.welcome-screen.seen" = true;
-        # Each window stands alone instead of mirroring tabs into new ones.
-        "zen.window-sync.enabled" = false;
-        # Noctalia theming: userChrome.css imports its colors, Pywalfox needs themes on.
+        "zen.window-sync.enabled" = false; # new windows don't copy my tabs
+
+        # Needed for the theme colors.
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         "zen.theme.disable-lightweight" = false;
-        # Mullvad owns DNS; Zen's DoH stalls on-VPN and hangs Keeper's login.
+
+        # Leave DNS to Mullvad; Zen's own DNS hangs Keeper's login on the VPN.
         "network.trr.mode" = 5;
         "doh-rollout.disable-heuristics" = true;
 
-        # Privacy: strict tracking protection, GPC + DNT, HTTPS-only.
+        # Privacy
         "browser.contentblocking.category" = "strict";
         "privacy.globalprivacycontrol.enabled" = true;
         "privacy.donottrackheader.enabled" = true;
         "dom.security.https_only_mode" = true;
+
         # Keeper fills logins and forms, not Zen.
         "signon.rememberSignons" = false;
         "browser.formfill.enable" = false;
-        # No sponsored suggestions, Pocket, studies or default-browser nag.
+
+        # No ads, Pocket, studies or default-browser nag.
         "browser.urlbar.suggest.quicksuggest.sponsored" = false;
         "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
         "browser.newtabpage.activity-stream.showSponsored" = false;
@@ -82,8 +86,8 @@
     };
   };
 
-  # Live Noctalia colors: zen-live.css maps Noctalia's Zen CSS onto Pywalfox's vars.
-  # Noctalia rewrites userChrome.css but keeps extra lines, so append the import once.
+  # --- Theme colors ---
+  # zen-live.css carries the colors; add its import line to userChrome.css once.
   home.file.".config/zen/default/chrome/zen-live.css".source = ./zen-live.css;
   home.activation.zenLiveImport = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     chrome="${config.home.homeDirectory}/.config/zen/default/chrome/userChrome.css"
@@ -93,12 +97,13 @@
     fi
   '';
 
-  # Same id as the package's entry (~/.local/share wins), minus "(Beta)" in the name.
+  # --- Launcher entry ---
+  # Replaces the shipped one so the name doesn't say "(Beta)".
   xdg.desktopEntries.zen-beta = {
     name = "Zen Browser";
     genericName = "Web Browser";
     exec = "zen-beta --name zen-beta %U";
-    icon = "${./zen.svg}"; # Papirus's Zen icon, dark
+    icon = "${./zen.svg}";
     categories = [
       "Network"
       "WebBrowser"
@@ -116,7 +121,7 @@
     };
   };
 
-  # Pywalfox's native host for Zen, without programs.firefox pulling in Firefox.
+  # Lets the Pywalfox extension read the theme colors.
   home.file.".mozilla/native-messaging-hosts/pywalfox.json".text = builtins.toJSON {
     name = "pywalfox";
     description = "Pywalfox native app";

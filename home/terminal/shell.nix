@@ -1,11 +1,8 @@
-# Shell stack: fish (aliases, greeting), starship, fzf, zoxide, bat.
-# There is no fish config in the dotfiles repo;
-# this file is the single owner of interactive-shell behavior here.
+# Fish shell: greeting, aliases, the apply/update commands, and small helpers.
 { pkgs, host, ... }:
 
 let
-  # Backs the apply/update/dotsync/save fish functions. writeShellApplication runs
-  # shellcheck at build time.
+  # The script behind apply, update, dotsync and save.
   nixosSync = pkgs.writeShellApplication {
     name = "nixos-sync";
     runtimeInputs = [
@@ -22,12 +19,9 @@ let
   };
 in
 {
-  # krabby: a Pokémon on every new shell (pokemon-colorscripts' sprites, plus Gen 9).
-  home.packages = [
-    pkgs.krabby
-  ];
+  home.packages = [ pkgs.krabby ]; # the Pokémon in the greeting
 
-  # ── Fish ─────────────────────────────────────────────────────────────────────
+  # --- Fish ---
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
@@ -60,45 +54,36 @@ in
       grep = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${host.name}";
     };
-    # apply: validate both hosts, switch, then publish. update: refresh, validate, switch.
     functions = {
       apply = "${nixosSync}/bin/nixos-sync apply";
       update = "${nixosSync}/bin/nixos-sync update";
       dotsync = "${nixosSync}/bin/nixos-sync dotsync";
       save = "${nixosSync}/bin/nixos-sync save";
-
     };
   };
 
-  # ── Starship ─────────────────────────────────────────────────────────────────
-  programs.starship = {
-    enable = true;
-    enableFishIntegration = true;
-    # false puts the init in shellInitLast so nothing can shadow fish_prompt.
-    enableInteractive = false;
-    # settings unset — starship.toml is written by home.activation.starshipConfig
-    # (dotfiles.nix) and must stay a writable file.
-  };
-
-  # ── fzf ──────────────────────────────────────────────────────────────────────
+  # --- Helpers ---
   programs.fzf = {
     enable = true;
-    # Off — it binds Ctrl+T over fish's transpose-chars.
-    enableFishIntegration = false;
+    enableFishIntegration = false; # it would take over Ctrl+T
   };
 
-  # ── zoxide ───────────────────────────────────────────────────────────────────
   programs.zoxide = {
     enable = true;
     enableFishIntegration = true;
   };
 
-  # ── bat ──────────────────────────────────────────────────────────────────────
   programs.bat = {
     enable = true;
     config = {
       theme = "base16";
       style = "plain";
     };
+  };
+
+  # Lets one-off nix-shell / nix-env use unfree packages too.
+  xdg.configFile."nixpkgs/config.nix" = {
+    force = true;
+    text = "{ allowUnfree = true; }\n";
   };
 }
