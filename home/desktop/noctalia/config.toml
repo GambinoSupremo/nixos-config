@@ -4,8 +4,8 @@ background_opacity = 1.0
 compositor_blur = false
 capsule = false
 start = [ "control-center", "workspaces" ]
-center = [ "clock", "weather", "privacy", "caffeine", "notifications" ]
-end = [ "tray", "bluetooth", "network", "volume", "cpu" ]
+center = [ "clock", "privacy", "caffeine", "notifications" ]
+end = [ "tray", "weather", "network", "volume", "cpu" ]
 color = "on_surface"
 font_weight = 400
 margin_edge = 0
@@ -87,6 +87,10 @@ enabled = true
 background_opacity = 0.89999997988343239
 offset_x = 8.0
 scale = 0.85000000521540642
+
+    # No toast on mic mute/unmute (PTT flips it constantly); bar icon stays.
+    [osd.kinds]
+    volume_input = false
 
 [shell]
 avatar_path = "/home/gav/.face"
@@ -234,6 +238,11 @@ scroll_repeat = "gesture"
 
 [widget.tray]
 drawer = true
+
+# Icon only; hover for details.
+[widget.weather]
+show_condition = false
+show_temperature = false
 
 [widget.workspaces]
 label_source = "name"
