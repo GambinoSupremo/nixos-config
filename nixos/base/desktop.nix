@@ -106,26 +106,19 @@ in
     # --- Fonts ---
     fonts = {
       enableDefaultPackages = true;
-      packages = with pkgs; [
-        noto-fonts
-        noto-fonts-cjk-sans
-        noto-fonts-color-emoji
-        dejavu_fonts
-        liberation_ttf
-        open-sans
-        ttf-bitstream-vera
-        # Coding fonts for the `font` picker (home/theming/font.nix).
-        nerd-fonts.jetbrains-mono
-        nerd-fonts.meslo-lg
-        nerd-fonts.caskaydia-mono
-        nerd-fonts.fira-code
-        nerd-fonts.iosevka-term
-        nerd-fonts.geist-mono
-        nerd-fonts.commit-mono
-        nerd-fonts.victor-mono
-        nerd-fonts.hack
-        nerd-fonts.departure-mono
-      ];
+      packages =
+        with pkgs;
+        [
+          noto-fonts
+          noto-fonts-cjk-sans
+          noto-fonts-color-emoji
+          dejavu_fonts
+          liberation_ttf
+          open-sans
+          ttf-bitstream-vera
+        ]
+        # Coding fonts for the `font` picker.
+        ++ map (f: f.package) (import ../../home/theming/font-list.nix pkgs);
       fontconfig.defaultFonts = {
         serif = [ "Noto Serif" ];
         sansSerif = [ "Noto Sans" ];

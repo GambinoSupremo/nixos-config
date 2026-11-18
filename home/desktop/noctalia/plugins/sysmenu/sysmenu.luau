@@ -1,81 +1,22 @@
--- gavos System menu (`/sys`): sections drill in, items run `sysmenu <section> <item>`.
--- Keep the labels in step with the case arms in home/desktop/menu.nix.
+-- gavos System menu (`/sys`). Rows come from ~/.config/sysmenu/menu.json, made
+-- from home/desktop/menu-entries.nix. Sections drill in; rows run `sysmenu run <id>`;
+-- list rows (fonts, themes) come from `<cmd> rows` and run `<cmd> <name>`.
 
-local sections = {
-  { id = "learn", title = "Learn", glyph = "school", sub = "Keybindings and docs", items = {
-    { "Keybindings", "keyboard" },
-    { "Hyprland wiki", "world" },
-    { "NixOS options", "book" },
-    { "Home Manager options", "book-2" },
-    { "Noctalia docs", "sparkles" },
-  } },
-  { id = "capture", title = "Capture", glyph = "camera", sub = "Screenshots, recording, QR codes", items = {
-    { "Region", "screenshot" },
-    { "Window", "app-window" },
-    { "Screen", "device-desktop" },
-    { "Draw on screen", "pencil" },
-    { "Region to clipboard", "clipboard" },
-    { "Scan QR code", "qrcode" },
-    { "Record region", "player-record" },
-    { "Record screen", "screen-share" },
-    { "Color picker", "color-picker" },
-  } },
-  { id = "tools", title = "Tools", glyph = "tools", sub = "btop, lazygit, dua, wiremix", items = {
-    { "System monitor (btop)", "cpu" },
-    { "Git (lazygit)", "git-branch" },
-    { "Disk usage (dua)", "chart-pie" },
-    { "Audio mixer (wiremix)", "volume" },
-  } },
-  { id = "toggle", title = "Toggle", glyph = "toggle-left", sub = "Night light, do not disturb, stay awake", items = {
-    { "Night light", "moon-stars" },
-    { "Do not disturb", "bell-off" },
-    { "Stay awake", "coffee" },
-    { "Bar", "layout-navbar" },
-    { "Bluetooth", "bluetooth" },
-  } },
-  { id = "style", title = "Style", glyph = "palette", sub = "Theme, font, wallpaper, light/dark", items = {
-    { "Theme", "brush" },
-    { "Font", "typography" },
-    { "Wallpaper", "photo" },
-    { "Random wallpaper", "arrows-shuffle" },
-    { "Light/dark", "sun-moon" },
-    { "Noctalia settings", "settings" },
-  } },
-  { id = "setup", title = "Setup", glyph = "adjustments", sub = "Audio, configs, restarts", items = {
-    { "Audio", "volume" },
-    { "Edit nixos-config", "folder-cog" },
-    { "Edit dotfiles", "brand-git" },
-    { "Restart Noctalia", "reload" },
-    { "Reload Hyprland", "refresh" },
-  } },
-  { id = "update", title = "Update", glyph = "package", sub = "apply, update", items = {
-    { "Apply config", "wand" },
-    { "Update inputs", "cloud-download" },
-  } },
-  { id = "system", title = "System", glyph = "power", sub = "Lock, suspend, reboot, shut down", items = {
-    { "Screensaver", "device-tv" },
-    { "Lock", "lock" },
-    { "Suspend", "zzz" },
-    { "Log out", "logout" },
-    { "Reboot", "rotate-clockwise" },
-    { "Reboot to UEFI", "settings" },
-    { "Shut down", "power" },
-  } },
-}
-
-local recording = false
-local extras = {} -- { label, glyph } from ~/.config/sysmenu/extra
+local entries, byId, children = {}, {}, {}
+local hidden = {} -- ids whose `when` test fails right now
+local hasWhen = false
+local lists = {} -- cmd -> rows from `<cmd> rows`
 local last = ""
 
-local function itemsOf(s)
-  if s.id ~= "capture" or not recording then
-    return s.items
+local function index(list)
+  entries, byId, children, hasWhen = list, {}, {}, false
+  for _, e in ipairs(list) do
+    byId[e.id] = e
+    local p = e.parent or ""
+    children[p] = children[p] or {}
+    table.insert(children[p], e)
+    hasWhen = hasWhen or e.when == true
   end
-  local list = { { "Stop recording", "player-stop" } }
-  for _, it in ipairs(s.items) do
-    table.insert(list, it)
-  end
-  return list
 end
 
 -- Unfiltered rows keep menu order; filtered rows are ranked by fuzzy score.
@@ -91,68 +32,111 @@ local function add(out, filter, row)
   end
 end
 
+local function entryRow(e, subtitle)
+  local row = { id = e.id, title = e.title, subtitle = subtitle or e.sub, glyph = e.glyph }
+  if e.menu then
+    row.query = e.id .. " "
+  end
+  return row
+end
+
 local function render(text)
   last = text
   local out = {}
   local head, rest = string.match(text, "^(%S+)%s(.*)$")
-  for _, s in ipairs(sections) do
-    if head == s.id then
-      for _, it in ipairs(itemsOf(s)) do
-        add(out, rest, { id = s.id .. "\t" .. it[1], title = it[1], glyph = it[2] })
+  local e = head and byId[head]
+  if e and e.list then
+    for _, r in ipairs(lists[e.list] or {}) do
+      local row = { id = "list\t" .. e.list .. "\t" .. r.name, title = r.name, subtitle = r.sub, glyph = e.glyph }
+      if r.icon ~= "" then
+        row.icon = r.icon
       end
-      launcher.setResults(text, out)
-      return
+      add(out, rest, row)
     end
+    launcher.setResults(text, out)
+    return
+  elseif e and e.menu then
+    for _, c in ipairs(children[e.id] or {}) do
+      if not hidden[c.id] then
+        add(out, rest, entryRow(c))
+      end
+    end
+    launcher.setResults(text, out)
+    return
   end
 
   local filter = string.match(text, "^%s*(.-)%s*$")
   add(out, filter, { id = "apps", title = "Apps", subtitle = "Search installed apps", glyph = "apps" })
-  for _, e in ipairs(extras) do
-    add(out, filter, { id = "extra\t" .. e[1], title = e[1], glyph = e[2] })
+  for _, c in ipairs(children[""] or {}) do
+    if not hidden[c.id] then
+      add(out, filter, entryRow(c))
+    end
   end
-  for _, s in ipairs(sections) do
-    add(out, filter, { id = s.id, title = s.title, subtitle = s.sub, glyph = s.glyph, query = s.id .. " " })
-  end
-  -- Typing at the top level also finds items inside sections.
+  -- Typing at the top level also finds rows inside sections.
   if filter ~= "" then
-    for _, s in ipairs(sections) do
-      for _, it in ipairs(itemsOf(s)) do
-        add(out, filter, { id = s.id .. "\t" .. it[1], title = it[1], subtitle = s.title, glyph = it[2] })
+    for _, c in ipairs(entries) do
+      if (c.parent or "") ~= "" and not hidden[c.id] then
+        local p = byId[c.parent]
+        add(out, filter, entryRow(c, p and p.title))
       end
     end
   end
   launcher.setResults(text, out)
 end
 
-local function loadExtras()
-  noctalia.readFileAsync(noctalia.expandPath("~/.config/sysmenu/extra"), function(contents)
-    local list = {}
-    for line in string.gmatch(contents or "", "[^\n]+") do
-      local label, _, glyph = string.match(line, "^([^\t]+)\t([^\t]*)\t?([^\t]*)$")
-      if label then
-        table.insert(list, { label, glyph ~= "" and glyph or "star" })
-      end
-    end
-    extras = list
-    render(last)
-  end)
-end
-
-local function checkRecording()
-  noctalia.runAsync({ "pgrep", "-f", "gpu-screen-recorder -w" }, function(res)
-    local now = res.exitCode == 0
-    if now ~= recording then
-      recording = now
+local function loadMenu()
+  noctalia.readFileAsync(noctalia.expandPath("~/.config/sysmenu/menu.json"), function(contents)
+    local ok, list = pcall(noctalia.json.decode, contents or "")
+    if ok and type(list) == "table" then
+      index(list)
       render(last)
     end
   end)
 end
 
+local function loadList(cmd)
+  noctalia.runAsync({ cmd, "rows" }, function(res)
+    if res.exitCode ~= 0 then
+      return
+    end
+    local rows = {}
+    for line in string.gmatch(res.stdout or "", "[^\n]+") do
+      local name, sub, icon = string.match(line, "^([^\t]*)\t?([^\t]*)\t?([^\t]*)$")
+      if name and name ~= "" then
+        table.insert(rows, { name = name, sub = sub ~= "" and sub or nil, icon = icon })
+      end
+    end
+    lists[cmd] = rows
+    render(last)
+  end)
+end
+
+local function loadHidden()
+  noctalia.runAsync({ "sysmenu", "hidden" }, function(res)
+    local now = {}
+    for id in string.gmatch(res.stdout or "", "[^\n]+") do
+      now[id] = true
+    end
+    hidden = now
+    render(last)
+  end)
+end
+
+pcall(loadMenu)
+
 function onQuery(text)
+  if text == "" or #entries == 0 then
+    loadMenu()
+  end
   render(text)
-  checkRecording()
-  if text == "" then
-    loadExtras()
+  local head = string.match(text, "^(%S+)%s")
+  local e = head and byId[head]
+  -- Refresh a list on the way in (so "Current" is right), or if it never loaded.
+  if e and e.list and (text == head .. " " or not lists[e.list]) then
+    loadList(e.list)
+  end
+  if hasWhen then
+    loadHidden()
   end
 end
 
@@ -162,16 +146,18 @@ function onActivate(id)
     noctalia.runAsync({ "sh", "-c", "sleep 0.2; noctalia msg panel-open launcher" })
     return
   end
-  local argv = { "systemd-run", "--user", "--scope", "--collect", "--quiet", "sysmenu" }
-  local section, item = string.match(id, "^([^\t]+)\t(.*)$")
-  if section == "extra" then
-    table.insert(argv, item)
-  elseif section then
-    table.insert(argv, section)
-    table.insert(argv, item)
+  -- Own scope, so apps it starts survive a Noctalia restart.
+  local argv = { "systemd-run", "--user", "--scope", "--collect", "--quiet" }
+  local cmd, name = string.match(id, "^list\t([^\t]+)\t(.*)$")
+  if cmd then
+    table.insert(argv, cmd)
+    table.insert(argv, name)
+  elseif byId[id] and not byId[id].menu then
+    table.insert(argv, "sysmenu")
+    table.insert(argv, "run")
+    table.insert(argv, id)
   else
     return
   end
-  -- Own scope, so apps it starts survive a Noctalia restart.
   noctalia.runAsync(argv)
 end

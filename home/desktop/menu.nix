@@ -1,8 +1,25 @@
 # Two launcher menus: sysmenu (capture, tools, toggles, style, setup, power)
 # and keybinds (searchable list of my shortcuts). The keys are set in the dotfiles.
-{ pkgs, ... }:
+# The System menu's rows live in menu-entries.nix.
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
+  entries = config.gav.sysmenu.entries;
+  parentOf = id: lib.concatStringsSep "." (lib.init (lib.splitString "." id));
+  # Sections and lists open in the launcher; everything else runs.
+  isMenu = e: e.list != null || lib.any (c: parentOf c.id == e.id) entries;
+  conditional = lib.filter (e: e.when != null) entries;
+  arm = pat: body: ''
+    ${lib.escapeShellArg pat})
+    ${body}
+    ;;
+  '';
+
   keybinds = pkgs.writeShellApplication {
     name = "keybinds";
     runtimeInputs = [ pkgs.jq ];
@@ -40,7 +57,6 @@ let
       pkgs.procps
     ];
     text = ''
-      pick() { local p=$1; shift; printf '%s\n' "$@" | noctalia dmenu -p "$p" || true; }
       n() { noctalia msg "$@"; }
       web() { xdg-open "$1" >/dev/null 2>&1 & }
       # Runs a fish command in the floating terminal and waits before closing.
@@ -48,19 +64,10 @@ let
         ghostty --gtk-single-instance=false --class=com.ghostty.floating \
           -e fish -c "$1; read -P 'Done. Enter to close '" &
       }
+      # Terminal apps, each in its own window.
+      tui() { ghostty --gtk-single-instance=false "$@" & }
       # Let the launcher close before grabbing the screen.
       settle() { sleep 0.3; }
-
-      learn() {
-        case ''${1:-$(pick Learn Keybindings "Hyprland wiki" "NixOS options" "Home Manager options" "Noctalia docs")} in
-          Keybindings) keybinds ;;
-          "Hyprland wiki") web https://wiki.hypr.land ;;
-          "NixOS options") web https://search.nixos.org/options ;;
-          "Home Manager options") web https://home-manager-options.extranix.com ;;
-          "Noctalia docs") web https://noctalia.dev ;;
-        esac
-      }
-
       # Record the screen with desktop audio. Ctrl-C finishes the file.
       record() {
         local dir=$HOME/Videos/Recordings
@@ -70,150 +77,115 @@ let
       }
       recording() { pgrep -f 'gpu-screen-recorder -w' >/dev/null; }
 
-      capture() {
-        local opts=(Region Window Screen "Draw on screen" "Region to clipboard" "Scan QR code" "Record region" "Record screen" "Color picker")
-        recording && opts=("Stop recording" "''${opts[@]}")
-        case ''${1:-$(pick Capture "''${opts[@]}")} in
-          Region) settle; n screenshot-region ;;
-          Window) settle; n screenshot-window ;;
-          Screen) settle; n screenshot-fullscreen ;;
-          "Draw on screen") settle; n annotate ;;
-          "Region to clipboard")
-            settle
-            area=$(slurp) || exit 0
-            grim -g "$area" - | wl-copy
-            # Edit opens the copy in Satty (annotate, then copy or save from there).
-            [ "$(notify-send -a Screenshot --action=edit=Edit "Copied to clipboard" "Region screenshot")" = edit ] \
-              && wl-paste | satty --filename -
-            ;;
-          "Scan QR code")
-            settle
-            area=$(slurp) || exit 0
-            if code=$(grim -g "$area" - | zbarimg -q --raw -); then
-              printf '%s' "$code" | wl-copy
-              notify-send -a "QR code" "Copied" "$code"
-            else
-              notify-send -a "QR code" "No QR code found"
-            fi
-            ;;
-          "Record region") settle; area=$(slurp -f '%wx%h+%x+%y') || exit 0; record -w region -region "$area" ;;
-          "Record screen") settle; output=$(slurp -o -f '%o') || exit 0; record -w "$output" ;;
-          "Stop recording")
-            pkill -INT -f 'gpu-screen-recorder -w'
-            sleep 0.5 # let it finish writing
-            file=$(find "$HOME/Videos/Recordings" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
-            case "$(notify-send -a Recorder --action=open=Open --action=folder="Show folder" "Recording saved" "''${file##*/}")" in
-              open) xdg-open "$file" ;;
-              folder) xdg-open "''${file%/*}" ;;
-            esac
-            ;;
-          "Color picker") settle; hyprpicker -a ;;
+      run_entry() {
+        case "$1" in
+          ${lib.concatMapStrings (
+            e:
+            arm e.id (
+              if isMenu e then ''exec noctalia msg panel-toggle launcher "/sys ${e.id} "'' else e.run
+            )
+          ) (lib.filter (e: isMenu e || e.run != null) entries)}
+          *) echo "sysmenu: no entry '$1'" >&2; exit 1 ;;
         esac
       }
 
-      # Terminal apps, each in its own window.
-      tui() { ghostty --gtk-single-instance=false "$@" & }
-      tools() {
-        case ''${1:-$(pick Tools "System monitor (btop)" "Git (lazygit)" "Disk usage (dua)" "Audio mixer (wiremix)")} in
-          "System monitor (btop)") tui -e btop ;;
-          "Git (lazygit)") tui --working-directory="$HOME/nixos-config" -e lazygit ;;
-          "Disk usage (dua)") tui --working-directory="$HOME" -e dua interactive ;;
-          "Audio mixer (wiremix)") tui --class=com.ghostty.floating -e wiremix ;;
+      # Rows with a `when` test, and the tests.
+      conditional=(${lib.escapeShellArgs (map (e: e.id) conditional)})
+      shows() {
+        case "$1" in
+          ${lib.concatMapStrings (e: arm e.id e.when) conditional}
+          *) true ;;
         esac
       }
 
-      toggle() {
-        case ''${1:-$(pick Toggle "Night light" "Do not disturb" "Stay awake" Bar Bluetooth)} in
-          "Night light") n nightlight-force-toggle ;;
-          "Do not disturb") n notification-dnd-toggle ;;
-          "Stay awake") n caffeine-toggle ;;
-          Bar) n bar-toggle ;;
-          Bluetooth) n bluetooth-toggle ;;
+      # `sysmenu capture 'Region to clipboard'` finds the row by its title.
+      by_title() {
+        case "$1" in
+          ${lib.concatMapStrings (e: arm "${parentOf e.id}/${e.title}" "echo ${e.id}") entries}
+          *) echo "$1" ;;
         esac
       }
 
-      style() {
-        case ''${1:-$(pick Style Theme Font Wallpaper "Random wallpaper" "Light/dark" "Noctalia settings")} in
-          Theme) theme ;;
-          Font) font ;;
-          Wallpaper) n panel-open wallpaper ;;
-          "Light/dark") theme toggle ;;
-          "Random wallpaper") n wallpaper-random ;;
-          "Noctalia settings") n settings-open ;;
-        esac
-      }
-
-      setup() {
-        case ''${1:-$(pick Setup Audio "Edit nixos-config" "Edit dotfiles" "Restart Noctalia" "Reload Hyprland")} in
-          Audio) n panel-open control-center audio ;;
-          "Edit nixos-config") zeditor "$HOME/nixos-config" ;;
-          "Edit dotfiles") zeditor "$HOME/Projects/dotfiles" ;;
-          "Restart Noctalia") systemctl --user restart noctalia.service ;;
-          "Reload Hyprland") hyprctl reload ;;
-        esac
-      }
-
-      update() {
-        case ''${1:-$(pick Update "Apply config" "Update inputs")} in
-          "Apply config") term apply ;;
-          "Update inputs") term update ;;
-        esac
-      }
-
-      system() {
-        case ''${1:-$(pick System Screensaver Lock Suspend "Log out" Reboot "Reboot to UEFI" "Shut down")} in
-          Screensaver) settle; screensaver ;;
-          Lock) n session lock ;;
-          Suspend) n session suspend ;;
-          "Log out") n session logout ;;
-          Reboot) n session reboot ;;
-          "Reboot to UEFI") n session reboot-uefi ;;
-          "Shut down") n session shutdown ;;
-        esac
-      }
-
-      # Extra menu entries, one "Label<tab>command[<tab>icon]" per line.
-      declare -A extras=()
-      extra_file=$HOME/.config/sysmenu/extra
-      if [ -r "$extra_file" ]; then
-        while IFS=$'\t' read -r label command _glyph; do
-          extras[$label]=$command
-        done <"$extra_file"
-      fi
-
-      # `sysmenu` alone opens the icon menu (Noctalia plugin gav/sysmenu).
-      # `sysmenu <section> [item]` opens one section or runs one entry.
-      item=''${2:-}
-      section=''${1:-}
-      section=''${section,,}
-      case "$section" in
-        learn | capture | tools | toggle | style | setup | update | system)
-          [ -n "$item" ] || exec noctalia msg panel-toggle launcher "/sys $section " ;;
-      esac
+      # `sysmenu` opens the icon menu (Noctalia plugin gav/sysmenu); `sysmenu <id>`
+      # opens a section or runs a row; `sysmenu hidden` lists rows to hide now.
       case "''${1:-}" in
-        "") n panel-toggle launcher "/sys " ;;
-        Apps | apps) n panel-open launcher ;;
-        Learn | learn) learn "$item" ;;
-        Capture | capture) capture "$item" ;;
-        Tools | tools) tools "$item" ;;
-        Toggle | toggle) toggle "$item" ;;
-        Style | style) style "$item" ;;
-        Setup | setup) setup "$item" ;;
-        Update | update) update "$item" ;;
-        System | system) system "$item" ;;
-        *) [ -z "''${extras[$1]:-}" ] || exec sh -c "''${extras[$1]}" ;;
+        "") exec noctalia msg panel-toggle launcher "/sys " ;;
+        apps | Apps) exec noctalia msg panel-open launcher ;;
+        run) run_entry "''${2:?entry id}" ;;
+        hidden) for id in "''${conditional[@]}"; do shows "$id" || echo "$id"; done ;;
+        *)
+          id=''${1,,}
+          [ -z "''${2:-}" ] || id=$(by_title "$id/$2")
+          run_entry "$id"
+          ;;
       esac
     '';
   };
 in
 {
-  home.packages = [
-    sysmenu
-    keybinds
-    pkgs.dua
-    pkgs.wiremix
-  ];
+  options.gav.sysmenu.entries = lib.mkOption {
+    description = "System menu rows, in order (see menu-entries.nix).";
+    default = [ ];
+    type = lib.types.listOf (
+      lib.types.submodule {
+        options = {
+          id = lib.mkOption { type = lib.types.str; };
+          title = lib.mkOption { type = lib.types.str; };
+          glyph = lib.mkOption {
+            type = lib.types.str;
+            default = "point";
+          };
+          sub = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+          };
+          run = lib.mkOption {
+            type = lib.types.nullOr lib.types.lines;
+            default = null;
+          };
+          list = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+          };
+          when = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+          };
+        };
+      }
+    );
+  };
 
-  # Enabled via [plugins] in noctalia/config.toml.
-  xdg.dataFile."noctalia/plugins/sysmenu".source = ./noctalia/plugins/sysmenu;
+  config = {
+    gav.sysmenu.entries = import ./menu-entries.nix;
+
+    home.packages = [
+      sysmenu
+      keybinds
+      pkgs.dua
+      pkgs.wiremix
+    ];
+
+    # Enabled via [plugins] in noctalia/config.toml.
+    xdg.dataFile."noctalia/plugins/sysmenu".source = ./noctalia/plugins/sysmenu;
+
+    # What the plugin draws; read each time the menu opens.
+    xdg.configFile."sysmenu/menu.json".text = builtins.toJSON (
+      map (
+        e:
+        lib.filterAttrs (_: v: v != null) {
+          inherit (e)
+            id
+            title
+            glyph
+            sub
+            list
+            ;
+          parent = parentOf e.id;
+          menu = isMenu e;
+          when = e.when != null;
+        }
+      ) entries
+    );
+  };
 }

@@ -1,12 +1,38 @@
 # The `font` command: one coding font for the terminal, the Noctalia bar and
-# launcher, Zed, and apps that ask for "monospace". The fonts are installed in
-# nixos/base/desktop.nix.
-{ pkgs, ... }:
+# launcher, Zed, GTK apps and anything that asks for "monospace". The list is
+# font-list.nix; `font` alone opens it in the System menu with previews.
+{ pkgs, lib, ... }:
 
 let
+  fonts = import ./font-list.nix pkgs;
+
+  # "Aa" tile per font for the menu rows.
+  previews =
+    pkgs.runCommand "font-previews"
+      {
+        nativeBuildInputs = [
+          pkgs.imagemagick
+          pkgs.fontconfig
+        ];
+        FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = map (f: f.package) fonts; };
+      }
+      ''
+        export HOME=$TMPDIR XDG_CACHE_HOME=$TMPDIR
+        mkdir -p $out
+        ${lib.concatMapStrings (f: ''
+          fc-match -f '%{family}' ${lib.escapeShellArg "${f.family}:style=Regular"} | grep -qF ${lib.escapeShellArg f.family} \
+            || { echo "font family not found: ${f.family}" >&2; exit 1; }
+          magick -size 128x128 xc:none -fill '#26262b' -draw 'roundrectangle 0,0 127,127 26,26' \
+            -font "$(fc-match -f '%{file}' ${lib.escapeShellArg "${f.family}:style=Regular"})" \
+            -pointsize 62 -fill '#ececec' -gravity center -annotate +0+0 Aa \
+            "$out"/${lib.escapeShellArg "${f.name}.png"}
+        '') fonts}
+      '';
+
   font = pkgs.writeShellApplication {
     name = "font";
     runtimeInputs = [
+      pkgs.dconf
       pkgs.fontconfig # fc-list
       pkgs.gnused
       pkgs.libnotify
@@ -14,16 +40,8 @@ let
     ];
     text = ''
       # name|font family
-      fonts='JetBrains Mono|JetBrainsMono Nerd Font
-      Cascadia Mono|CaskaydiaMono Nerd Font
-      Fira Code|FiraCode Nerd Font
-      Iosevka|IosevkaTerm Nerd Font
-      Geist Mono|GeistMono Nerd Font
-      Commit Mono|CommitMono Nerd Font
-      Victor Mono|VictorMono Nerd Font
-      Hack|Hack Nerd Font
-      Meslo|MesloLGM Nerd Font
-      Departure Mono|DepartureMono Nerd Font'
+      fonts=${lib.escapeShellArg (lib.concatMapStringsSep "\n" (f: "${f.name}|${f.family}") fonts)}
+      previews=${previews}
       cfg="''${XDG_CONFIG_HOME:-$HOME/.config}"
       state="''${XDG_STATE_HOME:-$HOME/.local/state}/font-current"
 
@@ -36,8 +54,17 @@ let
         done <<<"$fonts"
       }
 
+      # Menu rows: name, subtitle, preview image.
+      rows() {
+        local cur name
+        cur=$(current)
+        names | while read -r name; do
+          printf '%s\t%s\t%s\n' "$name" "$([ "$name" = "$cur" ] && echo Current)" "$previews/$name.png"
+        done
+      }
+
       apply() {
-        local family
+        local family size
         family=$(grep -m1 "^$1|" <<<"$fonts" | cut -d'|' -f2 || true)
         [ -n "$family" ] || { echo "unknown font: $1" >&2; exit 1; }
 
@@ -58,6 +85,10 @@ let
           fi
         fi
 
+        # GTK apps' monospace font, keeping the size.
+        size=$(dconf read /org/gnome/desktop/interface/monospace-font-name | grep -oE '[0-9.]+' | tail -1 || true)
+        dconf write /org/gnome/desktop/interface/monospace-font-name "'$family ''${size:-10}'" || true
+
         # Everything else that asks for "monospace".
         mkdir -p "$cfg/fontconfig/conf.d"
         cat >"$cfg/fontconfig/conf.d/60-font-picker.conf" <<EOF
@@ -71,20 +102,14 @@ let
 
         mkdir -p "''${state%/*}"
         echo "$1" >"$state"
-        notify-send -a Font -t 2000 "Font" "$1"
-      }
-
-      pick() {
-        local cur choice
-        cur=$(current)
-        choice=$(names | sed "s/^$cur\$/$cur  ·  current/" | noctalia dmenu -p "Font" || true)
-        [ -z "$choice" ] || apply "''${choice%  ·  current}"
+        notify-send -a Font -t 2000 -i "$previews/$1.png" "Font" "$1"
       }
 
       case "''${1:-}" in
         list) names ;;
+        rows) rows ;;
         current) current ;;
-        "") pick ;;
+        "") exec sysmenu style.font ;;
         *) apply "$*" ;;
       esac
     '';

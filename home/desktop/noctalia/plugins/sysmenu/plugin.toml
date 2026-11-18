@@ -2,7 +2,7 @@ id = "gav/sysmenu"
 name = "System menu"
 version = "1.0.0"
 author = "gav"
-description = "gavos System menu with an icon per entry; actions run `sysmenu <section> <item>`."
+description = "gavos System menu with an icon per entry; rows from ~/.config/sysmenu/menu.json."
 plugin_api = 24
 
 [[launcher_provider]]

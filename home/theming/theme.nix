@@ -1,8 +1,21 @@
 # The `theme` command: each theme is a color palette plus a wallpaper folder
-# in ~/Pictures/themes. `theme toggle` flips between dark and light.
-{ pkgs, ... }:
+# in ~/Pictures/themes. `theme toggle` flips between dark and light; `theme`
+# alone opens the list in the System menu with wallpaper thumbnails.
+{ pkgs, inputs, ... }:
 
 let
+  # First wallpaper of each theme folder, cropped to a rounded square.
+  thumbs = pkgs.runCommand "theme-thumbs" { nativeBuildInputs = [ pkgs.imagemagick ]; } ''
+    mkdir -p $out
+    for dir in ${inputs.wallpapers}/themes/*/; do
+      img=$(find "$dir" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.png' -o -iname '*.webp' \) | sort | head -1)
+      [ -n "$img" ] || continue
+      magick "$img" -resize 128x128^ -gravity center -extent 128x128 \
+        \( -size 128x128 xc:none -fill white -draw 'roundrectangle 0,0 127,127 26,26' \) \
+        -compose DstIn -composite "$out/$(basename "$dir").png"
+    done
+  '';
+
   theme = pkgs.writeShellApplication {
     name = "theme";
     runtimeInputs = [
@@ -27,9 +40,17 @@ let
       Retro-82|dark|custom|Retro-82|themes/retro-82
       Solitude|dark|custom|Solitude|themes/solitude
       Hackerman|dark|custom|Hackerman|themes/hackerman
+      Last Horizon|dark|custom|Last-Horizon|themes/last-horizon
+      Lumon|dark|custom|Lumon|themes/lumon
+      Matte Black|dark|custom|Matte-Black|themes/matte-black
+      Miasma|dark|custom|Miasma|themes/miasma
+      Ristretto|dark|custom|Ristretto|themes/ristretto
+      Vantablack|dark|custom|Vantablack|themes/vantablack
+      Catppuccin Latte|light|custom|Catppuccin-Latte|themes/catppuccin-latte
       Lupine|light|custom|Lupine|themes/lupine
       Flexoki Light|light|custom|Flexoki-Light|themes/flexoki-light
       White|light|custom|White|themes/white'
+      thumbs=${thumbs}
       sdir="''${XDG_STATE_HOME:-$HOME/.local/state}"
       state="$sdir/theme-current"
 
@@ -78,30 +99,33 @@ let
         THEME_NOTIFY=1 apply "$t"
       }
 
-      # Picker shows one mode at a time; the last row flips to the other mode's list.
-      pick() {
-        local m=$1 cur sw choice
+      # Menu rows: name, subtitle, thumbnail. Current mode first.
+      rows() {
+        local cur m name mode dir sub
         cur=$(current)
-        sw="→ $(other "$m") themes"
-        choice=$( { names "$m" | sed "s/^$cur\$/$cur  ·  current/"; echo "$sw"; } \
-          | noctalia dmenu -p "Theme ($m)" || true)
-        case "$choice" in
-          "") ;;
-          "$sw") pick "$(other "$m")" ;;
-          *) apply "''${choice%  ·  current}" ;;
-        esac
+        m=$(mode_of "$cur")
+        { awk -F'|' -v m="$m" '$2 == m' <<<"$themes"; awk -F'|' -v m="$m" '$2 != m' <<<"$themes"; } |
+          while IFS='|' read -r name mode _ _ dir; do
+            sub=''${mode^}
+            [ "$name" = "$cur" ] && sub="$sub · current"
+            printf '%s\t%s\t%s\n' "$name" "$sub" "$( [ -e "$thumbs/''${dir##*/}.png" ] && echo "$thumbs/''${dir##*/}.png")"
+          done
       }
+
+      case "''${1:-}" in
+        list) cut -d'|' -f1,2 <<<"$themes" | tr '|' '\t'; exit ;;
+        rows) rows; exit ;;
+        current) current; exit ;;
+        "") exec sysmenu style.theme ;;
+      esac
 
       exec 9>"''${XDG_RUNTIME_DIR:-/tmp}/theme.lock"
       flock -n 9 || exit 0
 
       case "''${1:-}" in
-        list) cut -d'|' -f1,2 <<<"$themes" | tr '|' '\t' ;;
         next) step 1 ;;
         prev) step -1 ;;
         toggle) toggle ;;
-        current) current ;;
-        "") pick "$(mode_of "$(current)")" ;;
         *) apply "$*" ;;
       esac
     '';
