@@ -184,6 +184,12 @@ let
       # `sysmenu` alone opens the icon menu (Noctalia plugin gav/sysmenu).
       # `sysmenu <section> [item]` opens one section or runs one entry.
       item=''${2:-}
+      section=''${1:-}
+      section=''${section,,}
+      case "$section" in
+        learn | capture | tools | toggle | style | setup | update | system)
+          [ -n "$item" ] || exec noctalia msg panel-toggle launcher "/sys $section " ;;
+      esac
       case "''${1:-}" in
         "") n panel-toggle launcher "/sys " ;;
         Apps | apps) n panel-open launcher ;;

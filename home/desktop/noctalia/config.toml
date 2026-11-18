@@ -5,7 +5,7 @@ compositor_blur = false
 capsule = false
 start = [ "control-center", "workspaces" ]
 center = [ "weather", "clock", "caffeine" ] # equal-width icons keep the clock dead centre
-end = [ "media", "privacy", "notifications", "tray", "network", "cpu", "volume" ]
+end = [ "media", "privacy", "notifications", "tray", "network", "cpu", "volume", "theme" ]
 color = "on_surface"
 font_weight = 400
 margin_edge = 0
@@ -231,15 +231,15 @@ show_label = false
 [widget.notifications]
 hide_when_no_unread = true
 
-# Theme button: click = picker, scroll = next/previous theme, right click = back to wallpaper colors.
+# Palette button: click = Style menu, scroll = next/previous theme, right click = back to wallpaper colors.
 [widget.theme]
 type = "custom_button"
 glyph = "palette"
-tooltip = "Theme (scroll to cycle)"
+tooltip = "Style (scroll to change theme)"
 scroll_repeat = "gesture"
 
     [widget.theme.actions]
-    left = "exec theme"
+    left = "exec sysmenu style"
     right = "exec theme Wallpaper"
     scroll_up = "exec theme prev"
     scroll_down = "exec theme next"
