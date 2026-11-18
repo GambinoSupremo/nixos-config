@@ -1,5 +1,5 @@
 [bar.default]
-# Solid theme-coloured strip, logo + workspaces | clock + indicators | status icons.
+# Solid theme-coloured strip: logo + workspaces | clock | status icons.
 background_opacity = 1.0
 compositor_blur = false
 capsule = false
