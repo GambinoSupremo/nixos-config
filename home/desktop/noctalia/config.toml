@@ -3,9 +3,9 @@
 background_opacity = 1.0
 compositor_blur = false
 capsule = false
-start = [ "control-center", "workspaces" ]
-center = [ "clock", "privacy", "caffeine", "notifications" ]
-end = [ "tray", "weather", "network", "volume", "cpu" ]
+start = [ "control-center", "workspaces", "media" ]
+center = [ "clock", "weather", "privacy", "caffeine", "notifications" ]
+end = [ "tray", "network", "volume", "cpu" ]
 color = "on_surface"
 font_weight = 400
 margin_edge = 0
@@ -210,6 +210,10 @@ type = "sysmon"
 stat = "cpu_usage"
 visualization = "none"
 show_value = false
+
+    # Click opens btop.
+    [widget.cpu.actions]
+    left = "exec ghostty --gtk-single-instance=false -e btop"
 
 [widget.network]
 show_label = false
