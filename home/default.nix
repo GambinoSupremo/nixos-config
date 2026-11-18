@@ -18,6 +18,7 @@
     ./theming/gtk-cursor.nix # GTK theme, icons, cursor, Nautilus sidebar
     ./theming/theme.nix # `theme` command: palette + matching wallpapers
     ./theming/papirus.nix # folder icons follow the accent color
+    ./theming/font.nix # `font` command: one coding font everywhere
 
     # apps/ - browser, web apps, default apps
     ./apps/zen.nix # Zen browser, search, privacy

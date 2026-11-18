@@ -200,11 +200,13 @@ directory = "/home/gav/Pictures/themes"
 address = "Kirkland, WA"
 unit = "imperial"
 
+# Accent touches: logo, current workspace and clock take the theme's main colour.
 [widget.clock]
-color = "on_surface"
+color = "primary"
 format = "{:%A %H:%M}"
 
 [widget.control-center]
+color = "primary"
 custom_image = "/run/current-system/sw/share/icons/hicolor/scalable/apps/nix-snowflake-white.svg"
 custom_image_colorize = true
 
@@ -256,7 +258,7 @@ label_source = "name"
 style = "minimal"
 hide_when_empty = false
 separator = " "
-focused_color = "on_surface"
+focused_color = "primary"
 occupied_color = "on_surface"
 empty_color = "on_surface_variant"
 

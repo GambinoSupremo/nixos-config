@@ -33,8 +33,9 @@ local sections = {
     { "Bar", "layout-navbar" },
     { "Bluetooth", "bluetooth" },
   } },
-  { id = "style", title = "Style", glyph = "palette", sub = "Theme, wallpaper, light/dark", items = {
+  { id = "style", title = "Style", glyph = "palette", sub = "Theme, font, wallpaper, light/dark", items = {
     { "Theme", "brush" },
+    { "Font", "typography" },
     { "Wallpaper", "photo" },
     { "Random wallpaper", "arrows-shuffle" },
     { "Light/dark", "sun-moon" },

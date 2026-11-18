@@ -133,8 +133,9 @@ let
       }
 
       style() {
-        case ''${1:-$(pick Style Theme Wallpaper "Random wallpaper" "Light/dark" "Noctalia settings")} in
+        case ''${1:-$(pick Style Theme Font Wallpaper "Random wallpaper" "Light/dark" "Noctalia settings")} in
           Theme) theme ;;
+          Font) font ;;
           Wallpaper) n panel-open wallpaper ;;
           "Light/dark") theme toggle ;;
           "Random wallpaper") n wallpaper-random ;;

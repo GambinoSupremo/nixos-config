@@ -114,8 +114,17 @@ in
         liberation_ttf
         open-sans
         ttf-bitstream-vera
-        nerd-fonts.meslo-lg
+        # Coding fonts for the `font` picker (home/theming/font.nix).
         nerd-fonts.jetbrains-mono
+        nerd-fonts.meslo-lg
+        nerd-fonts.caskaydia-mono
+        nerd-fonts.fira-code
+        nerd-fonts.iosevka-term
+        nerd-fonts.geist-mono
+        nerd-fonts.commit-mono
+        nerd-fonts.victor-mono
+        nerd-fonts.hack
+        nerd-fonts.departure-mono
       ];
       fontconfig.defaultFonts = {
         serif = [ "Noto Serif" ];
