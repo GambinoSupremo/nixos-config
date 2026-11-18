@@ -24,11 +24,11 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1795017508,
-        "narHash": "sha256-fBOqrN2BuOWWFnTr0VVHn01JbLWQyE0/lM4IX37jo3E=",
+        "lastModified": 1795018213,
+        "narHash": "sha256-z2zjsytIDgYlqx54pMxOR5Q9oLxqU7bgQrBGXaeJeU4=",
         "owner": "GambinoSupremo",
         "repo": "dotfiles",
-        "rev": "63b650c7b8ff955fd7234944b4c5d984f78cdba0",
+        "rev": "be7df32f93d27c962c740be1ae4f4df76dfce1ec",
         "type": "github"
       },
       "original": {
@@ -109,11 +109,11 @@
     },
     "private": {
       "locked": {
-        "lastModified": 1794882272,
-        "narHash": "sha256-fLEeEpGCesXfpJOL8QlBsCEhB20Xat1vuBee+itIAtA=",
+        "lastModified": 1795018213,
+        "narHash": "sha256-7uI+2zkV0TlLBzRtSeqRkqSrezLaoaOb1/PfMRM151E=",
         "ref": "refs/heads/main",
-        "rev": "9675e12879b9637cdd3f49772157944cae25945f",
-        "revCount": 20,
+        "rev": "baa131884eb922c3b0aa73af6d14bf95d8a15c62",
+        "revCount": 21,
         "type": "git",
         "url": "ssh://git@github.com/GambinoSupremo/nixos-private"
       },
