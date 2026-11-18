@@ -3,8 +3,8 @@
 background_opacity = 1.0
 compositor_blur = false
 capsule = false
-start = [ "control-center", "workspaces", "media" ]
-center = [ "clock", "weather", "privacy", "caffeine", "notifications" ]
+start = [ "control-center", "workspaces" ]
+center = [ "media", "clock", "weather", "privacy", "caffeine", "notifications" ]
 end = [ "tray", "network", "volume", "cpu" ]
 color = "on_surface"
 font_weight = 400
