@@ -83,6 +83,9 @@ widget_order = [ "lockscreen-login-box@DP-4", "lockscreen-login-box@DP-3" ]
 [nightlight]
 enabled = true
 
+[notification]
+position = "top_center" # under the clock
+
 [osd]
 background_opacity = 0.89999997988343239
 offset_x = 8.0
