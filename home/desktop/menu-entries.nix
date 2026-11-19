@@ -85,14 +85,16 @@
 
   { id = "style"; title = "Style"; glyph = "palette"; sub = "Theme, font, wallpaper, light/dark"; }
   { id = "style.theme"; title = "Theme"; glyph = "brush"; list = "theme"; }
+  { id = "style.add"; title = "Add theme from GitHub"; glyph = "brand-github"; run = "theme-install"; }
   { id = "style.font"; title = "Font"; glyph = "typography"; list = "font"; }
   { id = "style.wallpaper"; title = "Wallpaper"; glyph = "photo"; run = "n panel-open wallpaper"; }
   { id = "style.random"; title = "Random wallpaper"; glyph = "arrows-shuffle"; run = "n wallpaper-random"; }
   { id = "style.mode"; title = "Light/dark"; glyph = "sun-moon"; run = "theme toggle"; }
   { id = "style.settings"; title = "Noctalia settings"; glyph = "settings"; run = "n settings-open"; }
 
-  { id = "setup"; title = "Setup"; glyph = "adjustments"; sub = "Audio, configs, restarts"; }
+  { id = "setup"; title = "Setup"; glyph = "adjustments"; sub = "Audio, configs, web apps, restarts"; }
   { id = "setup.audio"; title = "Audio"; glyph = "volume"; run = "n panel-open control-center audio"; }
+  { id = "setup.webapp"; title = "Add web app"; glyph = "world-plus"; run = "webapp-add"; }
   { id = "setup.nixos"; title = "Edit nixos-config"; glyph = "folder-cog"; run = "zeditor \"$HOME/nixos-config\""; }
   { id = "setup.dotfiles"; title = "Edit dotfiles"; glyph = "brand-git"; run = "zeditor \"$HOME/Projects/dotfiles\""; }
   { id = "setup.noctalia"; title = "Restart Noctalia"; glyph = "reload"; run = "systemctl --user restart noctalia.service"; }
