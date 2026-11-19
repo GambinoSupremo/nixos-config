@@ -9,7 +9,7 @@
     ./desktop/noctalia.nix # the bar, launcher and wallpapers
     ./desktop/menu.nix # system menu + keybind cheatsheet
     ./desktop/capture-tools.nix # zoom, OCR, webcam bubble, recording fixes
-    ./desktop/remind.nix # Super+Shift+R: quick Todoist reminder
+    ./desktop/remind.nix # Super+Shift+R / `r`: Todoist reminders + PC pop-ups
     ./desktop/espanso.nix # type :smile: and get the emoji
     ./desktop/screensaver.nix # screensaver and idle timeouts
     ./desktop/dictation.nix # Super+D speech to text
