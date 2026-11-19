@@ -94,7 +94,7 @@ in
     qbittorrent
     matugen # colors from the wallpaper
     firefox
-    tutanota-desktop
+    protonmail-desktop
     pinta # simple image editor
     libreoffice
     xournalpp # sign / write on PDFs

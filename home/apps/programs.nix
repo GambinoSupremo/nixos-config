@@ -8,7 +8,8 @@
 
 {
   # --- Default apps ---
-  # Text and code open in Zed, folders in Nautilus, images in nomacs.
+  # Text and code open in Zed, folders in Nautilus, images in nomacs,
+  # email links in Proton Mail.
   xdg.mimeApps = {
     enable = true;
     # nomacs doesn't say it can open Canon RAW, so tell it here.
@@ -41,6 +42,7 @@
       ] (_: lib.mkForce [ "dev.zed.Zed.desktop" ])
       // {
         "inode/directory" = [ "org.gnome.Nautilus.desktop" ];
+        "x-scheme-handler/mailto" = [ "proton-mail.desktop" ];
       }
       // lib.genAttrs [
         "image/png"

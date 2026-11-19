@@ -143,17 +143,6 @@ in
           ];
         };
       };
-      sites."01M5K770R4K7SGG8XNF738Q2AD" = {
-        name = "Proton Mail";
-        url = "https://mail.proton.me";
-        desktopEntry = {
-          icon = "proton-mail";
-          categories = [
-            "Network"
-            "Email"
-          ];
-        };
-      };
       }
     ];
   };
