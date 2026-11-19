@@ -1,5 +1,6 @@
 # `remind` / `r`: one line, e.g. "call the bank tomorrow 5pm", becomes a Todoist
-# task in Reminders. A once-a-minute check pops due ones up here with Done/Snooze.
+# task in the Inbox. A once-a-minute check pops up any task with a set time, from
+# any project, when it's due, with Done/Snooze.
 # Token in ~/.config/todoist/token.
 { pkgs, lib, ... }:
 
@@ -39,7 +40,7 @@ let
       [ -r "$token_file" ] || { notify-send -a Reminders "No Todoist token" "Put it in $token_file"; exit 1; }
       text=''${*:-$(zenity --entry --title=Reminder --text="What and when? (e.g. call the bank tomorrow 5pm)" --width=420)} || exit 0
       [ -n "''${text// /}" ] || exit 0
-      body=$(jq -n --arg t "$text #Reminders" '{text: $t, auto_reminder: true}')
+      body=$(jq -n --arg t "$text" '{text: $t, auto_reminder: true}')
       if task=$(curl -sSf -X POST ${api}/tasks/quick \
         -H "Authorization: Bearer $(token)" \
         -H 'Content-Type: application/json' -d "$body"); then
@@ -74,7 +75,7 @@ let
     '';
   };
 
-  # Finds due reminders not shown yet and pops each up in its own unit.
+  # Finds timed tasks that are due and not shown yet; pops each up in its own unit.
   # Times are checked here: the API's today/overdue filters return nothing.
   check = pkgs.writeShellApplication {
     name = "reminders-check";
@@ -85,7 +86,7 @@ let
       fails=$state_dir/fails
       if ! [ -r "$token_file" ] || ! tasks=$(curl -sSf -G --max-time 20 ${api}/tasks/filter \
         -H "Authorization: Bearer $(token)" \
-        --data-urlencode 'query=#Reminders' --data-urlencode limit=200); then
+        --data-urlencode 'query=!no time' --data-urlencode limit=200); then
         n=$(($(cat "$fails" 2>/dev/null || echo 0) + 1))
         echo "$n" >"$fails"
         if [ "$n" -eq 5 ]; then
@@ -99,19 +100,17 @@ let
       now=$(date +%s)
       keys=()
       while IFS=$'\t' read -r id due content; do
-        # Timed: due then. Date only: 9 am that day.
-        if [[ $due == *T* ]]; then at=$(date -d "$due" +%s); else at=$(date -d "$due 09:00" +%s); fi
+        at=$(date -d "$due" +%s)
         key="$id@$due"
         keys+=("$key")
         ((at <= now)) || continue
         next=$(awk -v k="$key" '$1 == k { print $2 }' "$seen")
         if [ "$next" = never ] || { [ -n "$next" ] && ((next > now)); }; then continue; fi
-        if [[ $due != *T* ]]; then when="Due today"
-        elif [ "$(date -d "@$at" +%F)" = "$(date +%F)" ]; then when="Due $(date -d "@$at" '+%-I:%M %p')"
+        if [ "$(date -d "@$at" +%F)" = "$(date +%F)" ]; then when="Due $(date -d "@$at" '+%-I:%M %p')"
         else when="Due $(date -d "@$at" '+%a %-I:%M %p')"; fi
         set_seen "$key" never
         systemd-run --user --collect --quiet ${lib.getExe popup} "$id" "$key" "$content" "$when"
-      done < <(jq -r '.results[] | select(.due != null) | [.id, .due.date, .content] | @tsv' <<<"$tasks")
+      done < <(jq -r '.results[] | select(.due.date // "" | contains("T")) | [.id, .due.date, .content] | @tsv' <<<"$tasks")
 
       # Forget reminders that are done or moved.
       (
