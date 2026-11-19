@@ -46,7 +46,7 @@ let
 
   # Built from the emoji package's names and short aliases, skin-tone variants skipped.
   emoji = pkgs.runCommand "espanso-emoji.yml" { skip = map (m: m.trigger) extras.matches; } ''
-    ${py}/bin/python3 - >$out <<'EOF'
+    ${py}/bin/python3 - <<'EOF'
     import json, os, emoji
     seen, matches = set(os.environ["skip"].split()), []
     for e, d in emoji.EMOJI_DATA.items():
@@ -57,7 +57,9 @@ let
                 continue
             seen.add(t)
             matches.append({"trigger": t, "replace": e})
-    print(json.dumps({"matches": matches}))
+    # Raw characters: espanso's YAML reader rejects \ud83d-style escapes.
+    with open(os.environ["out"], "w", encoding="utf-8") as f:
+        json.dump({"matches": matches}, f, ensure_ascii=False)
     EOF
   '';
 in
