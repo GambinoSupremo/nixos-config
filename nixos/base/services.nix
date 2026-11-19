@@ -62,6 +62,7 @@ in
     enable = true;
     settings = {
       PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false; # else PAM still takes the password
       PermitRootLogin = "no";
     };
   };
