@@ -118,45 +118,30 @@ community_palette = "Tokyo Night Moon"
 source = "wallpaper"
 
     [theme.templates]
+    # Installed apps only; a missing app's template fails on every theme change.
     builtin_ids = [
-        "alacritty",
         "btop",
-        "cava",
-        "emacs",
-        "foot",
         "gtk3",
         "gtk4",
         "ghostty",
-        "helix",
         "hyprland",
         "kcolorscheme",
-        "labwc",
         "niri",
         "qt",
-        "scroll",
-        "starship",
-        "sway",
-        "wezterm"
+        "starship"
     ]
     community_ids = [
-        "pi-agent",
-        "spicetify",
-        "tauon",
+        "claude-code",
+        "sone",
         "pywalfox",
         "zen-browser",
-        "neovim",
-        "obsidian",
-        "vscode",
-        "zed",
-        "vicinae",
-        "walker",
         "discord",
-        "steam",
-        "telegram",
-        "yazi",
-        "zathura",
-        "hyprtoolkit",
-        "obs"
+        "obsidian",
+        "zed",
+        "heroiclauncher",
+        "obs",
+        "lazygit",
+        "neovim"
     ]
 
     # App themes Noctalia has no community template for.
@@ -164,6 +149,12 @@ source = "wallpaper"
     input_path = "~/.config/noctalia/templates/papirus-accent"
     output_path = "~/.cache/noctalia/papirus-accent"
     post_hook = "papirus-accent"
+
+    # Community tmux one edits tmux.conf, which home-manager owns; this just reloads.
+    [theme.templates.user.tmux]
+    input_path = "~/.config/noctalia/templates/tmux.conf"
+    output_path = "~/.config/tmux/themes/noctalia.conf"
+    post_hook = "tmux source-file -q ~/.config/tmux/themes/noctalia.conf 2>/dev/null || true"
 
 [wallpaper]
 directory = "/home/gav/Pictures/themes"

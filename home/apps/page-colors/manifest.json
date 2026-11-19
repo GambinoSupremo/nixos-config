@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "Page colors",
+  "version": "1.0",
+  "description": "Recolors YouTube with the browser theme Pywalfox sets.",
+  "browser_specific_settings": { "gecko": { "id": "page-colors@gavos" } },
+  "permissions": ["theme", "storage"],
+  "background": { "scripts": ["background.js"] },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["youtube.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

@@ -79,6 +79,11 @@ let
       url = "https://addons.mozilla.org/firefox/downloads/file/5055786/darkreader-4.9.133.xpi";
       sha256 = "eb06c5096d761616c7f1d954c11524ca4bff4fe7229044dc1fce288a8c0853ab";
     };
+    # Window colors follow the theme live (host set up in zen.nix).
+    "pywalfox@frewacom.org" = {
+      url = "https://addons.mozilla.org/firefox/downloads/file/4834767/pywalfox-2.1.1.xpi";
+      sha256 = "b7a7a86d1d49a8309758ce1d38492975abe07a61e3788e2d913c70a4d07758b4";
+    };
   };
 in
 {
@@ -87,11 +92,14 @@ in
       id: src: lib.nameValuePair "${profile}/extensions/${id}.xpi" { source = pkgs.fetchurl src; }
     ) extensions
     // {
+      # YouTube page colors follow the theme live; see page-colors/.
+      "${profile}/extensions/page-colors@gavos.xpi".source = pkgs.callPackage ./page-colors { };
       # Turn the extensions on and keep them at these versions.
       "${profile}/user.js".text = ''
         user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
         user_pref("extensions.autoDisableScopes", 0);
         user_pref("extensions.update.enabled", false);
+        user_pref("xpinstall.signatures.required", false);
       '';
       # The toolbar hides above the window; mouse to the top edge brings it back.
       "${profile}/chrome/userChrome.css".text = ''
@@ -119,6 +127,10 @@ in
   # --- Sites ---
   programs.firefoxpwa = {
     enable = true;
+    # Firefox ESR runtime: plain Firefox won't load the unsigned page-colors add-on.
+    package = pkgs.wrapFirefox (pkgs.firefoxpwa-unwrapped.override {
+      firefoxRuntime = pkgs.firefox-esr-unwrapped;
+    }) { };
     # One profile, so the web apps share logins with each other (not with Zen).
     profiles."01M5K68BBWCK8J79CEY7C3DDT9" = lib.mkMerge [
       { sites = added; }

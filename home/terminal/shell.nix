@@ -132,7 +132,10 @@ in
     baseIndex = 1;
     escapeTime = 0;
     terminal = "tmux-256color";
+    # Theme colors, written + reloaded by Noctalia on every theme change.
+    extraConfig = "source-file -q ~/.config/tmux/themes/noctalia.conf";
   };
+  xdg.configFile."noctalia/templates/tmux.conf".source = ./tmux-noctalia.conf;
 
   programs.fzf = {
     enable = true;

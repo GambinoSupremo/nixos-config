@@ -109,7 +109,5 @@ in
 
     # Mullvad comes from its service (networking.nix). Don't add pkgs.mullvad:
     # it's an older build and would replace the mullvad command.
-
-    pywalfox-native # lets Zen follow the theme colors
   ];
 }

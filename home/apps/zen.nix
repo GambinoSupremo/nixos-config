@@ -59,6 +59,9 @@
         # Needed for the theme colors.
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         "zen.theme.disable-lightweight" = false;
+        # Load the unsigned page-colors add-on below.
+        "xpinstall.signatures.required" = false;
+        "extensions.autoDisableScopes" = 0;
 
         # Leave DNS to Mullvad; Zen's own DNS hangs Keeper's login on the VPN.
         "network.trr.mode" = 5;
@@ -121,11 +124,16 @@
     };
   };
 
-  # Lets the Pywalfox extension read the theme colors.
+  # YouTube page colors follow the theme live; see page-colors/.
+  home.file.".config/zen/default/extensions/page-colors@gavos.xpi".source =
+    pkgs.callPackage ./page-colors { };
+
+  # Pywalfox gets the colors from Noctalia's own host, which pushes every
+  # theme change to all open browsers (Zen + web apps).
   home.file.".mozilla/native-messaging-hosts/pywalfox.json".text = builtins.toJSON {
     name = "pywalfox";
-    description = "Pywalfox native app";
-    path = "${pkgs.pywalfox-native}/bin/pywalfox";
+    description = "Noctalia Firefox theme native messaging host";
+    path = lib.getExe config.programs.noctalia.package;
     type = "stdio";
     allowed_extensions = [ "pywalfox@frewacom.org" ];
   };
