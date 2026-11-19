@@ -15,6 +15,11 @@ _:
     gui.enable = true;
   };
 
+  # --- LocalSend ---
+  # AirDrop-style sharing with phones on the LAN; opens its port. With Mullvad
+  # on, its "Local network sharing" setting must be enabled to be seen.
+  programs.localsend.enable = true;
+
   # --- DNS ---
   # DNSSEC stays off, it breaks Mullvad's DNS. Don't set domains here either.
   services.resolved = {

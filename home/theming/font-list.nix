@@ -11,6 +11,5 @@ pkgs: with pkgs.nerd-fonts; [
   { name = "Hack"; family = "Hack Nerd Font"; package = hack; }
   { name = "Meslo"; family = "MesloLGM Nerd Font"; package = meslo-lg; }
   { name = "Bitstream Vera"; family = "BitstromWera Nerd Font"; package = bitstream-vera-sans-mono; }
-  { name = "iA Writer Mono"; family = "iA Writer Mono V"; package = pkgs.ia-writer-mono; }
   { name = "Departure Mono"; family = "DepartureMono Nerd Font"; package = departure-mono; }
 ]

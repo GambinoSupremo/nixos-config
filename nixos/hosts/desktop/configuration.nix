@@ -8,6 +8,7 @@
     ../../features/amd.nix
     ../../base
     ../../features/gaming.nix
+    ../../features/local-ai.nix
     ../../features/sunshine.nix
     ../../features/tuning.nix
   ];

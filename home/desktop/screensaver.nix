@@ -1,5 +1,5 @@
 # Screensaver: text effects full screen on every monitor, gone on any input.
-# Starts after 30 idle minutes, screens off after 60, never while gaming.
+# Starts after 5 idle minutes, screens off after 10, never while gaming.
 { pkgs, ... }:
 
 let
@@ -66,13 +66,13 @@ in
   # Noctalia reads every .toml here on top of config.toml.
   xdg.configFile."noctalia/idle.toml".text = ''
     [idle.behavior.screensaver]
-    timeout = 1800
+    timeout = 300
     action = "command"
     command = "screensaver idle"
     resume_command = "screensaver stop"
 
     [idle.behavior.screen-off]
-    timeout = 3600
+    timeout = 600
     action = "command"
     command = "screensaver screen-off"
     resume_command = "noctalia msg dpms-on"

@@ -82,6 +82,9 @@
     matugen # colors from the wallpaper
     firefox
     tutanota-desktop
+    pinta # simple image editor
+    libreoffice
+    xournalpp # sign / write on PDFs
 
     # --- Music ---
     spotify
@@ -89,6 +92,7 @@
 
     # --- Gaming ---
     protonplus
+    heroic # Epic, GOG and Amazon games
 
     # Mullvad comes from its service (networking.nix). Don't add pkgs.mullvad:
     # it's an older build and would replace the mullvad command.

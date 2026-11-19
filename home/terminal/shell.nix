@@ -17,9 +17,64 @@ let
     runtimeEnv.NIXOS_SYNC_HOST = host.name;
     text = builtins.readFile ./nixos-sync.sh;
   };
+
+  # Shared by iso2usb and format-drive: only USB disks, chosen by typing the name.
+  pickUsb = ''
+    mapfile -t disks < <(lsblk -dnpo PATH,TRAN,SIZE,MODEL | awk '$2 == "usb"')
+    [ "''${#disks[@]}" -gt 0 ] || { echo "No USB drive plugged in."; exit 1; }
+    printf '%s\n' "''${disks[@]}"
+    read -rp "Type the drive to ERASE (e.g. /dev/sdX): " dev
+    printf '%s\n' "''${disks[@]}" | awk '{print $1}' | grep -qx -- "$dev" \
+      || { echo "$dev is not a USB drive in the list."; exit 1; }
+    read -rp "Everything on $dev will be lost. Type yes: " ok
+    [ "$ok" = yes ] || exit 1
+  '';
+
+  iso2usb = pkgs.writeShellApplication {
+    name = "iso2usb";
+    runtimeInputs = [
+      pkgs.util-linux
+      pkgs.gawk
+      pkgs.gnugrep
+      pkgs.coreutils
+    ];
+    text = ''
+      [ -f "''${1:-}" ] || { echo "usage: iso2usb file.iso"; exit 1; }
+      ${pickUsb}
+      sudo dd if="$1" of="$dev" bs=4M status=progress conv=fsync oflag=direct
+      echo "Done. You can unplug $dev."
+    '';
+  };
+
+  format-drive = pkgs.writeShellApplication {
+    name = "format-drive";
+    runtimeInputs = [
+      pkgs.util-linux
+      pkgs.gawk
+      pkgs.gnugrep
+      pkgs.coreutils
+      pkgs.parted
+      pkgs.exfatprogs
+    ];
+    text = ''
+      ${pickUsb}
+      label=''${1:-USB}
+      sudo wipefs -a "$dev"
+      sudo parted -s "$dev" mklabel gpt mkpart "$label" 1MiB 100%
+      sudo udevadm settle
+      part=$(lsblk -lnpo PATH "$dev" | sed -n 2p)
+      sudo mkfs.exfat -L "$label" "$part"
+      echo "Wiped and formatted $dev as exFAT ($label); works on Linux, Mac and Windows."
+    '';
+  };
 in
 {
-  home.packages = [ pkgs.krabby ]; # the Pokémon in the greeting
+  home.packages = [
+    pkgs.krabby # the Pokémon in the greeting
+    pkgs.ouch # compress / decompress any archive type
+    iso2usb
+    format-drive
+  ];
 
   # --- Fish ---
   programs.fish = {
@@ -53,6 +108,8 @@ in
       cat = "bat";
       grep = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${host.name}";
+      compress = "ouch compress"; # compress file1 dir2 out.tar.zst
+      decompress = "ouch decompress";
     };
     functions = {
       apply = "${nixosSync}/bin/nixos-sync apply";
@@ -63,6 +120,20 @@ in
   };
 
   # --- Helpers ---
+  # `tldr <cmd>`: short example-first help.
+  programs.tealdeer = {
+    enable = true;
+    settings.updates.auto_update = true;
+  };
+
+  programs.tmux = {
+    enable = true;
+    mouse = true;
+    baseIndex = 1;
+    escapeTime = 0;
+    terminal = "tmux-256color";
+  };
+
   programs.fzf = {
     enable = true;
     enableFishIntegration = false; # it would take over Ctrl+T

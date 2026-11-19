@@ -13,7 +13,7 @@
   { id = "learn.hm"; title = "Home Manager options"; glyph = "book-2"; run = "web https://home-manager-options.extranix.com"; }
   { id = "learn.noctalia"; title = "Noctalia docs"; glyph = "sparkles"; run = "web https://noctalia.dev"; }
 
-  { id = "capture"; title = "Capture"; glyph = "camera"; sub = "Screenshots, recording, QR codes"; }
+  { id = "capture"; title = "Capture"; glyph = "camera"; sub = "Screenshots, recording, text, QR codes"; }
   {
     id = "capture.stop";
     title = "Stop recording";
@@ -63,6 +63,11 @@
   }
   { id = "capture.rec-region"; title = "Record region"; glyph = "player-record"; run = "settle; area=$(slurp -f '%wx%h+%x+%y') || exit 0; record -w region -region \"$area\""; }
   { id = "capture.rec-screen"; title = "Record screen"; glyph = "screen-share"; run = "settle; output=$(slurp -o -f '%o') || exit 0; record -w \"$output\""; }
+  { id = "capture.audio"; title = "Recording audio"; glyph = "microphone"; sub = "Desktop, mic, both or none"; list = "recaudio"; }
+  { id = "capture.webcam"; title = "Webcam bubble"; glyph = "camera-selfie"; run = "webcam &"; }
+  { id = "capture.fix"; title = "Fix a recording"; glyph = "cut"; sub = "Trim or even out volume"; run = "media-fix"; }
+  { id = "capture.convert"; title = "Shrink or convert"; glyph = "file-export"; sub = "Videos, GIFs, images"; run = "convert-file"; }
+  { id = "capture.ocr"; title = "Copy text from screen"; glyph = "text-scan-2"; run = "settle; ocr"; }
   { id = "capture.color"; title = "Color picker"; glyph = "color-picker"; run = "settle; hyprpicker -a"; }
 
   { id = "tools"; title = "Tools"; glyph = "tools"; sub = "btop, lazygit, dua, wiremix"; }

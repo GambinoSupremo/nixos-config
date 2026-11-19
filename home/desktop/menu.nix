@@ -68,11 +68,17 @@ let
       tui() { ghostty --gtk-single-instance=false "$@" & }
       # Let the launcher close before grabbing the screen.
       settle() { sleep 0.3; }
-      # Record the screen with desktop audio. Ctrl-C finishes the file.
+      # Record the screen; audio per `recaudio` (Capture → Recording audio). Ctrl-C finishes the file.
       record() {
-        local dir=$HOME/Videos/Recordings
+        local dir=$HOME/Videos/Recordings audio=()
         mkdir -p "$dir"
-        gpu-screen-recorder "$@" -a default_output -o "$dir/$(date +%F_%H-%M-%S).mp4" >/dev/null 2>&1 &
+        case "$(recaudio current)" in
+          Mic) audio=(-a default_input) ;;
+          Both) audio=(-a "default_output|default_input") ;;
+          None) ;;
+          *) audio=(-a default_output) ;;
+        esac
+        gpu-screen-recorder "$@" "''${audio[@]}" -o "$dir/$(date +%F_%H-%M-%S).mp4" >/dev/null 2>&1 &
         notify-send -a Recorder "Recording" "Stop it from System menu → Capture."
       }
       recording() { pgrep -f 'gpu-screen-recorder -w' >/dev/null; }

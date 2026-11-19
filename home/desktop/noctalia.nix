@@ -18,6 +18,9 @@ in
     systemd.enable = true;
   };
 
+  # Bar icons that only show while on (enabled in noctalia/config.toml).
+  xdg.dataFile."noctalia/plugins/status".source = ./noctalia/plugins/status;
+
   # One wallpaper folder per theme.
   home.file."Pictures/themes".source = "${inputs.wallpapers}/themes";
 

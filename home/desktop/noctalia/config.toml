@@ -5,7 +5,7 @@ compositor_blur = false
 capsule = false
 start = [ "control-center", "workspaces" ]
 center = [ "weather", "clock", "caffeine" ] # equal-width icons keep the clock dead centre
-end = [ "media", "privacy", "notifications", "tray", "network", "cpu", "theme", "volume" ] # volume stays far right
+end = [ "gav/status:dictating", "media", "privacy", "notifications", "tray", "network", "cpu", "gav/status:update", "theme", "volume" ] # volume stays far right
 color = "on_surface"
 font_weight = 400
 margin_edge = 0
@@ -31,10 +31,9 @@ type = "nightlight"
 [[control_center.shortcuts]]
 type = "notification"
 
+# Night light follows the real sunset/sunrise for the auto-located city.
 [location]
-custom_schedule = true
-sunrise = "06:45"
-sunset = "21:45"
+custom_schedule = false
 
 [lockscreen_widgets]
 enabled = false
@@ -261,6 +260,6 @@ focused_color = "primary"
 occupied_color = "on_surface"
 empty_color = "on_surface_variant"
 
-# System menu icons (home/desktop/noctalia/plugins/sysmenu).
+# System menu icons and on-only status icons (home/desktop/noctalia/plugins).
 [plugins]
-enabled = ["gav/sysmenu"]
+enabled = ["gav/sysmenu", "gav/status"]

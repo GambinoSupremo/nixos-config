@@ -1,0 +1,19 @@
+id = "gav/status"
+name = "Status icons"
+version = "1.0.0"
+author = "gav"
+description = "Bar icons that only show while something is on: dictation, pending update."
+plugin_api = 24
+
+# Mic icon while voxtype is recording or transcribing.
+[[widget]]
+id = "dictating"
+entry = "dictating.luau"
+
+# Dot once nixpkgs in ~/nixos-config/flake.lock is over 10 days old. Click runs update.
+[[widget]]
+id = "update"
+entry = "update.luau"
+
+  [widget.actions]
+  left = "exec sysmenu update"
