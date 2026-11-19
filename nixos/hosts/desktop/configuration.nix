@@ -11,7 +11,6 @@
     ../../features/local-ai.nix
     ../../features/sunshine.nix
     ../../features/tuning.nix
-    ../../features/yubikey.nix
     ../../features/espanso.nix
   ];
 
