@@ -40,9 +40,10 @@ KDE Plasma is not installed.
 - **Electron apps**: `NIXOS_OZONE_WL=1` (amd.nix) puts them on Wayland.
   Signal must launch with `--password-store=gnome-libsecret` everywhere or
   the keyring backend flips between sessions and loses the encryption key.
-- **Mullvad**: the GUI user service polls the system daemon with a BOUNDED
-  wait (home/desktop/vpn-bluetooth.nix) — an unbounded loop hung activation during
-  rebuilds. `mullvad-exclude` is setuid and dies in Steam's nosuid sandbox;
+- **Mullvad**: the GUI doesn't autostart (~700 MB for a tray icon); the daemon
+  auto-connects on its own. If it's ever brought back, any wait on the daemon
+  must be bounded: an unbounded loop hung activation during rebuilds.
+  `mullvad-exclude` is setuid and dies in Steam's nosuid sandbox;
   games that need to bypass the VPN use the `novpn` wrapper (daemon RPC,
   gaming.nix): `novpn gamemoderun %command%`.
 - **mustSed coupling**: home/desktop/dotfiles.nix patches exact line text in the

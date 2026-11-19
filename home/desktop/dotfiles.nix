@@ -143,7 +143,7 @@ in
     "niri" = lib.mkIf sessions.niri (deploy "niri");
 
     # --- Autostart entries switched off ---
-    # Mullvad starts from its own service (vpn-bluetooth.nix). Signal and
+    # The VPN runs without its window (open Mullvad from the launcher). Signal and
     # Vesktop start from the desktop config; two Signals at login lock its database.
     "autostart/mullvad-vpn.desktop" = hidden;
     "autostart/signal.desktop" = hidden;

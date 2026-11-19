@@ -15,7 +15,7 @@
     ./desktop/dictation.nix # Super+D speech to text
     ./desktop/philips-input.nix # flip the Philips between this PC and the work Mac
     ./desktop/home-alerts.nix # homelab alerts as desktop notifications
-    ./desktop/vpn-bluetooth.nix # Mullvad window at login, quieter Bluetooth
+    ./desktop/bluetooth.nix # quieter Bluetooth
 
     # theming/ - colors, icons, cursor
     ./theming/gtk-cursor.nix # GTK theme, icons, cursor, Nautilus sidebar
