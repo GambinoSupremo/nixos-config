@@ -2,6 +2,19 @@
 # (Steam, fish, OBS...) is switched on where those settings live instead.
 { pkgs, ... }:
 
+let
+  # Sone 0.23 never refetches cached mixes (Daily Discovery lags ~28h); clear them on each launch.
+  soneLauncher = pkgs.writeShellScriptBin "sone" ''
+    for m in "$HOME"/.config/sone/cache/v7/dynamic/*.meta; do
+      ${pkgs.gnugrep}/bin/grep -qs '"mix-page"' "$m" && rm -f -- "$m" "''${m%.meta}.dat"
+    done
+    exec ${pkgs.sone}/bin/sone "$@"
+  '';
+  soneFreshMixes = pkgs.symlinkJoin {
+    name = "sone-fresh-mixes";
+    paths = [ soneLauncher pkgs.sone ];
+  };
+in
 {
   environment.systemPackages = with pkgs; [
 
@@ -88,7 +101,7 @@
 
     # --- Music ---
     spotify
-    sone # TIDAL
+    soneFreshMixes # TIDAL
 
     # --- Gaming ---
     protonplus
