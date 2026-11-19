@@ -10,6 +10,7 @@
     ./desktop/menu.nix # system menu + keybind cheatsheet
     ./desktop/capture-tools.nix # zoom, OCR, webcam bubble, recording fixes
     ./desktop/remind.nix # Super+Shift+R: quick Todoist reminder
+    ./desktop/espanso.nix # type :smile: and get the emoji
     ./desktop/screensaver.nix # screensaver and idle timeouts
     ./desktop/dictation.nix # Super+D speech to text
     ./desktop/philips-input.nix # flip the Philips between this PC and the work Mac

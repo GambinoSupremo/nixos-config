@@ -12,6 +12,7 @@
     ../../features/sunshine.nix
     ../../features/tuning.nix
     ../../features/yubikey.nix
+    ../../features/espanso.nix
   ];
 
   # --- Disk ---
