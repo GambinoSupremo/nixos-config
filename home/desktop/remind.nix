@@ -75,6 +75,7 @@ let
   };
 
   # Finds due reminders not shown yet and pops each up in its own unit.
+  # Times are checked here: the API's today/overdue filters return nothing.
   check = pkgs.writeShellApplication {
     name = "reminders-check";
     runtimeInputs = deps ++ [ pkgs.systemd ];
@@ -84,7 +85,7 @@ let
       fails=$state_dir/fails
       if ! [ -r "$token_file" ] || ! tasks=$(curl -sSf -G --max-time 20 ${api}/tasks/filter \
         -H "Authorization: Bearer $(token)" \
-        --data-urlencode 'query=#Reminders & (today | overdue)' --data-urlencode limit=200); then
+        --data-urlencode 'query=#Reminders' --data-urlencode limit=200); then
         n=$(($(cat "$fails" 2>/dev/null || echo 0) + 1))
         echo "$n" >"$fails"
         if [ "$n" -eq 5 ]; then
