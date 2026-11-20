@@ -100,7 +100,7 @@ in
     xournalpp # sign / write on PDFs
 
     # --- Music ---
-    spotify
+    # Spotify: home/apps/spotify.nix (themed copy)
     soneFreshMixes # TIDAL
 
     # --- Gaming ---

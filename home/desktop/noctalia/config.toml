@@ -203,7 +203,8 @@ source = "wallpaper"
         "heroiclauncher",
         "obs",
         "lazygit",
-        "neovim"
+        "neovim",
+        "spicetify-noctalia"
     ]
 
     # App themes Noctalia has no community template for.

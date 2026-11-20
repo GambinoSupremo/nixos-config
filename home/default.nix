@@ -27,6 +27,7 @@
     ./apps/zen.nix # Zen browser, search, privacy
     ./apps/webapps.nix # sites in their own window
     ./apps/programs.nix # what opens what, OBS, screenshots
+    ./apps/spotify.nix # Spotify with Noctalia's colors
 
     # terminal/ - shell, git, editor
     ./terminal/shell.nix # fish, aliases, apply/update commands (nixos-sync.sh)
