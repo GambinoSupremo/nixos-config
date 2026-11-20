@@ -84,6 +84,68 @@ enabled = true
 
 [notification]
 position = "top_center" # under the clock
+# Small pings (Claude replies, screenshots, ...) toast but skip the bell history.
+filter_order = [ "claude-code", "claude-floating", "claude-app", "ghostty", "screenshot", "satty", "recorder", "copy-text", "qr-code", "convert", "theme", "font", "web-apps", "spotify", "sone" ]
+
+    [notification.filter.claude-code]
+    match = "com.claude.code"
+    save_history = false
+
+    [notification.filter.claude-floating]
+    match = "com.claude.floating"
+    save_history = false
+
+    [notification.filter.claude-app]
+    match = "claude"
+    save_history = false
+
+    [notification.filter.ghostty]
+    match = "com.mitchellh.ghostty"
+    save_history = false
+
+    [notification.filter.screenshot]
+    match = "screenshot"
+    save_history = false
+
+    [notification.filter.satty]
+    match = "satty"
+    save_history = false
+
+    [notification.filter.recorder]
+    match = "recorder"
+    save_history = false
+
+    [notification.filter.copy-text]
+    match = "copy text"
+    save_history = false
+
+    [notification.filter.qr-code]
+    match = "qr code"
+    save_history = false
+
+    [notification.filter.convert]
+    match = "convert"
+    save_history = false
+
+    [notification.filter.theme]
+    match = "theme"
+    save_history = false
+
+    [notification.filter.font]
+    match = "font"
+    save_history = false
+
+    [notification.filter.web-apps]
+    match = "web apps"
+    save_history = false
+
+    [notification.filter.spotify]
+    match = "spotify"
+    save_history = false
+
+    [notification.filter.sone]
+    match = "sone"
+    save_history = false
 
 [osd]
 background_opacity = 0.89999997988343239
