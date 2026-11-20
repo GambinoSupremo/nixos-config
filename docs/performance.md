@@ -60,6 +60,6 @@ systemd-analyze critical-chain
 systemd-analyze --user blame
 ```
 
-Keep the current scheduler, zram, GPU power settings, HDR, and VRR behavior
+Keep the current scheduler, zram, GPU power settings, HDR (off), and VRR behavior
 until a comparison justifies changing them. A new kernel parameter or
 scheduler is not evidence of a performance improvement.

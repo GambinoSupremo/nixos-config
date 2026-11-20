@@ -10,9 +10,8 @@ separate repo and patched for NixOS at build time.
   a patch whose source line changes fails the build instead of silently missing.
 - **Hyprland with Noctalia.** Noctalia v5 is the bar, shell and greeter (on
   greetd). Mango and Niri are kept as one-flag alternative sessions.
-- **Gaming on AMD.** Steam, gamescope and gamemode on an RX 9070 XT, an HDR-
-  capable QD-OLED ultrawide with fullscreen HDR switching, and a `novpn`
-  wrapper so games can skip Mullvad.
+- **Gaming on AMD.** Steam, gamescope and gamemode on an RX 9070 XT, a QD-OLED
+  ultrawide, and a `novpn` wrapper so games can skip Mullvad.
 - **Game streaming.** Sunshine streams to Moonlight through a virtual display
   sized for the client.
 - **One-command upkeep.** `apply`, `update` and `dotsync` build and switch in one go;
@@ -26,7 +25,7 @@ separate repo and patched for NixOS at build time.
 | GPU | AMD Radeon RX 9070 XT |
 | Board / RAM | Gigabyte B650E AORUS ELITE X AX ICE, 32 GB DDR5-6000 |
 | Storage | Samsung 980 PRO 2 TB, WD 1 TB HDD |
-| Displays | Alienware AW3423DW (3440×1440, 175 Hz, HDR), Philips 278E1 (4K, 60 Hz) |
+| Displays | Alienware AW3423DW (3440×1440, 175 Hz), Philips 278E1 (4K, 60 Hz) |
 
 ## Hosts
 

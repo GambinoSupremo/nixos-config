@@ -1,5 +1,5 @@
 # Gaming: Steam, gamescope, GameMode, kernel settings for games, and the
-# novpn and hdr-game launch options.
+# novpn launch option.
 {
   config,
   pkgs,
@@ -122,14 +122,6 @@ in
     # doesn't work inside Steam, so this asks the Mullvad service instead.
     (writeShellScriptBin "novpn" ''
       mullvad split-tunnel add $$ >/dev/null 2>&1 || true
-      exec "$@"
-    '')
-    # `hdr-game %command%`: HDR when playing at the desk. Streamed launches
-    # are left alone, Remote Play can't capture HDR game windows.
-    (writeShellScriptBin "hdr-game" ''
-      if [ "''${SteamStreaming:-0}" != 1 ]; then
-        export PROTON_ENABLE_WAYLAND=1 PROTON_ENABLE_HDR=1 SDL_VIDEODRIVER=wayland
-      fi
       exec "$@"
     '')
     lutris
