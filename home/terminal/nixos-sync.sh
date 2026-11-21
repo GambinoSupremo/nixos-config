@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # The work behind my apply, update, dotsync and save commands (home/terminal/shell.nix).
 # NIXOS_SYNC_HOST says which system to build (desktop or vm); shell.nix sets it.
 
@@ -163,7 +164,7 @@ print_changes() {
 # Be on an up-to-date main (in $1, default nixos-config). Only switch branches
 # with a clean tree.
 preflight() {
-  cd "${1:-$flake_dir}"
+  cd "${1:-$flake_dir}" || exit 1
   local branch before
   branch=$(git branch --show-current)
   if [[ "$branch" != main ]]; then
@@ -329,15 +330,15 @@ cmd_apply() {
     require_clean
   fi
 
-  cd "$flake_dir"
+  cd "$flake_dir" || exit 1
   find_pending
   nix_branch=$pending
   if [[ -n "$dotfiles_override" ]]; then
-    cd "$dot_dir"
+    cd "$dot_dir" || exit 1
     find_pending
     dot_branch=$pending
     land_branch "$dot_branch"
-    cd "$flake_dir"
+    cd "$flake_dir" || exit 1
   fi
   land_branch "$nix_branch"
 
@@ -383,9 +384,9 @@ cmd_apply() {
   if quiet git push; then
     ok "Pushed nixos-config"
     if [[ -n "$dotfiles_override" ]]; then
-      cd "$dot_dir"
+      cd "$dot_dir" || exit 1
       prune_branches
-      cd "$flake_dir"
+      cd "$flake_dir" || exit 1
     fi
     prune_branches
   else

@@ -10,7 +10,8 @@
 }:
 
 let
-  alienware = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH";
+  alienware = config.gav.monitors.main.desc;
+  alienwareModel = config.gav.monitors.main.model;
   # Steam Controller puck: unplugged during a stream, or a controller paired
   # to it takes player 1 from the Moonlight one.
   puck = state: ''
@@ -173,7 +174,7 @@ let
         sleep 0.2
       done
       hyprctl output destroy SUNSHINE
-      aw=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.model == "Dell AW3423DW") | .name')
+      aw=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.model == "${alienwareModel}") | .name')
       [ -n "$aw" ] && ${pkgs.xrandr}/bin/xrandr --output "$aw" --primary
       # Re-enable and pick up any theme changes made during the stream.
       hyprctl eval 'hl.config({ misc = { disable_autoreload = false } })'
@@ -247,7 +248,7 @@ let
         ids=$(onStream)
         [ -n "$ids" ] || break
         for id in $ids; do
-          ${mmsg} dispatch 'tagmon,model:Dell AW3423DW,1' "client,$id" >/dev/null
+          ${mmsg} dispatch 'tagmon,model:${alienwareModel},1' "client,$id" >/dev/null
         done
         sleep 0.2
       done
@@ -291,7 +292,7 @@ let
     done
   '';
 in
-{
+lib.mkIf config.gav.features.streaming.enable {
   # --- Controller puck ---
   # Lets the stream script switch the puck off and on without sudo.
   services.udev.extraRules = ''

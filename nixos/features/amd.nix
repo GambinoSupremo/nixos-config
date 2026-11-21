@@ -1,7 +1,13 @@
 # AMD graphics card (RX 9070 XT): driver, fan and undervolt tool, and the
 # settings games and apps need. Desktop only.
-{ pkgs, ... }:
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+lib.mkIf config.gav.features.amd.enable {
   # --- Driver ---
   services.xserver.videoDrivers = [ "amdgpu" ];
   hardware.amdgpu.initrd.enable = true; # full resolution from the boot screen on

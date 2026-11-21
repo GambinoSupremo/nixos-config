@@ -59,8 +59,9 @@ docs/                notes on why things are the way they are
 
 | Change | File |
 |---|---|
-| Inputs, host definitions, formatter | `flake.nix` |
-| Kernel, boot, desktop hardware | `nixos/hosts/desktop/` |
+| Inputs, checks, host definitions, formatter | `flake.nix` |
+| Host control panel (monitors, feature switches), kernel, boot | `nixos/hosts/desktop/configuration.nix` |
+| Custom `gav.*` option definitions | `nixos/base/options.nix` |
 | Login screen, sessions, portals, fonts | `nixos/base/desktop.nix` |
 | Installed applications | `nixos/base/packages.nix` |
 | Keyboard remapping, Bluetooth, printer | `nixos/base/services.nix` |

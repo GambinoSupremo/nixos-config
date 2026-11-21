@@ -87,9 +87,7 @@ let
         case "$1" in
           ${lib.concatMapStrings (
             e:
-            arm e.id (
-              if isMenu e then ''exec noctalia msg panel-toggle launcher "/sys ${e.id} "'' else e.run
-            )
+            arm e.id (if isMenu e then ''exec noctalia msg panel-toggle launcher "/sys ${e.id} "'' else e.run)
           ) (lib.filter (e: isMenu e || e.run != null) entries)}
           *) echo "sysmenu: no entry '$1'" >&2; exit 1 ;;
         esac

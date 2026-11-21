@@ -12,7 +12,10 @@ let
   '';
   soneFreshMixes = pkgs.symlinkJoin {
     name = "sone-fresh-mixes";
-    paths = [ soneLauncher pkgs.sone ];
+    paths = [
+      soneLauncher
+      pkgs.sone
+    ];
   };
 in
 {
@@ -41,7 +44,8 @@ in
     # --- Dev tools ---
     git
     github-cli
-    nil # Nix language server for Zed
+    nil # Nix language server for Neovim
+    nixd # Nix language server for Zed (NixOS + Home Manager option docs)
     jq
     python3
     # Keeper Commander isn't in nixpkgs, so run a pinned release through uv.

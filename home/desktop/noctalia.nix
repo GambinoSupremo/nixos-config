@@ -127,81 +127,81 @@ in
 
     # Restart Noctalia when plugin code changes, and sync declared plugins + templates.
     home.activation.syncNoctalia = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      export XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-      export WAYLAND_DISPLAY="''${WAYLAND_DISPLAY:-wayland-1}"
-      n=${config.programs.noctalia.package}/bin/noctalia
-      pdir="${config.xdg.dataHome}/noctalia/plugins"
-      stamp="${config.xdg.cacheHome}/noctalia-plugin-targets"
+            export XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+            export WAYLAND_DISPLAY="''${WAYLAND_DISPLAY:-wayland-1}"
+            n=${config.programs.noctalia.package}/bin/noctalia
+            pdir="${config.xdg.dataHome}/noctalia/plugins"
+            stamp="${config.xdg.cacheHome}/noctalia-plugin-targets"
 
-      if [ -d "$pdir" ]; then
-        cur=$(for p in "$pdir"/*; do [ -e "$p" ] && printf '%s=%s\n' "$(basename "$p")" "$(readlink -f "$p")"; done | sort)
-        if [ -f "$stamp" ] && [ "$(cat "$stamp")" != "$cur" ]; then
-          if ${pkgs.systemd}/bin/systemctl --user is-active -q noctalia.service 2>/dev/null; then
-            run ${pkgs.systemd}/bin/systemctl --user restart noctalia.service || true
-            for _ in 1 2 3 4 5 6; do
-              $n msg config-get plugins.enabled >/dev/null 2>&1 && break
-              sleep 0.5
-            done
-          fi
-        fi
-        run mkdir -p "$(dirname "$stamp")"
-        printf '%s\n' "$cur" >"$stamp"
-      fi
+            if [ -d "$pdir" ]; then
+              cur=$(for p in "$pdir"/*; do [ -e "$p" ] && printf '%s=%s\n' "$(basename "$p")" "$(readlink -f "$p")"; done | sort)
+              if [ -f "$stamp" ] && [ "$(cat "$stamp")" != "$cur" ]; then
+                if ${pkgs.systemd}/bin/systemctl --user is-active -q noctalia.service 2>/dev/null; then
+                  run ${pkgs.systemd}/bin/systemctl --user restart noctalia.service || true
+                  for _ in 1 2 3 4 5 6; do
+                    $n msg config-get plugins.enabled >/dev/null 2>&1 && break
+                    sleep 0.5
+                  done
+                fi
+              fi
+              run mkdir -p "$(dirname "$stamp")"
+              printf '%s\n' "$cur" >"$stamp"
+            fi
 
-      if $n msg config-get plugins.enabled >/dev/null 2>&1; then
-        run ${pkgs.python3}/bin/python3 -I - "$n" "${syncData}" <<'PY' || true
-import json, subprocess, sys, tomllib
+            if $n msg config-get plugins.enabled >/dev/null 2>&1; then
+              run ${pkgs.python3}/bin/python3 -I - "$n" "${syncData}" <<'PY' || true
+      import json, subprocess, sys, tomllib
 
-noctalia, data_path = sys.argv[1], sys.argv[2]
-want = json.load(open(data_path))
+      noctalia, data_path = sys.argv[1], sys.argv[2]
+      want = json.load(open(data_path))
 
-def get_toml(key):
-    r = subprocess.run([noctalia, "msg", "config-get", key], capture_output=True, text=True)
-    if r.returncode != 0 or not r.stdout.strip():
-        return None
-    txt = r.stdout.strip()
-    try:
-        return tomllib.loads(f"v = {txt}")["v"]
-    except Exception:
-        try:
-            return tomllib.loads(txt)
-        except Exception:
-            return None
+      def get_toml(key):
+          r = subprocess.run([noctalia, "msg", "config-get", key], capture_output=True, text=True)
+          if r.returncode != 0 or not r.stdout.strip():
+              return None
+          txt = r.stdout.strip()
+          try:
+              return tomllib.loads(f"v = {txt}")["v"]
+          except Exception:
+              try:
+                  return tomllib.loads(txt)
+              except Exception:
+                  return None
 
-def toml_str(s):
-    return "'" + s + "'" if "'" not in s else json.dumps(s)
+      def toml_str(s):
+          return "'" + s + "'" if "'" not in s else json.dumps(s)
 
-def toml_list(xs):
-    return "[ " + ", ".join(toml_str(x) for x in xs) + " ]"
+      def toml_list(xs):
+          return "[ " + ", ".join(toml_str(x) for x in xs) + " ]"
 
-def set_val(key, raw):
-    subprocess.run([noctalia, "msg", "config-set", key, raw], check=False, stdout=subprocess.DEVNULL)
+      def set_val(key, raw):
+          subprocess.run([noctalia, "msg", "config-set", key, raw], check=False, stdout=subprocess.DEVNULL)
 
-enabled = get_toml("plugins.enabled") or []
-for pid in want["plugins"]:
-    if pid not in enabled:
-        subprocess.run([noctalia, "msg", "plugins", "enable", pid], check=False, stdout=subprocess.DEVNULL)
+      enabled = get_toml("plugins.enabled") or []
+      for pid in want["plugins"]:
+          if pid not in enabled:
+              subprocess.run([noctalia, "msg", "plugins", "enable", pid], check=False, stdout=subprocess.DEVNULL)
 
-for key, field in [
-    ("theme.templates.builtin_ids", "builtinTemplates"),
-    ("theme.templates.community_ids", "communityTemplates"),
-]:
-    cur = get_toml(key)
-    if cur is not None and sorted(cur) != sorted(want[field]):
-        set_val(key, toml_list(want[field]))
+      for key, field in [
+          ("theme.templates.builtin_ids", "builtinTemplates"),
+          ("theme.templates.community_ids", "communityTemplates"),
+      ]:
+          cur = get_toml(key)
+          if cur is not None and sorted(cur) != sorted(want[field]):
+              set_val(key, toml_list(want[field]))
 
-cur_user = get_toml("theme.templates.user") or {}
-for name, tpl in want["userTemplates"].items():
-    existing = cur_user.get(name) if isinstance(cur_user, dict) else None
-    cur_out = existing.get("output_path") if isinstance(existing, dict) else None
-    if not isinstance(existing, dict) or existing.get("input_path") != tpl["input_path"]:
-        set_val(f"theme.templates.user.{name}.input_path", toml_str(tpl["input_path"]))
-    if cur_out != [tpl["output_path"]]:
-        set_val(f"theme.templates.user.{name}.output_path", toml_list([tpl["output_path"]]))
-    if not isinstance(existing, dict) or existing.get("post_hook", "") != tpl["post_hook"]:
-        set_val(f"theme.templates.user.{name}.post_hook", toml_str(tpl["post_hook"]))
-PY
-      fi
+      cur_user = get_toml("theme.templates.user") or {}
+      for name, tpl in want["userTemplates"].items():
+          existing = cur_user.get(name) if isinstance(cur_user, dict) else None
+          cur_out = existing.get("output_path") if isinstance(existing, dict) else None
+          if not isinstance(existing, dict) or existing.get("input_path") != tpl["input_path"]:
+              set_val(f"theme.templates.user.{name}.input_path", toml_str(tpl["input_path"]))
+          if cur_out != [tpl["output_path"]]:
+              set_val(f"theme.templates.user.{name}.output_path", toml_list([tpl["output_path"]]))
+          if not isinstance(existing, dict) or existing.get("post_hook", "") != tpl["post_hook"]:
+              set_val(f"theme.templates.user.{name}.post_hook", toml_str(tpl["post_hook"]))
+      PY
+            fi
     '';
   };
 }

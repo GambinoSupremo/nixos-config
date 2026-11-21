@@ -7,7 +7,7 @@
 }:
 
 let
-  spotify = pkgs.spotify;
+  inherit (pkgs) spotify;
   spicetify = "${pkgs.spicetify-cli}/bin/spicetify";
   copy = "${config.xdg.dataHome}/spotify-spicetify";
   ext = "${config.xdg.configHome}/spicetify/Extensions";

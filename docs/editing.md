@@ -6,17 +6,19 @@ Use `desktop` for the physical machine's flake output; `gavos` is its hostname.
 
 ## Editors
 
-Both editors use `nil` for Nix diagnostics and navigation, and `nixfmt` for
-formatting. NixOS installs these tools; there is no second Nix server to
-install through Mason. The formatter version follows `flake.lock`.
+Zed uses `nixd` (with live NixOS and Home Manager option docs), Neovim uses
+`nil`, and both use `nixfmt` for formatting. NixOS installs these tools; there
+is no second Nix server to install through Mason. The formatter version follows
+`flake.lock`.
 
 - **Neovim:** `~/Projects/dotfiles/nvim/lua/plugins/nix.lua` configures Nix
   support. LazyVim's normal format-on-save behavior applies. Run `:LspInfo`
   to check the server or `:ConformInfo` to check formatting.
 - **Zed:** install the Nix extension once. `.zed/settings.json` selects
-  `nil` and `nixfmt` for this project, without replacing your global settings.
+  `nixd` and `nixfmt` for this project, without replacing your global settings.
 - **Terminal:** `nix fmt home/terminal/editors.nix` formats a specific file. Review
-  `git diff` before committing.
+  `git diff` before committing. `nix flake check` runs `nixfmt --check`,
+  `deadnix`, `statix`, `shellcheck`, and the repo's JSON/theme/menu checks.
 
 `.editorconfig` keeps indentation and line endings consistent. Add settings
 to the file that owns the feature; avoid repeating options across modules.

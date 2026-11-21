@@ -95,15 +95,46 @@
       checks.x86_64-linux =
         let
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          lib = nixpkgs.lib;
+          inherit (nixpkgs) lib;
           themes = import ./home/theming/theme-list.nix;
           palettes = builtins.attrNames (builtins.readDir ./home/theming/palettes);
           entries = import ./home/desktop/menu-entries.nix;
           parentOf = id: lib.concatStringsSep "." (lib.init (lib.splitString "." id));
           entryIds = map (e: e.id) entries;
           themeNames = map (t: t.name) themes;
+          statixConfig = pkgs.writeText "statix.toml" ''
+            disabled = [
+              "repeated_keys",
+              "empty_pattern",
+            ]
+            ignore = [
+              "**/hardware-configuration.nix",
+            ]
+          '';
         in
         {
+          formatting = pkgs.runCommand "check-formatting" { nativeBuildInputs = [ pkgs.nixfmt ]; } ''
+            find ${./.} -name '*.nix' ! -name 'hardware-configuration.nix' -print0 \
+              | xargs -0 nixfmt --check
+            touch $out
+          '';
+
+          deadnix = pkgs.runCommand "check-deadnix" { nativeBuildInputs = [ pkgs.deadnix ]; } ''
+            find ${./.} -name '*.nix' ! -name 'hardware-configuration.nix' -print0 \
+              | xargs -0 deadnix --fail --no-lambda-pattern-names
+            touch $out
+          '';
+
+          statix = pkgs.runCommand "check-statix" { nativeBuildInputs = [ pkgs.statix ]; } ''
+            statix check -c ${statixConfig} ${./.}
+            touch $out
+          '';
+
+          shellcheck = pkgs.runCommand "check-shellcheck" { nativeBuildInputs = [ pkgs.shellcheck ]; } ''
+            find ${./.} -name '*.sh' -print0 | xargs -0 shellcheck
+            touch $out
+          '';
+
           json-valid = pkgs.runCommand "check-json-valid" { nativeBuildInputs = [ pkgs.jq ]; } ''
             jq empty ${./home/apps/webapps.json}
             for f in ${./home/theming/palettes}/*.json; do
@@ -116,12 +147,16 @@
             let
               dupNames = builtins.length themeNames != builtins.length (lib.unique themeNames);
               missingPalettes = map (t: t.palette) (
-                builtins.filter (
-                  t: t.source == "custom" && !(builtins.elem "${t.palette}.json" palettes)
-                ) themes
+                builtins.filter (t: t.source == "custom" && !(builtins.elem "${t.palette}.json" palettes)) themes
               );
               badModes = map (t: t.name) (
-                builtins.filter (t: !(builtins.elem t.mode [ "dark" "light" ])) themes
+                builtins.filter (
+                  t:
+                  !(builtins.elem t.mode [
+                    "dark"
+                    "light"
+                  ])
+                ) themes
               );
             in
             assert !dupNames;
@@ -132,9 +167,9 @@
           menu-valid =
             let
               dupIds = builtins.length entryIds != builtins.length (lib.unique entryIds);
-              missingParents = builtins.filter (
-                p: p != "" && !(builtins.elem p entryIds)
-              ) (map (e: parentOf e.id) entries);
+              missingParents = builtins.filter (p: p != "" && !(builtins.elem p entryIds)) (
+                map (e: parentOf e.id) entries
+              );
               hasChildren = id: lib.any (e: parentOf e.id == id) entries;
               deadLeaves = map (e: e.id) (
                 builtins.filter (

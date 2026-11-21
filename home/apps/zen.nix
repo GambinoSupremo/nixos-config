@@ -126,7 +126,8 @@
 
   # YouTube page colors follow the theme live; see page-colors/.
   home.file.".config/zen/default/extensions/page-colors@gavos.xpi".source =
-    pkgs.callPackage ./page-colors { };
+    pkgs.callPackage ./page-colors
+      { };
 
   # Pywalfox gets the colors from Noctalia's own host, which pushes every
   # theme change to all open browsers (Zen + web apps).

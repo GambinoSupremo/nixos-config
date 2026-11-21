@@ -1,7 +1,7 @@
 {
   "languages": {
     "Nix": {
-      "language_servers": ["nil", "!nixd"],
+      "language_servers": ["nixd", "!nil"],
       "tab_size": 2,
       "formatter": {
         "external": {
@@ -10,6 +10,26 @@
         }
       },
       "format_on_save": "on"
+    }
+  },
+  "lsp": {
+    "nixd": {
+      "initialization_options": {
+        "nixpkgs": {
+          "expr": "import (builtins.getFlake \"/home/gav/nixos-config\").inputs.nixpkgs { }"
+        },
+        "formatting": {
+          "command": ["nixfmt"]
+        },
+        "options": {
+          "nixos": {
+            "expr": "(builtins.getFlake \"/home/gav/nixos-config\").nixosConfigurations.desktop.options"
+          },
+          "home_manager": {
+            "expr": "(builtins.getFlake \"/home/gav/nixos-config\").nixosConfigurations.desktop.options.home-manager.users.type.getSubOptions []"
+          }
+        }
+      }
     }
   }
 }

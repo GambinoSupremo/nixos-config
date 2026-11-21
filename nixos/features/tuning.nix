@@ -1,8 +1,13 @@
 # Speed tweaks borrowed from CachyOS: memory compression, process
 # priorities and a few kernel settings. The kernel itself is in hosts/desktop.
-{ pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+lib.mkIf config.gav.features.tuning.enable {
   # --- Builds stay out of the way ---
   # Lowest priority so games win; cores is capped to keep build memory down.
   nix = {

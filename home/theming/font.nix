@@ -120,21 +120,21 @@ in
 
       # Update buffer_font_family in Zed's JSONC without disturbing comments.
       zed = ''
-        zed="$CFG_DIR/zed/settings.json"
-        if [ -w "$zed" ]; then
-          python3 -I - "$zed" "$FONT_FAMILY" <<'PY'
-import json, re, sys
-path, fam = sys.argv[1], sys.argv[2]
-txt = open(path).read()
-val = json.dumps(fam)
-if re.search(r'"buffer_font_family"\s*:', txt):
-    out = re.sub(r'("buffer_font_family"\s*:\s*)"(?:\\.|[^"\\])*"', rf'\1{val}', txt, count=1)
-else:
-    out = re.sub(r'^([ \t]*"buffer_font_size"[^\n]*)$', rf'\1\n  "buffer_font_family": {val},', txt, count=1, flags=re.M)
-if out != txt:
-    open(path, "w").write(out)
-PY
-        fi
+                zed="$CFG_DIR/zed/settings.json"
+                if [ -w "$zed" ]; then
+                  python3 -I - "$zed" "$FONT_FAMILY" <<'PY'
+        import json, re, sys
+        path, fam = sys.argv[1], sys.argv[2]
+        txt = open(path).read()
+        val = json.dumps(fam)
+        if re.search(r'"buffer_font_family"\s*:', txt):
+            out = re.sub(r'("buffer_font_family"\s*:\s*)"(?:\\.|[^"\\])*"', rf'\1{val}', txt, count=1)
+        else:
+            out = re.sub(r'^([ \t]*"buffer_font_size"[^\n]*)$', rf'\1\n  "buffer_font_family": {val},', txt, count=1, flags=re.M)
+        if out != txt:
+            open(path, "w").write(out)
+        PY
+                fi
       '';
 
       # GTK apps' monospace font, keeping the size.

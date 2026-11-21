@@ -2,6 +2,7 @@
 # novpn launch option.
 {
   config,
+  lib,
   pkgs,
   inputs,
   ...
@@ -26,7 +27,7 @@ let
     done
   '';
 in
-{
+lib.mkIf config.gav.features.gaming.enable {
   # --- Deadlock Mod Manager ---
   # Download it prebuilt instead of compiling it.
   nix.settings = {
@@ -106,7 +107,7 @@ in
   # Lutris 0.5.22 crashes at startup with the current gnome-desktop.
   # Drop this once Lutris fixes it.
   nixpkgs.overlays = [
-    (final: prev: {
+    (_final: prev: {
       lutris-unwrapped = prev.lutris-unwrapped.overrideAttrs (o: {
         postPatch = (o.postPatch or "") + ''
           substituteInPlace lutris/util/display.py \

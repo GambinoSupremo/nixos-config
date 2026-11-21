@@ -18,10 +18,10 @@ in
 
   config = {
     # --- Which desktops are on ---
-    # Set one to true to get it back on the login screen. Hyprland is always on.
+    # Set one to true in hosts/<host>/configuration.nix to get it back on the login screen.
     gav.sessions = {
-      mango = false;
-      niri = false;
+      mango = lib.mkDefault false;
+      niri = lib.mkDefault false;
     };
 
     # --- Mango and Niri ---

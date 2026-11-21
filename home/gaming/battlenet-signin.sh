@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Battle.net often gets stuck before signing in; restarting it is faster than waiting.
 # Exits 0 once signed in or WoW is running, 1 if it gave up.
 logs="$HOME/Games/battlenet/drive_c/users/steamuser/AppData/Local/Battle.net/Logs"

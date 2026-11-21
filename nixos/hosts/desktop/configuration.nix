@@ -14,6 +14,35 @@
     ../../features/espanso.nix
   ];
 
+  # --- Control panel ---
+  # Hardware names and major desktop features switched on for this PC.
+  gav = {
+    monitors = {
+      main = {
+        desc = "Dell Inc. Dell AW3423DW #tBszGDAYBQUH";
+        model = "Dell AW3423DW";
+      };
+      side = {
+        desc = "Philips Consumer Electronics Company PHL 278E1 0x0000065F";
+        model = "PHL 278E1";
+      };
+    };
+
+    sessions = {
+      mango = false;
+      niri = false;
+    };
+
+    features = {
+      amd.enable = true;
+      gaming.enable = true;
+      streaming.enable = true; # Sunshine + Steam Remote Play
+      localAi.enable = true; # Ollama
+      tuning.enable = true; # zram, process priorities, low-priority builds
+      espanso.enable = true; # :emoji: text expansion
+    };
+  };
+
   # --- Disk ---
   # Monthly check of the disk for silent corruption.
   services.btrfs.autoScrub = {

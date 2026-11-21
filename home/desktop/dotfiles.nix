@@ -12,6 +12,7 @@
 let
   inherit (host) isVM;
   sessions = osConfig.gav.sessions; # which desktops are on (nixos/base/desktop.nix)
+  monitors = osConfig.gav.monitors;
   configDirs = [
     "hypr"
     "ghostty"
@@ -52,8 +53,8 @@ let
 
       # Monitors are matched by name because the port numbers change.
       # The last line catches any other screen.
-      monitor = desc:Dell Inc. Dell AW3423DW #tBszGDAYBQUH, 3440x1440@174, 0x0, 1
-      monitor = desc:Philips Consumer Electronics Company PHL 278E1 0x0000065F, 3840x2160@60, 3440x0, 1.5
+      monitor = desc:${monitors.main.desc}, 3440x1440@174, 0x0, 1
+      monitor = desc:${monitors.side.desc}, 3840x2160@60, 3440x0, 1.5
       monitor = , preferred, auto, 1
       misc {
           vrr = 0    # off: stutters on the RX 9070 XT, same as hyprland.lua

@@ -134,26 +134,26 @@ in
     profiles."01M5K68BBWCK8J79CEY7C3DDT9" = lib.mkMerge [
       { sites = added; }
       {
-      name = "Web apps";
-      sites."01M5K770R4RKNSG5FN1DWH0N2M" = {
-        name = "Todoist";
-        url = "https://app.todoist.com";
-        desktopEntry = {
-          icon = "todoist";
-          categories = [ "Office" ];
+        name = "Web apps";
+        sites."01M5K770R4RKNSG5FN1DWH0N2M" = {
+          name = "Todoist";
+          url = "https://app.todoist.com";
+          desktopEntry = {
+            icon = "todoist";
+            categories = [ "Office" ];
+          };
         };
-      };
-      sites."01M5K7BCQEJQ4BGRNA0T8WVXPA" = {
-        name = "YouTube";
-        url = "https://www.youtube.com";
-        desktopEntry = {
-          icon = "youtube";
-          categories = [
-            "AudioVideo"
-            "Video"
-          ];
+        sites."01M5K7BCQEJQ4BGRNA0T8WVXPA" = {
+          name = "YouTube";
+          url = "https://www.youtube.com";
+          desktopEntry = {
+            icon = "youtube";
+            categories = [
+              "AudioVideo"
+              "Video"
+            ];
+          };
         };
-      };
       }
     ];
   };
