@@ -155,6 +155,16 @@ PY
         </fontconfig>
         EOF
       '';
+
+      # Hyprland window/groupbar text (live + persisted in ~/.config/hypr/font.lua).
+      hyprland = ''
+        fam=''${FONT_FAMILY//\'/\\\'}
+        mkdir -p "$CFG_DIR/hypr"
+        printf "hl.config({ misc = { font_family = '%s' }, group = { groupbar = { font_family = '%s' } } })\n" "$fam" "$fam" >"$CFG_DIR/hypr/font.lua"
+        if [ -n "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ] && command -v hyprctl >/dev/null 2>&1; then
+          hyprctl eval "hl.config({ misc = { font_family = '$fam' }, group = { groupbar = { font_family = '$fam' } } })" >/dev/null 2>&1 || true
+        fi
+      '';
     };
 
     home.packages = [ font ];

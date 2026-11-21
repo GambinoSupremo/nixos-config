@@ -170,6 +170,8 @@ in
       keybinds
       pkgs.dua
       pkgs.wiremix
+      pkgs.libqalculate
+      pkgs.speedtest-go
     ];
 
     # Enabled via [plugins] in noctalia/config.toml.

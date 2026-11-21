@@ -147,6 +147,12 @@ in
     enableFishIntegration = true;
   };
 
+  # Auto-load Nix dev shells when entering a project folder.
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   programs.bat = {
     enable = true;
     config = {

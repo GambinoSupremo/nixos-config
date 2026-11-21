@@ -141,6 +141,79 @@ let
       notify-send -a Convert "Saved" "''${out##*/}"
     '';
   };
+
+  # Toggle Hyprland window gaps or transparency/blur live.
+  hypr-toggle = pkgs.writeShellApplication {
+    name = "hypr-toggle";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.libnotify
+    ];
+    text = ''
+      case "''${1:-}" in
+        gaps)
+          cur=$(hyprctl getoption general:gaps_in -j | jq -r '.css // "5"' | awk '{print $1}')
+          if [ "$cur" = "0" ]; then
+            hyprctl eval 'hl.config({ general = { gaps_in = 5, gaps_out = 10 } })' >/dev/null
+            notify-send -a Desktop -t 2000 "Window gaps" "Normal"
+          else
+            hyprctl eval 'hl.config({ general = { gaps_in = 0, gaps_out = 0 } })' >/dev/null
+            notify-send -a Desktop -t 2000 "Window gaps" "Off"
+          fi ;;
+        opacity)
+          blur=$(hyprctl getoption decoration:blur:enabled -j | jq -r '.int // 1')
+          if [ "$blur" = "0" ]; then
+            hyprctl eval 'hl.config({ decoration = { inactive_opacity = 0.98, blur = { enabled = true } } })' >/dev/null
+            notify-send -a Desktop -t 2000 "Window transparency" "On"
+          else
+            hyprctl eval 'hl.config({ decoration = { inactive_opacity = 1.0, blur = { enabled = false } } })' >/dev/null
+            notify-send -a Desktop -t 2000 "Window transparency" "Solid"
+          fi ;;
+        *) echo "usage: hypr-toggle gaps|opacity" >&2; exit 1 ;;
+      esac
+    '';
+  };
+
+  # Download video or MP3 audio from a copied link via yt-dlp.
+  dl-media = pkgs.writeShellApplication {
+    name = "dl-media";
+    runtimeInputs = [
+      pkgs.yt-dlp
+      pkgs.ffmpeg
+      pkgs.wl-clipboard
+      pkgs.zenity
+      pkgs.libnotify
+      pkgs.xdg-utils
+    ];
+    text = ''
+      clip=$(wl-paste -n 2>/dev/null || true)
+      [[ $clip == http://* || $clip == https://* ]] || clip=""
+      url=$(zenity --entry --title="Download from link" --text="Video or audio link" --entry-text="$clip" --width=480) || exit 0
+      [ -n "$url" ] || exit 0
+      kind=$(printf 'Video\nAudio (MP3)\n' | noctalia dmenu -p "Download as") || exit 0
+      case "$kind" in
+        Video)
+          dir="$HOME/Videos"
+          mkdir -p "$dir"
+          notify-send -a Download "Downloading video" "$url"
+          out=$(yt-dlp --no-playlist -f "bv*+ba/b" --merge-output-format mp4 -P "$dir" -o "%(title)s.%(ext)s" --print after_move:filepath "$url") ;;
+        "Audio (MP3)")
+          dir="$HOME/Music"
+          mkdir -p "$dir"
+          notify-send -a Download "Downloading audio" "$url"
+          out=$(yt-dlp --no-playlist -x --audio-format mp3 -P "$dir" -o "%(title)s.%(ext)s" --print after_move:filepath "$url") ;;
+        *) exit 0 ;;
+      esac
+      if [ -n "''${out:-}" ] && [ -e "$out" ]; then
+        case "$(notify-send -a Download --action=open=Open --action=folder="Show folder" "Download saved" "''${out##*/}")" in
+          open) xdg-open "$out" ;;
+          folder) xdg-open "$dir" ;;
+        esac
+      else
+        notify-send -a Download "Download failed" "$url"
+      fi
+    '';
+  };
 in
 {
   home.packages = [
@@ -150,5 +223,7 @@ in
     webcam
     media-fix
     convert-file
+    hypr-toggle
+    dl-media
   ];
 }

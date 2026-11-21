@@ -67,21 +67,26 @@
   { id = "capture.webcam"; title = "Webcam bubble"; glyph = "camera-selfie"; run = "webcam &"; }
   { id = "capture.fix"; title = "Fix a recording"; glyph = "cut"; sub = "Trim or even out volume"; run = "media-fix"; }
   { id = "capture.convert"; title = "Shrink or convert"; glyph = "file-export"; sub = "Videos, GIFs, images"; run = "convert-file"; }
+  { id = "capture.download"; title = "Download from link"; glyph = "download"; sub = "Video or MP3 via yt-dlp"; run = "dl-media &"; }
   { id = "capture.ocr"; title = "Copy text from screen"; glyph = "text-scan-2"; run = "settle; ocr"; }
   { id = "capture.color"; title = "Color picker"; glyph = "color-picker"; run = "settle; hyprpicker -a"; }
 
-  { id = "tools"; title = "Tools"; glyph = "tools"; sub = "btop, lazygit, dua, wiremix"; }
+  { id = "tools"; title = "Tools"; glyph = "tools"; sub = "btop, lazygit, dua, wiremix, calc, speed test"; }
   { id = "tools.btop"; title = "System monitor (btop)"; glyph = "cpu"; run = "tui -e btop"; }
   { id = "tools.git"; title = "Git (lazygit)"; glyph = "git-branch"; run = "tui --working-directory=\"$HOME/nixos-config\" -e lazygit"; }
   { id = "tools.dua"; title = "Disk usage (dua)"; glyph = "chart-pie"; run = "tui --working-directory=\"$HOME\" -e dua interactive"; }
   { id = "tools.mixer"; title = "Audio mixer (wiremix)"; glyph = "volume"; run = "tui --class=com.ghostty.floating -e wiremix"; }
+  { id = "tools.calc"; title = "Calculator (qalc)"; glyph = "calculator"; run = "tui --class=com.ghostty.floating -e qalc"; }
+  { id = "tools.speedtest"; title = "Speed test"; glyph = "gauge"; run = "term speedtest-go"; }
 
-  { id = "toggle"; title = "Toggle"; glyph = "toggle-left"; sub = "Night light, do not disturb, stay awake"; }
+  { id = "toggle"; title = "Toggle"; glyph = "toggle-left"; sub = "Night light, DND, stay awake, gaps, transparency"; }
   { id = "toggle.nightlight"; title = "Night light"; glyph = "moon-stars"; run = "n nightlight-force-toggle"; }
   { id = "toggle.dnd"; title = "Do not disturb"; glyph = "bell-off"; run = "n notification-dnd-toggle"; }
   { id = "toggle.awake"; title = "Stay awake"; glyph = "coffee"; run = "n caffeine-toggle"; }
   { id = "toggle.bar"; title = "Bar"; glyph = "layout-navbar"; run = "n bar-toggle"; }
   { id = "toggle.bluetooth"; title = "Bluetooth"; glyph = "bluetooth"; run = "n bluetooth-toggle"; }
+  { id = "toggle.gaps"; title = "Window gaps"; glyph = "layout-grid"; run = "hypr-toggle gaps"; }
+  { id = "toggle.opacity"; title = "Window transparency"; glyph = "shadow"; run = "hypr-toggle opacity"; }
 
   { id = "style"; title = "Style"; glyph = "palette"; sub = "Theme, font, wallpaper, light/dark"; }
   { id = "style.theme"; title = "Theme"; glyph = "brush"; list = "theme"; }
@@ -100,9 +105,10 @@
   { id = "setup.noctalia"; title = "Restart Noctalia"; glyph = "reload"; run = "systemctl --user restart noctalia.service"; }
   { id = "setup.hyprland"; title = "Reload Hyprland"; glyph = "refresh"; run = "hyprctl reload"; }
 
-  { id = "update"; title = "Update"; glyph = "package"; sub = "apply, update"; }
+  { id = "update"; title = "Update"; glyph = "package"; sub = "apply, update, last changes"; }
   { id = "update.apply"; title = "Apply config"; glyph = "wand"; run = "term apply"; }
   { id = "update.inputs"; title = "Update inputs"; glyph = "cloud-download"; run = "term update"; }
+  { id = "update.changes"; title = "Last changes"; glyph = "list-details"; sub = "What changed on the last apply/update"; run = "term 'cat ~/.cache/nixos-sync/last-changes.txt 2>/dev/null; or echo No saved changes yet.'"; }
 
   { id = "system"; title = "System"; glyph = "power"; sub = "Lock, suspend, reboot, shut down"; }
   { id = "system.screensaver"; title = "Screensaver"; glyph = "device-tv"; run = "settle; screensaver"; }

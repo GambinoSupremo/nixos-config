@@ -100,9 +100,17 @@ build_system() {
 
 # dix's package diff without the store paths, path counts and total size.
 show_diff() {
-  local d
+  local d summary="$log_dir/last-changes.txt"
   d=$(dix --color always /run/current-system "$new_system" 2>/dev/null |
     sed -E '/(<<<|>>>|PATHS|SIZE)/d' | awk 'NF { if (n++ && gap) print ""; gap = 0; print; next } { gap = 1 }')
+  {
+    printf '%s (%s)\n\n' "$(date '+%Y-%m-%d %H:%M')" "$host"
+    if [[ "$d" == *'['* ]]; then
+      printf '%s\n' "$d" | sed 's/^/  /'
+    else
+      printf '  No package changes.\n'
+    fi
+  } >"$summary"
   if [[ "$d" == *'['* ]]; then
     printf '%s\n' "$d" | sed 's/^/  /'
   else

@@ -51,13 +51,22 @@ let
       mkdir -p "$(dirname "$state")"
       echo "#''${hex:0:6}" >"$state"
       [ "$(cat "$state.color" 2>/dev/null)" = "$color" ] && [ -z "''${PAPIRUS_FORCE:-}" ] && exit 0
-      papirus-folders -t Papirus-Dark -C "$color" >/dev/null
+      for variant in Papirus-Dark Papirus-Light; do
+        [ -d "$HOME/.local/share/icons/$variant" ] && papirus-folders -t "$variant" -C "$color" >/dev/null
+      done
       echo "$color" >"$state.color"
     '';
   };
 in
 {
   home.packages = [ papirus-accent ];
+
+  # Flip icon variant with light/dark themes.
+  gav.hooks.onThemeChange.papirusMode = ''
+    icon=Papirus-Dark
+    [ "''${THEME_MODE:-dark}" = light ] && icon=Papirus-Light
+    ${lib.getExe pkgs.dconf} write /org/gnome/desktop/interface/icon-theme "'$icon'" || true
+  '';
 
   xdg.configFile."noctalia/templates/papirus-accent".text = ''
     {{ colors.primary.default.hex }}
