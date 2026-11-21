@@ -13,6 +13,18 @@
     };
   };
 
+  # Side-by-side color git diffs; base16 follows the terminal theme.
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      side-by-side = true;
+      line-numbers = true;
+      navigate = true;
+      syntax-theme = "base16";
+    };
+  };
+
   # No settings here: Noctalia writes lazygit's config for the colors.
   programs.lazygit.enable = true;
 

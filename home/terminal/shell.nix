@@ -1,5 +1,10 @@
-# Fish shell: greeting, aliases, the apply/update commands, and small helpers.
-{ pkgs, host, ... }:
+# Fish shell: shared dotfiles config, the apply/update commands, and small helpers.
+{
+  pkgs,
+  host,
+  inputs,
+  ...
+}:
 
 let
   # The script behind apply, update, dotsync and save.
@@ -77,45 +82,32 @@ in
   ];
 
   # --- Fish ---
+  # Shared greeting, abbreviations and krabby live in dotfiles/fish/conf.d/shared.fish.
+  xdg.configFile."fish/conf.d/shared.fish".source = "${inputs.dotfiles}/fish/conf.d/shared.fish";
+
   programs.fish = {
     enable = true;
-    interactiveShellInit = ''
-      set fish_greeting ""
-      fish_add_path -g ~/.local/bin  # user-installed CLIs
-      # A krabby Pokémon on each new shell; 1 in 40 is shiny, with a sparkle at its top right.
-      if command -q krabby
-        set -l shiny
-        test (random 1 40) -eq 1; and set shiny --shiny
-        set -l art (krabby random --no-title $shiny 2>/dev/null)
-        # Drop krabby's blank padding rows so the prompt sits close under the sprite.
-        while set -q art[1]; and test -z (string replace -ra '\e\[[0-9;]*m' "" -- $art[-1] | string trim)
-          set -e art[-1]
-        end
-        while set -q art[1]; and test -z (string replace -ra '\e\[[0-9;]*m' "" -- $art[1] | string trim)
-          set -e art[1]
-        end
-        if set -q art[1]
-          set -q shiny[1]; and set art[1] "$art[1]  ✨"
-          printf '%s\n' $art
-        end
-      end
-    '';
-    shellAliases = {
-      ls = "eza --icons --group-directories-first";
-      la = "eza -la --icons --group-directories-first";
-      ll = "eza -l --icons --group-directories-first";
-      tree = "eza --tree --icons --group-directories-first";
-      cat = "bat";
-      grep = "rg";
+    shellAbbrs = {
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${host.name}";
-      compress = "ouch compress"; # compress file1 dir2 out.tar.zst
-      decompress = "ouch decompress";
     };
     functions = {
       apply = "${nixosSync}/bin/nixos-sync apply";
       update = "${nixosSync}/bin/nixos-sync update";
       dotsync = "${nixosSync}/bin/nixos-sync dotsync";
       save = "${nixosSync}/bin/nixos-sync save";
+    };
+  };
+
+  # Searchable shell history on Ctrl+R (Up arrow stays Fish's default).
+  programs.atuin = {
+    enable = true;
+    enableFishIntegration = true;
+    flags = [ "--disable-up-arrow" ];
+    settings = {
+      auto_sync = false;
+      update_check = false;
+      style = "compact";
+      inline_height = 16;
     };
   };
 
