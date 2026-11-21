@@ -1,9 +1,31 @@
 # The `theme` command: each theme is a color palette plus a wallpaper folder
-# in ~/Pictures/themes. `theme toggle` flips between dark and light; `theme`
-# alone opens the list in the System menu with wallpaper thumbnails.
-{ pkgs, inputs, ... }:
+# in ~/Pictures/themes. The list is theme-list.nix; modules can hook changes.
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
+  themeList = import ./theme-list.nix;
+  paletteFiles = builtins.attrNames (builtins.readDir ./palettes);
+  missingPalettes = map (t: t.palette) (
+    builtins.filter (
+      t: t.source == "custom" && !(builtins.elem "${t.palette}.json" paletteFiles)
+    ) themeList
+  );
+
+  themeHooks = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (name: body: ''
+      # hook: ${name}
+      (
+        ${body}
+      ) 9>&-
+    '') config.gav.hooks.onThemeChange
+  );
+
   # First wallpaper of each theme folder, cropped to a rounded square.
   thumbs = pkgs.runCommand "theme-thumbs" { nativeBuildInputs = [ pkgs.imagemagick ]; } ''
     mkdir -p $out
@@ -24,32 +46,13 @@ let
     ];
     text = ''
       # name|mode|source|palette|wallpaper folder (relative to ~/Pictures)
-      themes='Wallpaper|dark|wallpaper|m3-content|themes
-      Gruvbox|dark|builtin|Gruvbox|themes/gruvbox
-      Everforest|dark|community|Everforest|themes/everforest
-      Nord|dark|builtin|Nord|themes/nord
-      Catppuccin|dark|builtin|Catppuccin|themes/catppuccin
-      Tokyo Night|dark|builtin|Tokyo-Night|themes/tokyo-night
-      Kanagawa|dark|builtin|Kanagawa|themes/kanagawa
-      Rosé Pine|dark|builtin|Rosé Pine|themes/rose-pine
-      Dracula|dark|builtin|Dracula|themes/dracula
-      Ayu|dark|builtin|Ayu|themes/ayu
-      Eldritch|dark|builtin|Eldritch|themes/eldritch
-      Solarized|dark|community|Solarized|themes/solarized
-      Jade Horse|dark|custom|Jade-Horse|themes/jade-horse
-      Retro-82|dark|custom|Retro-82|themes/retro-82
-      Solitude|dark|custom|Solitude|themes/solitude
-      Hackerman|dark|custom|Hackerman|themes/hackerman
-      Last Horizon|dark|custom|Last-Horizon|themes/last-horizon
-      Lumon|dark|custom|Lumon|themes/lumon
-      Matte Black|dark|custom|Matte-Black|themes/matte-black
-      Miasma|dark|custom|Miasma|themes/miasma
-      Ristretto|dark|custom|Ristretto|themes/ristretto
-      Vantablack|dark|custom|Vantablack|themes/vantablack
-      Catppuccin Latte|light|custom|Catppuccin-Latte|themes/catppuccin-latte
-      Lupine|light|custom|Lupine|themes/lupine
-      Flexoki Light|light|custom|Flexoki-Light|themes/flexoki-light
-      White|light|custom|White|themes/white'
+      themes=${
+        lib.escapeShellArg (
+          lib.concatMapStringsSep "\n" (
+            t: "${t.name}|${t.mode}|${t.source}|${t.palette}|${t.dir}"
+          ) themeList
+        )
+      }
       thumbs=${thumbs}
       sdir="''${XDG_STATE_HOME:-$HOME/.local/state}"
       state="$sdir/theme-current"
@@ -79,8 +82,8 @@ let
         echo "$name" >"$state"
         echo "$name" >"$sdir/theme-last-$mode"
         [ -n "''${THEME_NOTIFY:-}" ] && notify-send -a Theme -t 2000 "Theme" "$name"
-        # Login screen follows too, once the new wallpaper has landed.
-        (sleep 3; noctalia msg greeter-sync >/dev/null 2>&1) 9>&- &
+        export THEME_NAME="$name" THEME_MODE="$mode" THEME_SOURCE="$source" THEME_PALETTE="$palette" THEME_DIR="$dir"
+        ${themeHooks}
       }
 
       # Next or previous theme in the current mode (bar scroll, Super+Ctrl+T).
@@ -199,16 +202,36 @@ let
   };
 in
 {
-  home.packages = [
-    theme
-    theme-install
-  ];
+  options.gav.hooks.onThemeChange = lib.mkOption {
+    description = "Shell hooks run after `theme` switches (THEME_NAME, THEME_MODE, THEME_SOURCE, THEME_PALETTE, THEME_DIR).";
+    type = lib.types.attrsOf lib.types.lines;
+    default = { };
+  };
 
-  # Custom palettes for the "custom" source.
-  xdg.configFile = builtins.listToAttrs (
-    map (f: {
-      name = "noctalia/palettes/${f}";
-      value.source = ./palettes + "/${f}";
-    }) (builtins.attrNames (builtins.readDir ./palettes))
-  );
+  config = {
+    assertions = [
+      {
+        assertion = missingPalettes == [ ];
+        message = "theme-list.nix references missing custom palettes: ${lib.concatStringsSep ", " missingPalettes}";
+      }
+    ];
+
+    # Login screen follows too, once the new wallpaper has landed.
+    gav.hooks.onThemeChange.greeter = ''
+      (sleep 3; noctalia msg greeter-sync >/dev/null 2>&1) &
+    '';
+
+    home.packages = [
+      theme
+      theme-install
+    ];
+
+    # Custom palettes for the "custom" source.
+    xdg.configFile = builtins.listToAttrs (
+      map (f: {
+        name = "noctalia/palettes/${f}";
+        value.source = ./palettes + "/${f}";
+      }) paletteFiles
+    );
+  };
 }

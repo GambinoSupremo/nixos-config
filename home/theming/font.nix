@@ -1,10 +1,22 @@
-# The `font` command: one coding font for the terminal, the Noctalia bar and
-# launcher, Zed, GTK apps and anything that asks for "monospace". The list is
-# font-list.nix; `font` alone opens it in the System menu with previews.
-{ pkgs, lib, ... }:
+# The `font` command: one coding font across apps. The list is font-list.nix;
+# modules can hook font switches via gav.hooks.onFontChange.
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   fonts = import ./font-list.nix pkgs;
+  fontHooks = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (name: body: ''
+      # hook: ${name}
+      (
+        ${body}
+      )
+    '') config.gav.hooks.onFontChange
+  );
 
   # "Aa" tile per font for the menu rows.
   previews =
@@ -34,9 +46,9 @@ let
     runtimeInputs = [
       pkgs.dconf
       pkgs.fontconfig # fc-list
-      pkgs.gnused
       pkgs.libnotify
       pkgs.procps # pkill
+      pkgs.python3
     ];
     text = ''
       # name|font family
@@ -64,41 +76,12 @@ let
       }
 
       apply() {
-        local family size
+        local family
         family=$(grep -m1 "^$1|" <<<"$fonts" | cut -d'|' -f2 || true)
         [ -n "$family" ] || { echo "unknown font: $1" >&2; exit 1; }
 
-        # Ghostty: its config includes this file; SIGUSR2 reloads open windows.
-        mkdir -p "$cfg/ghostty"
-        echo "font-family = $family" >"$cfg/ghostty/font"
-        pkill -USR2 -f '^ghostty( |$)' || true
-
-        noctalia msg config-set shell.font_family "'$family'" >/dev/null
-
-        # Zed: settings.json allows trailing commas, so edit the line in place.
-        zed="$cfg/zed/settings.json"
-        if [ -w "$zed" ]; then
-          if grep -q '"buffer_font_family"' "$zed"; then
-            sed -i "s|\"buffer_font_family\": *\"[^\"]*\"|\"buffer_font_family\": \"$family\"|" "$zed"
-          else
-            sed -i "s|^\( *\)\"buffer_font_size\".*|&\n\1\"buffer_font_family\": \"$family\",|" "$zed"
-          fi
-        fi
-
-        # GTK apps' monospace font, keeping the size.
-        size=$(dconf read /org/gnome/desktop/interface/monospace-font-name | grep -oE '[0-9.]+' | tail -1 || true)
-        dconf write /org/gnome/desktop/interface/monospace-font-name "'$family ''${size:-10}'" || true
-
-        # Everything else that asks for "monospace".
-        mkdir -p "$cfg/fontconfig/conf.d"
-        cat >"$cfg/fontconfig/conf.d/60-font-picker.conf" <<EOF
-      <?xml version="1.0"?>
-      <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
-      <!-- Written by the font command. -->
-      <fontconfig>
-        <alias><family>monospace</family><prefer><family>$family</family></prefer></alias>
-      </fontconfig>
-      EOF
+        export FONT_FAMILY="$family" FONT_NAME="$1" CFG_DIR="$cfg"
+        ${fontHooks}
 
         mkdir -p "''${state%/*}"
         echo "$1" >"$state"
@@ -116,5 +99,64 @@ let
   };
 in
 {
-  home.packages = [ font ];
+  options.gav.hooks.onFontChange = lib.mkOption {
+    description = "Shell hooks run when `font` switches (FONT_FAMILY, FONT_NAME, CFG_DIR).";
+    type = lib.types.attrsOf lib.types.lines;
+    default = { };
+  };
+
+  config = {
+    gav.hooks.onFontChange = {
+      # Ghostty includes ~/.config/ghostty/font; SIGUSR2 reloads open windows.
+      ghostty = ''
+        mkdir -p "$CFG_DIR/ghostty"
+        printf 'font-family = %s\n' "$FONT_FAMILY" >"$CFG_DIR/ghostty/font"
+        pkill -USR2 -f '^ghostty( |$)' || true
+      '';
+
+      noctalia = ''
+        noctalia msg config-set shell.font_family "'$FONT_FAMILY'" >/dev/null
+      '';
+
+      # Update buffer_font_family in Zed's JSONC without disturbing comments.
+      zed = ''
+        zed="$CFG_DIR/zed/settings.json"
+        if [ -w "$zed" ]; then
+          python3 -I - "$zed" "$FONT_FAMILY" <<'PY'
+import json, re, sys
+path, fam = sys.argv[1], sys.argv[2]
+txt = open(path).read()
+val = json.dumps(fam)
+if re.search(r'"buffer_font_family"\s*:', txt):
+    out = re.sub(r'("buffer_font_family"\s*:\s*)"(?:\\.|[^"\\])*"', rf'\1{val}', txt, count=1)
+else:
+    out = re.sub(r'^([ \t]*"buffer_font_size"[^\n]*)$', rf'\1\n  "buffer_font_family": {val},', txt, count=1, flags=re.M)
+if out != txt:
+    open(path, "w").write(out)
+PY
+        fi
+      '';
+
+      # GTK apps' monospace font, keeping the size.
+      gtk = ''
+        size=$(dconf read /org/gnome/desktop/interface/monospace-font-name | grep -oE '[0-9.]+' | tail -1 || true)
+        dconf write /org/gnome/desktop/interface/monospace-font-name "'$FONT_FAMILY ''${size:-10}'" || true
+      '';
+
+      # Everything else that asks for "monospace".
+      fontconfig = ''
+        mkdir -p "$CFG_DIR/fontconfig/conf.d"
+        cat >"$CFG_DIR/fontconfig/conf.d/60-font-picker.conf" <<EOF
+        <?xml version="1.0"?>
+        <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+        <!-- Written by the font command. -->
+        <fontconfig>
+          <alias><family>monospace</family><prefer><family>$FONT_FAMILY</family></prefer></alias>
+        </fontconfig>
+        EOF
+      '';
+    };
+
+    home.packages = [ font ];
+  };
 }

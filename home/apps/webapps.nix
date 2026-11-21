@@ -1,10 +1,16 @@
 # Web apps: sites in their own window with no tabs or URL bar, each with a
 # launcher entry. Add one from System menu → Setup → Add web app (saves it to
 # webapps.json, then apply), or copy a site block below with a new ID (ULID).
-{ lib, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   profile = ".local/share/firefoxpwa/profiles/01M5K68BBWCK8J79CEY7C3DDT9";
+  addons = (inputs.firefox-addons.overlays.default pkgs pkgs).firefox-addons;
 
   # Sites added from the menu.
   added = lib.listToAttrs (
@@ -65,32 +71,25 @@ let
   };
 
   # --- Extensions ---
-  # Fixed versions from addons.mozilla.org; bump the url and hash to update.
-  extensions = {
-    "sponsorBlocker@ajay.app" = {
-      url = "https://addons.mozilla.org/firefox/downloads/file/4897574/sponsorblock-6.1.7.xpi";
-      sha256 = "0d50e1632c6f15ee15a543e670e1c572974605a5c02622916e08e026803df83f";
-    };
-    "enhancerforyoutube@maximerf.addons.mozilla.org" = {
-      url = "https://addons.mozilla.org/firefox/downloads/file/4933627/enhancer_for_youtube-2.0.136.xpi";
-      sha256 = "38a0420804d08224fc44e838aec432e947eb688b1300f423eeecbb44d33037fa";
-    };
-    "addon@darkreader.org" = {
-      url = "https://addons.mozilla.org/firefox/downloads/file/5055786/darkreader-4.9.133.xpi";
-      sha256 = "eb06c5096d761616c7f1d954c11524ca4bff4fe7229044dc1fce288a8c0853ab";
-    };
+  # Pulled from the firefox-addons flake input; bumped by `update`.
+  extensions = [
+    addons.sponsorblock
+    addons.enhancer-for-youtube
+    addons.darkreader
     # Window colors follow the theme live (host set up in zen.nix).
-    "pywalfox@frewacom.org" = {
-      url = "https://addons.mozilla.org/firefox/downloads/file/4834767/pywalfox-2.1.1.xpi";
-      sha256 = "b7a7a86d1d49a8309758ce1d38492975abe07a61e3788e2d913c70a4d07758b4";
-    };
-  };
+    addons.pywalfox
+  ];
 in
 {
   home.file =
-    lib.mapAttrs' (
-      id: src: lib.nameValuePair "${profile}/extensions/${id}.xpi" { source = pkgs.fetchurl src; }
-    ) extensions
+    builtins.listToAttrs (
+      map (
+        pkg:
+        lib.nameValuePair "${profile}/extensions/${pkg.addonId}.xpi" {
+          source = "${pkg}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/${pkg.addonId}.xpi";
+        }
+      ) extensions
+    )
     // {
       # YouTube page colors follow the theme live; see page-colors/.
       "${profile}/extensions/page-colors@gavos.xpi".source = pkgs.callPackage ./page-colors { };

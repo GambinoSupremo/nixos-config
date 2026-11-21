@@ -40,6 +40,12 @@
 
     # Personal settings kept out of this public repo.
     private.url = "git+ssh://git@github.com/GambinoSupremo/nixos-private";
+
+    # Firefox extensions for web apps, updated with `update`.
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # --- What gets built ---
@@ -85,6 +91,62 @@
     in
     {
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
+
+      checks.x86_64-linux =
+        let
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          lib = nixpkgs.lib;
+          themes = import ./home/theming/theme-list.nix;
+          palettes = builtins.attrNames (builtins.readDir ./home/theming/palettes);
+          entries = import ./home/desktop/menu-entries.nix;
+          parentOf = id: lib.concatStringsSep "." (lib.init (lib.splitString "." id));
+          entryIds = map (e: e.id) entries;
+          themeNames = map (t: t.name) themes;
+        in
+        {
+          json-valid = pkgs.runCommand "check-json-valid" { nativeBuildInputs = [ pkgs.jq ]; } ''
+            jq empty ${./home/apps/webapps.json}
+            for f in ${./home/theming/palettes}/*.json; do
+              jq empty "$f"
+            done
+            touch $out
+          '';
+
+          themes-valid =
+            let
+              dupNames = builtins.length themeNames != builtins.length (lib.unique themeNames);
+              missingPalettes = map (t: t.palette) (
+                builtins.filter (
+                  t: t.source == "custom" && !(builtins.elem "${t.palette}.json" palettes)
+                ) themes
+              );
+              badModes = map (t: t.name) (
+                builtins.filter (t: !(builtins.elem t.mode [ "dark" "light" ])) themes
+              );
+            in
+            assert !dupNames;
+            assert missingPalettes == [ ];
+            assert badModes == [ ];
+            pkgs.runCommand "check-themes-valid" { } "touch $out";
+
+          menu-valid =
+            let
+              dupIds = builtins.length entryIds != builtins.length (lib.unique entryIds);
+              missingParents = builtins.filter (
+                p: p != "" && !(builtins.elem p entryIds)
+              ) (map (e: parentOf e.id) entries);
+              hasChildren = id: lib.any (e: parentOf e.id == id) entries;
+              deadLeaves = map (e: e.id) (
+                builtins.filter (
+                  e: !(hasChildren e.id) && (e.run or null) == null && (e.list or null) == null
+                ) entries
+              );
+            in
+            assert !dupIds;
+            assert missingParents == [ ];
+            assert deadLeaves == [ ];
+            pkgs.runCommand "check-menu-valid" { } "touch $out";
+        };
 
       nixosConfigurations = {
 
