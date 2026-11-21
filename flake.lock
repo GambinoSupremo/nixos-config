@@ -195,10 +195,10 @@
     "wallpapers": {
       "flake": false,
       "locked": {
-        "lastModified": 1795146801,
-        "narHash": "sha256-q0Rrq4TCQVKR1S0WtQ9SV5FxQoq5h0SKpYlYErT67r4=",
+        "lastModified": 1795224572,
+        "narHash": "sha256-YQLHTTRQdu2mr0aGnmRjgzgi2OcXaBynjzclWOXzXy8=",
         "ref": "refs/heads/main",
-        "rev": "e3eaa0ab57d115a43ea53c3e6b31ac4226259e90",
+        "rev": "54c3f7e4ada68fca9b821d7e1d0af5a615a2ddbc",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/GambinoSupremo/wallpapers"
