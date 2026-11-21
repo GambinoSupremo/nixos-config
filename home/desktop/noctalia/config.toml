@@ -307,7 +307,9 @@ show_temperature = false
 
 [widget.workspaces]
 label_source = "name"
-style = "minimal"
+style = "regular"
+active_pill_size = 2.2
+inactive_pill_size = 1.2
 hide_when_empty = false
 separator = " "
 focused_color = "primary"
