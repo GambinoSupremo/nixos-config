@@ -28,6 +28,7 @@ in
       default = [
         "gav/sysmenu"
         "gav/status"
+        "omerfuyar/overview"
       ];
     };
     templates.builtin = lib.mkOption {

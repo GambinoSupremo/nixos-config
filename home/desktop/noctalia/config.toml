@@ -318,4 +318,4 @@ empty_color = "on_surface_variant"
 
 # System menu icons and on-only status icons (home/desktop/noctalia/plugins).
 [plugins]
-enabled = ["gav/sysmenu", "gav/status"]
+enabled = ["gav/sysmenu", "gav/status", "omerfuyar/overview"]

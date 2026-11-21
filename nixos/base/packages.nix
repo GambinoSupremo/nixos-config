@@ -107,6 +107,10 @@ in
     # Spotify: home/apps/spotify.nix (themed copy)
     soneFreshMixes # TIDAL
 
+    # --- Creative / Game dev ---
+    blender
+    godot
+
     # --- Gaming ---
     protonplus
     heroic # Epic, GOG and Amazon games

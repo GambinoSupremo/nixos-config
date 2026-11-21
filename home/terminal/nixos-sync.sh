@@ -125,7 +125,8 @@ nh_switch() {
   section "Changes"
   show_diff
   section "Activating"
-  live nh os switch "$new_system" --no-nom --diff never -q && return
+  sudo -v || return 1
+  quiet nh os switch "$new_system" --no-rom --diff never -q && return
   # A unit failing during activation still leaves the new system live.
   [[ "$(readlink -f /run/current-system)" != "$new_system" ]] || return 2
   return 1
