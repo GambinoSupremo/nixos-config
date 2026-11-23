@@ -25,6 +25,7 @@
 
     # apps/ - browser, web apps, default apps
     ./apps/zen.nix # Zen browser, search, privacy
+    ./apps/ladybird.nix # Ladybird with the same search + privacy as Zen
     ./apps/webapps.nix # sites in their own window
     ./apps/programs.nix # what opens what, OBS, screenshots
     ./apps/spotify.nix # Spotify with Noctalia's colors
