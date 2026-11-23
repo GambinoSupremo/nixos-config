@@ -109,8 +109,9 @@ in
     soneFreshMixes # TIDAL
 
     # --- Creative / Game dev ---
-    blender
     godot
+    pixelorama
+    libresprite
 
     # --- Gaming ---
     protonplus
