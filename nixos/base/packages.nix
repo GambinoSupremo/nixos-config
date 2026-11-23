@@ -98,6 +98,7 @@ in
     qbittorrent
     matugen # colors from the wallpaper
     firefox
+    ladybird # independent browser engine (pre-alpha)
     protonmail-desktop
     pinta # simple image editor
     libreoffice
