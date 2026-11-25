@@ -44,6 +44,7 @@ in
     # --- Dev tools ---
     git
     github-cli
+    github-desktop
     nil # Nix language server for Neovim
     nixd # Nix language server for Zed (NixOS + Home Manager option docs)
     jq
